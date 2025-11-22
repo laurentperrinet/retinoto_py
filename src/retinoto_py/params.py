@@ -17,17 +17,20 @@ class Params:
     n_train_stop: int = 0 # set to zero to use all images
     seed: int = 1998 # Set the seed for reproducibility 
     batch_size: int = 64 # Set number of images per input batch
+    num_workers:int = 4
+
 
     # interpolation = T.InterpolationMode.BILINEAR
     # padding_mode = "border"
 
-    model_name: str = 'resnet50' # Name of the model to use
+    model_name: str = 'resnet18' # Name of the model to use
     do_scratch: bool = False # Whether to train from scratch (True) or use pretrained weights (False)
 
-    batch_size = 50 # Set the batch size for training and validation
     batch_size = 250 # Set the batch size for training and validation
+    batch_size = 64 # Set the batch size for training and validation
+    # label_smoothing: float = 0. # See https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html
+
     shuffle: bool = True # Whether to shuffle the data during training
-    num_workers = 2
     data_cache = Path('cached_data')
     data_cache.mkdir(exist_ok=True)
     figures_folder = Path('figures')
