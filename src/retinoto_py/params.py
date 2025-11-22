@@ -12,6 +12,7 @@ class Params:
     DATAROOT = Path.home() / 'data'
 
     image_size: int = 224 # base resolution of the image (224, 224)
+    do_mask: bool = False # Whether apply a circular mask to the image
     num_epochs: int = 5 # 
     n_train_stop: int = 0 # set to zero to use all images
     seed: int = 1998 # Set the seed for reproducibility 
