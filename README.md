@@ -1,9 +1,9 @@
-# Foveated Retinotopy
+# Foveated Retinotopy: Giving a biological look to deep learning convolutional networks.
+
 
 ![PyPI version](https://img.shields.io/pypi/v/retinoto_py.svg)
 [![Documentation Status](https://readthedocs.org/projects/retinoto_py/badge/?version=latest)](https://retinoto_py.readthedocs.io/en/latest/?version=latest)
 
-Giving a biological eye to deep learning convolutional networks.
 
 * PyPI package: https://pypi.org/project/retinoto_py/
 * Free software: MIT License
@@ -11,7 +11,7 @@ Giving a biological eye to deep learning convolutional networks.
 
 ## Features
 
-* TODO
+* TODO : use ecoset
 
 ## Credits
 
