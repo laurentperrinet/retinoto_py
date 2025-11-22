@@ -1,0 +1,30 @@
+# https://pip.pypa.io/en/stable/user_guide/#requirements-files
+# use it to install (and update) dependencies with
+# `pip install -U -r requirements.txt`
+pip
+matplotlib
+opencv-python
+numpy
+numexpr
+imageio
+nltk
+torch
+torchvision
+ipykernel
+ipywidgets
+jupyter
+notebook
+nbconvert
+lmfit
+pandas
+pyarrow
+scipy
+scikit-learn
+seaborn
+optuna
+optuna-dashboard
+watermark
+moviepy
+imageio
+imageio-ffmpeg
+tqdm
