@@ -96,3 +96,41 @@ class Params:
     if verbose: 
         print('Welcome on', platform.platform(), end='\t')
         print(f'User {USER} Working on host {HOST} with device {device}, pytorch=={torch.__version__}')
+
+
+#############################################################
+#############################################################
+
+from torchvision import datasets
+
+import torchvision.transforms as transforms
+
+def get_loader(args, DATA_DIR):
+    # --- 5. Define Image Pre-processing ---
+    # The images must be pre-processed in the exact same way the model was trained on.
+    # This includes resizing, cropping, and normalizing.
+    preprocess = transforms.Compose([
+        transforms.Resize(256),                # Resize the shortest side to 256px
+        transforms.CenterCrop(224),            # Crop the center 224x224 pixels
+        transforms.ToTensor(),                 # Convert the image to a PyTorch Tensor
+        transforms.Normalize(                  # Normalize with ImageNet mean and std
+            mean=[0.485, 0.456, 0.406],
+            std=[0.229, 0.224, 0.225]
+        )
+    ])
+    # --- 2. Create Dataset and DataLoader using ImageFolder ---
+    # ImageFolder automatically infers class names from directory names
+    # and maps them to integer indices.
+    val_dataset = datasets.ImageFolder(root=DATA_DIR, transform=preprocess)
+
+    # The dataset provides a mapping from class index to class name (folder name)
+    class_to_idx = val_dataset.class_to_idx
+    # We often want the inverse mapping for printing results
+    idx_to_class = {v: k for k, v in class_to_idx.items()}
+
+    # The DataLoader handles batching, shuffling (for training), and loading data efficiently.
+    # For evaluation, we don't need to shuffle.
+    # A batch size of 1 is simplest for per-image analysis, but you can use larger batches.
+    val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=1, shuffle=False)
+
+    return val_loader, class_to_idx, idx_to_class
