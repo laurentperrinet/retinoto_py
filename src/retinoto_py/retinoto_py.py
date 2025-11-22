@@ -104,3 +104,103 @@ def get_validation_accuracy(args, model, val_loader):
 
     accuracy = correct_predictions / total_predictions
     return accuracy
+
+import time
+import pandas as pd
+def train_model(args, model, train_loader, val_loader, df_train=None, each_steps:int=64, 
+                verbose:bool=True, do_save:bool=True, model_filename='resnet.pth'):
+    
+    # retraining the full model
+    for param in model.parameters():
+        param.requires_grad = True        
+
+
+    # sets the optimizer
+    if args.delta2 > 0.: 
+        optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, betas=(1-args.delta1, 1-args.delta2), weight_decay=args.weight_decay) 
+    else:
+        optimizer = torch.optim.SGD(model.parameters(), lr=args.lr, momentum=1-args.delta1, weight_decay=args.weight_decay) # to set training variables
+    
+    # https://pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html 
+    criterion = torch.nn.CrossEntropyLoss()
+
+    # the DataFrame to record from
+    if df_train is None:
+        i_epoch_start = 0
+        df_train = pd.DataFrame([], columns=['epoch', 'i_image', 'total_image', 'avg_loss', 'avg_acc', 'avg_loss_val', 'avg_acc_val', 'time']) 
+        if verbose: print(f"Starting learning...")
+    else:
+        i_epoch_start = df_train['epoch'].max() + 1
+        if verbose: print(f"Starting from epoch {i_epoch_start} with {len(df_train)} records")
+        # # reset the index
+        # df_train.reset_index(drop=True, inplace=True)
+        # make a copy of the DataFrame to avoid modifying the original one
+        df_train = df_train.copy()
+
+    since = time.time()
+    total_image = 0
+    n_train = len(train_loader.dataset)
+    n_train_stop = args.n_train_stop
+    if n_train_stop==0: n_train_stop = n_train
+
+    avg_loss_ = avg_acc_ = []
+    for i_epoch in range(i_epoch_start, args.num_epochs):
+        i_image = 0
+        for i_step, (images, labels) in enumerate(train_loader):
+            images, labels = images.to(args.device), labels.to(args.device)
+            total_image += len(images)
+            i_image += len(images)
+            if i_image > n_train_stop: break # early stopping
+
+            # https://pytorch.org/tutorials/recipes/recipes/tuning_guide.html#use-parameter-grad-none-instead-of-model-zero-grad-or-optimizer-zero-grad
+            optimizer.zero_grad(set_to_none=True)
+            # for param in model.parameters():
+            #     param.grad = None
+
+            outputs = model(images)
+             
+            loss = criterion(outputs, labels)
+            loss.backward()
+            optimizer.step()
+
+            _, preds = torch.max(outputs.data, dim=1)
+
+            avg_loss_.append(loss.item() * images.size(0))
+            avg_acc_.append(torch.mean((preds == labels.data)*1.).cpu().item()) # append average accuracy in the last batch
+
+            if (i_step % (max(n_train_stop//args.batch_size//each_steps, 1))==0) : #or (i_step == n_train_stop-1):
+                with torch.no_grad():
+
+                    avg_loss = np.mean(avg_loss_)
+                    avg_acc = np.mean(avg_acc_)
+
+                    loss_val = 0
+                    acc_val = 0
+                    model = model.eval()
+                    n_val = len(val_loader)
+                    for _, (images, labels) in enumerate(val_loader):
+                        images, labels = images.to(args.device), labels.to(args.device)
+
+                        outputs = model(images)
+
+                        loss = criterion(outputs, labels)
+
+                        loss_val += loss.item() * images.size(0)
+
+                        _, preds = torch.max(outputs.data, dim=1)
+                        acc_val += torch.mean((preds == labels.data)*1.).cpu().item()
+
+                    avg_loss_val = loss_val / n_val
+                    avg_acc_val = acc_val / n_val
+
+                    df_train.loc[len(df_train)] = {'epoch': i_epoch, 'i_image':i_image, 'total_image':total_image, 'avg_loss':avg_loss, 'avg_acc':avg_acc, 'avg_loss_val':avg_loss_val, 'avg_acc_val':avg_acc_val, 'time':time.time() - since}
+                    if verbose:  print(f"{model_filename} - Epoch {i_epoch}, i_image {i_image} : train= loss: {avg_loss:.4f} / acc : {avg_acc:.4f} - val= loss : {avg_loss_val:.4f} / acc : {avg_acc_val:.4f} / time:{time.time() - since:.1f}")
+                avg_loss_ = avg_acc_ = []
+
+        if do_save:
+            if verbose:  print(f"Saving...{model_filename}")
+            torch.save(model.state_dict(), model_filename)
+            df_train.to_json(model_filename.replace('pth', 'json'), orient='index', indent=2)
+
+
+    return model, df_train
