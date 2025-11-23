@@ -3,7 +3,7 @@
 __author__ = """Laurent U Perrinet"""
 __email__ = 'laurent.perrinet@cnrs.fr'
 
-all_models = ['resnet18', 'resnet50', 'resnet101'] 
+all_model_names = ['resnet18', 'resnet50', 'resnet101'] 
 all_datasets = ['full', 'bbox']
 
 #####################################################
@@ -70,7 +70,7 @@ import seaborn as sns
 # https://seaborn.pydata.org/generated/seaborn.set_theme.html
 # https://seaborn.pydata.org/tutorial/color_palettes.html
 sns.set_theme(style="whitegrid")
-sns.despine(offset=10, trim=True);
+# sns.despine(offset=10, trim=True);
 # sns.set_context("talk")
 sns.set_context("notebook", font_scale=1.5, rc={"lines.linewidth": 2.5})
 #############################################################
