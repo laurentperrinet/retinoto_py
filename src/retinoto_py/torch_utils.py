@@ -2,12 +2,14 @@
 
 #############################################################
 #############################################################
+
+import matplotlib.pyplot as plt
+import matplotlib
+import torchvision
 import torch
 import numpy as np
 import torchvision.transforms as T
-
 from torchvision import datasets
-
 import torchvision.transforms as transforms
 
 def get_idx_to_label(args):
@@ -114,9 +116,6 @@ def count_layers(model, layer_type=None):
         return sum(1 for module in model.modules() if isinstance(module, layer_type))
 
 #############################################################
-import matplotlib.pyplot as plt
-import matplotlib
-import torchvision
 
 def imgs_to_np(img_list, im_mean:np.array=im_mean, im_std:np.array=im_std):
     images = torchvision.utils.make_grid(img_list, nrow=11)
