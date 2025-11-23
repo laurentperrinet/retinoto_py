@@ -22,7 +22,7 @@ class Params:
     # interpolation = T.InterpolationMode.BILINEAR
     # padding_mode = "border"
 
-    model_name: str = 'resnet18' # Name of the model to use
+    model_name: str = 'resnet50' # Name of the model to use
     do_scratch: bool = False # Whether to train from scratch (True) or use pretrained weights (False)
 
     batch_size = 250 # Set the batch size for training and validation
