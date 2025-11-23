@@ -14,6 +14,7 @@ from .torch_utils import load_model, count_parameters, count_layers
 from .retinoto_py import get_validation_accuracy, train_model
 #############################################################
 # Importing libraries
+from tqdm.auto import tqdm
 
 import time
 import numpy as np
@@ -66,4 +67,11 @@ opts_savefig = dict(
     edgecolor=None
 )
 import seaborn as sns
-sns.set_theme(style="whitegrid", font_scale=1.1)
+# https://seaborn.pydata.org/generated/seaborn.set_theme.html
+# https://seaborn.pydata.org/tutorial/color_palettes.html
+sns.set_theme(style="whitegrid")
+sns.despine(offset=10, trim=True);
+# sns.set_context("talk")
+sns.set_context("notebook", font_scale=1.5, rc={"lines.linewidth": 2.5})
+#############################################################
+

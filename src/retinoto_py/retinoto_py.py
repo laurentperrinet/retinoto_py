@@ -76,7 +76,6 @@ def get_preprocess(args, angle_min=None, angle_max=None):
     preprocess = transforms.Compose(transform_list)
     return preprocess
     
-from tqdm.auto import tqdm
 def get_validation_accuracy(args, model, val_loader, desc=None):
     if desc is None:
         desc = f"Evaluating {args.model_name}"
