@@ -28,11 +28,11 @@ class Params:
     batch_size = 250 # Set the batch size for training and validation
     batch_size = 64 # Set the batch size for training and validation
 
-    num_epochs: int = 10
-    lr: float = 0.02
-    delta1: float = 0.1
+    num_epochs: int = 1
+    lr: float = 0.0
+    delta1: float = 0.05
     delta2: float = 0.001
-    weight_decay: float = 0.001
+    weight_decay: float = 0.0
     # label_smoothing: float = 0. # See https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html
 
     shuffle: bool = True # Whether to shuffle the data during training
