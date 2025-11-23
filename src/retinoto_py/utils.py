@@ -59,7 +59,8 @@ def print_gpu_memory():
             print(f"{var_name}: {var.element_size() * var.nelement() / 1024**2:.2f} MB", end='\t')
 
 
-def savefig(fig, name:str, exts:list=['pdf', 'png'], dpi='figure', figures_folder:str='figures'):
+def savefig(fig, name:str, exts:list=['pdf', 'png'], figures_folder:str='figures'):
+    from retinoto_py import opts_savefig
     for ext in exts: 
-        fig.savefig(figures_folder / f'{name}.{ext}', dpi=dpi, bbox_inches='tight', pad_inches=0, edgecolor=None)
+        fig.savefig(figures_folder / f'{name}.{ext}', **opts_savefig)
 
