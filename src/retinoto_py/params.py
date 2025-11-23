@@ -29,7 +29,7 @@ class Params:
     batch_size = 64 # Set the batch size for training and validation
 
     num_epochs: int = 1
-    lr: float = 0.0
+    lr: float = 1.e-4
     delta1: float = 0.05
     delta2: float = 0.001
     weight_decay: float = 0.0
