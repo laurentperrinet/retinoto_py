@@ -19,7 +19,6 @@ class Params:
     batch_size: int = 64 # Set number of images per input batch
     num_workers:int = 4
 
-
     # interpolation = T.InterpolationMode.BILINEAR
     # padding_mode = "border"
 

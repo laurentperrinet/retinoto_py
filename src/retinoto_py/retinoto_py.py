@@ -77,13 +77,16 @@ def get_preprocess(args, angle_min=None, angle_max=None):
     return preprocess
     
 from tqdm.auto import tqdm
-def get_validation_accuracy(args, model, val_loader):
+def get_validation_accuracy(args, model, val_loader, desc=None):
+    if desc is None:
+        desc = f"Evaluating {args.model_name}"
+
     model.eval()
 
     correct_predictions = 0
     total_predictions = 0
 
-    for images, true_labels in tqdm(val_loader, desc=f"Evaluating {args.model_name}"):
+    for images, true_labels in tqdm(val_loader, desc=desc):
         images = images.to(args.device)
         true_labels = true_labels.to(args.device)
 
