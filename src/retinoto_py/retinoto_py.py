@@ -61,6 +61,7 @@ def get_preprocess(args, angle_min=None, angle_max=None):
         transform_list.append(transforms.RandomRotation(degrees=(angle_min, angle_max)))
     
     transform_list.append(transforms.ToTensor())  # Convert the image to a PyTorch Tensor
+    transform_list.append(transforms.RandomHorizontalFlip())
 
     if args.do_mask:
         # Créer le masque une seule fois avec la taille de l'image
@@ -122,7 +123,7 @@ def train_model(args, model, train_loader, val_loader, df_train=None, each_steps
         optimizer = torch.optim.SGD(model.parameters(), lr=args.lr, momentum=1-args.delta1, weight_decay=args.weight_decay) # to set training variables
     
     # https://pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html 
-    criterion = torch.nn.CrossEntropyLoss()
+    criterion = torch.nn.CrossEntropyLoss(reduction='mean')
 
     # the DataFrame to record from
     if df_train is None:
@@ -178,14 +179,11 @@ def train_model(args, model, train_loader, val_loader, df_train=None, each_steps
                     acc_val = 0
                     model = model.eval()
                     n_val = len(val_loader)
-                    for _, (images, labels) in enumerate(val_loader):
+                    for images, labels in val_loader:
                         images, labels = images.to(args.device), labels.to(args.device)
-
                         outputs = model(images)
-
                         loss = criterion(outputs, labels)
-
-                        loss_val += loss.item() * images.size(0)
+                        loss_val += loss.item()
 
                         _, preds = torch.max(outputs.data, dim=1)
                         acc_val += torch.mean((preds == labels.data)*1.).cpu().item()
