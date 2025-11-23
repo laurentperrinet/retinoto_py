@@ -3,7 +3,8 @@ import pytest
 
 """Tests for `retinoto_py` package."""
 
-# from retinoto_py import retinoto_py
+from retinoto_py import get_preprocess
+from retinoto_py import Params, get_idx_to_label
 
 
 @pytest.fixture
@@ -14,9 +15,16 @@ def response():
     """
     # import requests
     # return requests.get('https://github.com/audreyfeldroy/cookiecutter-pypackage')
+    args = Params()
+    preprocess = get_preprocess(args)
+
+
+
 
 
 def test_content(response):
     """Sample pytest test function with the pytest fixture as an argument."""
-    # from bs4 import BeautifulSoup
-    # assert 'GitHub' in BeautifulSoup(response.content).title.string
+
+    args = Params()
+    idx_to_label = get_idx_to_label(args)
+    assert idx_to_label[0] == 'tench'
