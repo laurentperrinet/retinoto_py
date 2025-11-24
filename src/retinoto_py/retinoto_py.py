@@ -106,7 +106,8 @@ def get_validation_accuracy(args, model, val_loader, desc=None):
 import time
 import pandas as pd
 def train_model(args, model, train_loader, val_loader, df_train=None, each_steps=64, 
-                verbose:bool=True, do_save:bool=True, model_filename='resnet.pth'):
+                verbose:bool=True, do_save:bool=True, 
+                model_filename='resnet.pth', json_filename='resnet.json'):
     
     model = model.to(args.device)
     # retraining the full model
@@ -116,6 +117,7 @@ def train_model(args, model, train_loader, val_loader, df_train=None, each_steps
     n_train = len(train_loader.dataset)
     n_train_stop = args.n_train_stop
     if n_train_stop==0: n_train_stop = n_train
+    # number of batches to process to make `each_step` steps in one epoch
     n_step = max(n_train_stop//args.batch_size//each_steps, 1)
 
     # sets the optimizer
@@ -149,7 +151,7 @@ def train_model(args, model, train_loader, val_loader, df_train=None, each_steps
         running_loss = 0.0
         running_corrects = 0
         i_image = 0
-        for i_step, (images, true_labels) in enumerate(train_loader):
+        for images, true_labels in fovea.tqdm(train_loader, desc=f'epoch={i_epoch+1}/{args.num_epochs}'):
 
 
             model.train()
@@ -174,35 +176,33 @@ def train_model(args, model, train_loader, val_loader, df_train=None, each_steps
             optimizer.step()
 
 
-            if (i_step % n_step==0) or (i_step == n_train_stop-1):
-                model.eval()  # Set model to evaluation mode
+        model.eval()  # Set model to evaluation mode
+        running_loss_val = 0.0
+        running_corrects_val = 0
 
-                running_loss_val = 0.0
-                running_corrects_val = 0
+        with torch.no_grad():
+            for images, true_labels in val_loader:
+                images, true_labels = images.to(args.device), true_labels.to(args.device)
+                outputs = model(images)
+                _, predicted_labels = torch.max(outputs, dim=1)
+                running_corrects_val += (predicted_labels == true_labels).sum().item()
 
-                with torch.no_grad():
-                    for images, true_labels in val_loader:
-                        images, true_labels = images.to(args.device), true_labels.to(args.device)
-                        outputs = model(images)
-                        _, predicted_labels = torch.max(outputs, dim=1)
-                        running_corrects_val += (predicted_labels == true_labels).sum().item()
+                loss = criterion(outputs, true_labels)
+                running_loss_val += loss.item() * images.size(0)
+                
+        loss_val = running_loss_val / len(val_loader.dataset)
+        acc_val = running_corrects_val / len(val_loader.dataset)
 
-                        loss = criterion(outputs, true_labels)
-                        running_loss_val += loss.item() * images.size(0)
-                        
-                loss_val = running_loss_val / len(val_loader.dataset)
-                acc_val = running_corrects_val / len(val_loader.dataset)
+        loss_train = running_loss / i_image
+        acc_train = running_corrects*1. / i_image
+        history.append({'epoch': i_epoch, 'i_image':i_image, 'total_image':total_image, 'loss_train':loss_train, 'acc_train':acc_train, 'loss_val':loss_val, 'acc_val':acc_val, 'time':time.time() - since})
+        if verbose:  print(f"{model_filename} \t| Epoch {i_epoch}, i_image {i_image} \t| train= loss: {loss_train:.4f} \t| acc : {acc_train:.4f} - val= loss : {loss_val:.4f} \t| acc : {acc_val:.4f} \t| time:{time.time() - since:.1f}")
 
-                loss_train = running_loss / i_image
-                acc_train = running_corrects*1. / i_image
-                history.append({'epoch': i_epoch, 'i_image':i_image, 'total_image':total_image, 'loss_train':loss_train, 'acc_train':acc_train, 'loss_val':loss_val, 'acc_val':acc_val, 'time':time.time() - since})
-                if verbose:  print(f"{model_filename} - Epoch {i_epoch}, i_image {i_image} : train= loss: {loss_train:.4f} / acc : {acc_train:.4f} - val= loss : {loss_val:.4f} / acc : {acc_val:.4f} / time:{time.time() - since:.1f}")
-
-        df_train = pd.DataFrame(history)
-        if do_save:
-            if verbose:  print(f"Saving...{model_filename}")
-            torch.save(model.state_dict(), model_filename)
-            df_train.to_json(model_filename.replace('pth', 'json'), orient='index', indent=2)
+    df_train = pd.DataFrame(history)
+    if do_save:
+        if verbose:  print(f"Saving...{model_filename}")
+        torch.save(model.state_dict(), model_filename)
+        df_train.to_json(model_filename.replace('pth', 'json'), orient='index', indent=2)
 
 
     return model, df_train

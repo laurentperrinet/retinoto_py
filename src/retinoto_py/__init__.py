@@ -63,11 +63,6 @@ plt.rcParams.update({
     'figure.subplot.wspace': 0.05,
     'figure.subplot.hspace': 0.05,
 })
-opts_savefig = dict(
-    bbox_inches='tight',
-    pad_inches=0.1,
-    edgecolor=None
-)
 import seaborn as sns
 # https://seaborn.pydata.org/generated/seaborn.set_theme.html
 # https://seaborn.pydata.org/tutorial/color_palettes.html

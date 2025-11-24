@@ -59,7 +59,7 @@ def print_gpu_memory():
             print(f"{var_name}: {var.element_size() * var.nelement() / 1024**2:.2f} MB", end='\t')
 
 
-def savefig(fig, name:str, exts:list=['pdf', 'png'], figures_folder=Path('figures')):
+def savefig(fig, name:str, exts:list=['pdf', 'png'], figures_folder=Path('figures'), opts_savefig = dict(    bbox_inches='tight', pad_inches=0.1, edgecolor=None)):
     for ext in exts: 
-        fig.savefig(figures_folder / f'{name}.{ext}')
+        fig.savefig(figures_folder / f'{name}.{ext}', **opts_savefig)
 
