@@ -108,7 +108,7 @@ import pandas as pd
 from tqdm.auto import tqdm
 
 def train_model(args, model, train_loader, val_loader, df_train=None, each_steps=64, 
-                verbose:bool=True, do_save:bool=True, 
+                verbose:ol=True, do_save=True, 
                 model_filename='resnet.pth', json_filename='resnet.json'):
     
     model = model.to(args.device)
@@ -153,7 +153,7 @@ def train_model(args, model, train_loader, val_loader, df_train=None, each_steps
         running_loss = 0.0
         running_corrects = 0
         i_image = 0
-        for images, true_labels in tqdm(train_loader, desc=f'epoch={i_epoch+1}/{args.num_epochs}', max_value=n_train_stop):
+        for images, true_labels in tqdm(train_loader, desc=f'epoch={i_epoch+1}/{args.num_epochs}', total=n_train_stop):
 
 
             model.train()
