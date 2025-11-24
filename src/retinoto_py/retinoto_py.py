@@ -200,7 +200,8 @@ def train_model(args, model, train_loader, val_loader, df_train=None, each_steps
         history.append({'epoch': i_epoch, 'i_image':i_image, 'total_image':total_image, 'loss_train':loss_train, 'acc_train':acc_train, 'loss_val':loss_val, 'acc_val':acc_val, 'time':time.time() - since})
         if verbose:  print(f"{model_filename} \t| Epoch {i_epoch}, i_image {i_image} \t| train= loss: {loss_train:.4f} \t| acc : {acc_train:.4f} - val= loss : {loss_val:.4f} \t| acc : {acc_val:.4f} \t| time:{time.time() - since:.1f}")
 
-    df_train = pd.DataFrame(history)
+    df_new_row = pd.DataFrame(history)
+    df_train = pd.concat([df_train, df_new_row], ignore_index=True)
     if do_save:
         if verbose:  print(f"Saving...{model_filename}")
         torch.save(model.state_dict(), model_filename)
@@ -240,7 +241,7 @@ def do_learning(args, dataset, name):
 
     if json_filename.exists():
         print(f"Load JSON from pre-trained resnet {json_filename}")
-        df_train = pd.read_json(json_filename, orient='index')
+        df_train = pd.read_json(json_filename, orient='records')
         print(f"{model_filename}: accuracy = {df_train['acc_val'][-5:].mean():.3f}")
         should_resume_training = (df_train['epoch'].max() + 1 < args.num_epochs) and (not lock_filename.exists())
 
