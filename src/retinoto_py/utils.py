@@ -1,6 +1,7 @@
 import torch
 import platform
 from pathlib import Path
+import numpy as np
 
 #############################################################
 
@@ -8,7 +9,7 @@ def get_device(verbose):
 
     if verbose: 
         print('Welcome on', platform.platform(), end='\t')
-        print(f' user {Path.home().owner() if hasattr(Path.home(), 'owner') else Path.home().name}', end='\t')
+        print(f" user {Path.home().owner() if hasattr(Path.home(), 'owner') else Path.home().name}", end='\t')
 
 
     if torch.backends.mps.is_available():
@@ -36,17 +37,16 @@ def get_device(verbose):
 
 # set seed function
 def set_seed(seed=None, seed_torch=True, verbose=False):
-  "Define a random seed or use a predefined seed for repeatability"
-  if seed is None:
-    seed = np.random.choice(2 ** 32)
+    "Define a random seed or use a predefined seed for repeatability"
+    if seed is None:
+        seed = np.random.choice(2 ** 32)
 
-  import numpy as np
-  np.random.seed(seed)
+    np.random.seed(seed)
 
-  if seed_torch:
-    torch.manual_seed(seed)
+    if seed_torch:
+        torch.manual_seed(seed)
 
-  if verbose: print(f'Random seed {seed} has been set.')    
+    if verbose: print(f'Random seed {seed} has been set.')    
 
 def print_gpu_memory():
     print(f"Allocated memory: {torch.cuda.memory_allocated() / 1024**2:.2f} MB", end='\t')
