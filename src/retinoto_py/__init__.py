@@ -13,7 +13,8 @@ from .params import Params
 from .utils import get_device, set_seed, savefig
 from .torch_utils import imshow, get_idx_to_label, get_loader, imgs_to_np
 from .torch_utils import load_model, count_parameters, count_layers
-from .retinoto_py import get_validation_accuracy, train_model, make_mask
+from .retinoto_py import train_model, make_mask, do_learning
+from .retinoto_py import get_validation_accuracy, get_preprocess
 #############################################################
 # Importing libraries
 from tqdm.auto import tqdm

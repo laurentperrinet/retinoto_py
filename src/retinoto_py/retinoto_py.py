@@ -153,7 +153,7 @@ def train_model(args, model, train_loader, val_loader, df_train=None, each_steps
         running_loss = 0.0
         running_corrects = 0
         i_image = 0
-        for images, true_labels in tqdm(train_loader, desc=f'epoch={i_epoch+1}/{args.num_epochs}'):
+        for images, true_labels in tqdm(train_loader, desc=f'epoch={i_epoch+1}/{args.num_epochs}', max_value=n_train_stop):
 
 
             model.train()
@@ -204,7 +204,53 @@ def train_model(args, model, train_loader, val_loader, df_train=None, each_steps
     if do_save:
         if verbose:  print(f"Saving...{model_filename}")
         torch.save(model.state_dict(), model_filename)
-        df_train.to_json(json_filename, orient='index', indent=2)
+        df_train.to_json(json_filename, orient='records', indent=2)
 
 
     return model, df_train
+
+def do_learning(args, dataset, name):
+
+
+    from .torch_utils import get_loader
+    TRAIN_DATA_DIR = args.DATAROOT / f'Imagenet_{dataset}' / 'train'
+    train_loader, class_to_idx, idx_to_class = get_loader(args, TRAIN_DATA_DIR)
+    VAL_DATA_DIR = args.DATAROOT / f'Imagenet_{dataset}' / 'val'
+    val_loader, class_to_idx, idx_to_class = get_loader(args, VAL_DATA_DIR)
+
+    model_filename = args.data_cache / f'{name}.pth'
+    json_filename = args.data_cache / model_filename.name.replace('.pth', '.json')
+    lock_filename = args.data_cache / model_filename.name.replace('.pth', '.lock')
+
+
+    # --- 3. Load the Pre-trained ResNet Model ---
+    from .torch_utils import load_model
+    model = load_model(args)
+    if args.verbose:
+        num_classes = len(val_loader.dataset.classes)
+        num_ftrs = model.fc.out_features
+        print(f'Model has {num_ftrs} output features to final FC layer for {num_classes} classes.')
+
+    def touch(fname): open(fname, 'w').close()
+
+    # %rm {lock_filename}
+
+    df_train = None
+    should_resume_training = not lock_filename.exists()
+
+    if json_filename.exists():
+        print(f"Load JSON from pre-trained resnet {json_filename}")
+        df_train = pd.read_json(json_filename, orient='index')
+        print(f"{model_filename}: accuracy = {df_train['acc_val'][-5:].mean():.3f}")
+        should_resume_training = (df_train['epoch'].max() + 1 < args.num_epochs) and (not lock_filename.exists())
+
+    if should_resume_training:
+        touch(lock_filename) # as we do a training let's lock it
+        # we need to train the model or finish a training that already started
+        print(f"Training model {args.model_name}, file= {model_filename} - image_size={args.image_size}")
+        start_time = time.time()
+        model_retrain, df_train = train_model(args, model=model, train_loader=train_loader, val_loader=val_loader, df_train=df_train, model_filename=model_filename, json_filename=json_filename)
+        elapsed_time = time.time() - start_time
+        print(f"Training completed in {elapsed_time // 60:.0f}m {elapsed_time % 60:.0f}s")
+
+    return model_filename, json_filename
