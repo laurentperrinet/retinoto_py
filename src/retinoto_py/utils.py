@@ -35,18 +35,16 @@ def get_device(verbose):
 
 
 # set seed function
-def set_seed(seed=None, seed_torch:bool=True, verbose:bool=False):
+def set_seed(seed=None, seed_torch=True, verbose=False):
   "Define a random seed or use a predefined seed for repeatability"
-  import numpy as np
   if seed is None:
     seed = np.random.choice(2 ** 32)
+
+  import numpy as np
   np.random.seed(seed)
+
   if seed_torch:
     torch.manual_seed(seed)
-    torch.cuda.manual_seed_all(seed)
-    torch.cuda.manual_seed(seed)
-    torch.backends.cudnn.benchmark = False
-    torch.backends.cudnn.deterministic = True
 
   if verbose: print(f'Random seed {seed} has been set.')    
 
