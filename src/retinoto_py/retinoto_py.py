@@ -107,8 +107,8 @@ import time
 import pandas as pd
 from tqdm.auto import tqdm
 
-def train_model(args, model, train_loader, val_loader, df_train=None, each_steps=64, 
-                verbose:ol=True, do_save=True, 
+def train_model(args, model, train_loader, val_loader, df_train=None, #each_steps=64, 
+                verbose=True, do_save=True, 
                 model_filename='resnet.pth', json_filename='resnet.json'):
     
     model = model.to(args.device)
@@ -116,11 +116,8 @@ def train_model(args, model, train_loader, val_loader, df_train=None, each_steps
     for param in model.parameters():
         param.requires_grad = True        
 
-    n_train = len(train_loader.dataset)
     n_train_stop = args.n_train_stop
-    if n_train_stop==0: n_train_stop = n_train
-    # number of batches to process to make `each_step` steps in one epoch
-    n_step = max(n_train_stop//args.batch_size//each_steps, 1)
+    if n_train_stop==0: n_train_stop = len(train_loader.dataset)
 
     # sets the optimizer
     if args.delta2 > 0.: 
@@ -136,7 +133,6 @@ def train_model(args, model, train_loader, val_loader, df_train=None, each_steps
     # the DataFrame to record from
     if df_train is None:
         i_epoch_start = 0
-        df_train = pd.DataFrame([], columns=['epoch', 'i_image', 'total_image', 'loss_train', 'acc_train', 'loss_val', 'acc_val', 'time']) 
         if verbose: print(f"Starting learning...")
     else:
         i_epoch_start = df_train['epoch'].max() + 1
@@ -153,8 +149,7 @@ def train_model(args, model, train_loader, val_loader, df_train=None, each_steps
         running_loss = 0.0
         running_corrects = 0
         i_image = 0
-        for images, true_labels in tqdm(train_loader, desc=f'epoch={i_epoch+1}/{args.num_epochs}', total=n_train_stop):
-
+        for i_batch, (images, true_labels) in tqdm(enumerate(train_loader), desc=f'epoch={i_epoch+1}/{args.num_epochs}', total=n_train_stop//args.batch_size, leave=True):
 
             model.train()
 
@@ -181,6 +176,9 @@ def train_model(args, model, train_loader, val_loader, df_train=None, each_steps
         model.eval()  # Set model to evaluation mode
         running_loss_val = 0.0
         running_corrects_val = 0
+        i_image = 0
+        n_val_stop = args.n_val_stop
+        if n_val_stop==0: n_val_stop = len(val_loader.dataset)
 
         with torch.no_grad():
             for images, true_labels in val_loader:
@@ -191,17 +189,23 @@ def train_model(args, model, train_loader, val_loader, df_train=None, each_steps
 
                 loss = criterion(outputs, true_labels)
                 running_loss_val += loss.item() * images.size(0)
-                
-        loss_val = running_loss_val / len(val_loader.dataset)
-        acc_val = running_corrects_val / len(val_loader.dataset)
+                i_image += len(images)
+                if i_image > n_val_stop: break # early stopping
+
+
+        loss_val = running_loss_val / n_val_stop
+        acc_val = running_corrects_val / n_val_stop
 
         loss_train = running_loss / i_image
         acc_train = running_corrects*1. / i_image
         history.append({'epoch': i_epoch, 'i_image':i_image, 'total_image':total_image, 'loss_train':loss_train, 'acc_train':acc_train, 'loss_val':loss_val, 'acc_val':acc_val, 'time':time.time() - since})
         if verbose:  print(f"{model_filename} \t| Epoch {i_epoch}, i_image {i_image} \t| train= loss: {loss_train:.4f} \t| acc : {acc_train:.4f} - val= loss : {loss_val:.4f} \t| acc : {acc_val:.4f} \t| time:{time.time() - since:.1f}")
 
-    df_new_row = pd.DataFrame(history)
-    df_train = pd.concat([df_train, df_new_row], ignore_index=True)
+    if df_train is None:
+        df_train = pd.DataFrame(history)
+    else:
+        df_new_row = pd.DataFrame(history)
+        df_train = pd.concat([df_train, df_new_row], ignore_index=True)
     if do_save:
         if verbose:  print(f"Saving...{model_filename}")
         torch.save(model.state_dict(), model_filename)
@@ -212,8 +216,8 @@ def train_model(args, model, train_loader, val_loader, df_train=None, each_steps
 
 def do_learning(args, dataset, name):
 
+    from .torch_utils import get_loader, load_model, apply_weights
 
-    from .torch_utils import get_loader
     TRAIN_DATA_DIR = args.DATAROOT / f'Imagenet_{dataset}' / 'train'
     train_loader, class_to_idx, idx_to_class = get_loader(args, TRAIN_DATA_DIR)
     VAL_DATA_DIR = args.DATAROOT / f'Imagenet_{dataset}' / 'val'
@@ -225,12 +229,6 @@ def do_learning(args, dataset, name):
 
 
     # --- 3. Load the Pre-trained ResNet Model ---
-    from .torch_utils import load_model
-    model = load_model(args)
-    if args.verbose:
-        num_classes = len(val_loader.dataset.classes)
-        num_ftrs = model.fc.out_features
-        print(f'Model has {num_ftrs} output features to final FC layer for {num_classes} classes.')
 
     def touch(fname): open(fname, 'w').close()
 
@@ -249,6 +247,14 @@ def do_learning(args, dataset, name):
         touch(lock_filename) # as we do a training let's lock it
         # we need to train the model or finish a training that already started
         print(f"Training model {args.model_name}, file= {model_filename} - image_size={args.image_size}")
+
+        model = load_model(args, model_path = model_filename if model_filename.is_file() else None)
+        if args.verbose:
+            num_classes = len(val_loader.dataset.classes)
+            num_ftrs = model.fc.out_features
+            print(f'Model has {num_ftrs} output features to final FC layer for {num_classes} classes.')
+
+                
         start_time = time.time()
         model_retrain, df_train = train_model(args, model=model, train_loader=train_loader, val_loader=val_loader, df_train=df_train, model_filename=model_filename, json_filename=json_filename)
         elapsed_time = time.time() - start_time
