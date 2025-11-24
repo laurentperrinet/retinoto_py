@@ -105,6 +105,8 @@ def get_validation_accuracy(args, model, val_loader, desc=None):
 
 import time
 import pandas as pd
+from tqdm.auto import tqdm
+
 def train_model(args, model, train_loader, val_loader, df_train=None, each_steps=64, 
                 verbose:bool=True, do_save:bool=True, 
                 model_filename='resnet.pth', json_filename='resnet.json'):
@@ -151,7 +153,7 @@ def train_model(args, model, train_loader, val_loader, df_train=None, each_steps
         running_loss = 0.0
         running_corrects = 0
         i_image = 0
-        for images, true_labels in fovea.tqdm(train_loader, desc=f'epoch={i_epoch+1}/{args.num_epochs}'):
+        for images, true_labels in tqdm(train_loader, desc=f'epoch={i_epoch+1}/{args.num_epochs}'):
 
 
             model.train()
@@ -202,7 +204,7 @@ def train_model(args, model, train_loader, val_loader, df_train=None, each_steps
     if do_save:
         if verbose:  print(f"Saving...{model_filename}")
         torch.save(model.state_dict(), model_filename)
-        df_train.to_json(model_filename.replace('pth', 'json'), orient='index', indent=2)
+        df_train.to_json(json_filename, orient='index', indent=2)
 
 
     return model, df_train

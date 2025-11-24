@@ -14,7 +14,8 @@ class Params:
     image_size: int = 224 # base resolution of the image (224, 224)
     do_mask: bool = True # Whether apply a circular mask to the image
     num_epochs: int = 5 # 
-    n_train_stop: int = 0 # set to zero to use all images
+    n_train_stop: int = 100 # set to 1000 for DEBUGging
+    # n_train_stop: int = 0 # set to zero to use all images
     seed: int = 1998 # Set the seed for reproducibility 
     batch_size: int = 64 # Set number of images per input batch
     num_workers:int = 4
