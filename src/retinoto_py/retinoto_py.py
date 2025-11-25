@@ -75,12 +75,16 @@ def get_validation_accuracy(args, model, val_loader, desc=None):
     if desc is None:
         desc = f"Evaluating {args.model_name}"
 
+    model = model.to(args.device)
+    n_val_stop = args.n_val_stop
+    if n_val_stop==0: n_val_stop = len(val_loader.dataset)
+
     model.eval()
 
     correct_predictions = 0
     total_predictions = 0
 
-    for images, true_labels in tqdm(val_loader, desc=desc):
+    for images, true_labels in tqdm(val_loader, desc=desc, total=n_val_stop//args.batch_size):
         images = images.to(args.device)
         true_labels = true_labels.to(args.device)
 
@@ -99,6 +103,8 @@ def get_validation_accuracy(args, model, val_loader, desc=None):
 
         # The total number of predictions is the batch size
         total_predictions += true_labels.size(0)
+        if total_predictions > n_val_stop: break # early stopping
+
 
     accuracy = correct_predictions / total_predictions
     return accuracy
@@ -118,6 +124,8 @@ def train_model(args, model, train_loader, val_loader, df_train=None, #each_step
 
     n_train_stop = args.n_train_stop
     if n_train_stop==0: n_train_stop = len(train_loader.dataset)
+    n_val_stop = args.n_val_stop
+    if n_val_stop==0: n_val_stop = len(val_loader.dataset)
 
     # sets the optimizer
     if args.delta2 > 0.: 
@@ -177,8 +185,6 @@ def train_model(args, model, train_loader, val_loader, df_train=None, #each_step
         running_loss_val = 0.0
         running_corrects_val = 0
         i_image = 0
-        n_val_stop = args.n_val_stop
-        if n_val_stop==0: n_val_stop = len(val_loader.dataset)
 
         with torch.no_grad():
             for images, true_labels in val_loader:

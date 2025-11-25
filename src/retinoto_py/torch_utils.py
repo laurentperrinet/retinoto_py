@@ -55,26 +55,65 @@ def get_idx_to_label(args):
 im_mean = np.array([0.485, 0.456, 0.406])
 im_std = np.array([0.229, 0.224, 0.225]) 
 
+from torch.utils.data import Dataset, DataLoader
+
+class InMemoryImageDataset(Dataset):
+    """Load entire ImageFolder dataset into memory"""
+    def __init__(self, root, transform=None):
+        # Use ImageFolder to handle directory structure and class mapping
+        image_folder = datasets.ImageFolder(root=root, transform=None)
+        
+        self.class_to_idx = image_folder.class_to_idx
+        self.idx_to_class = {v: k for k, v in self.class_to_idx.items()}
+        self.transform = transform
+        
+        # Load all images into memory
+        # print("Loading dataset into memory...")
+        self.images = []
+        self.labels = []
+
+        for img, label in image_folder:
+            self.images.append(img)
+            self.labels.append(label)
+        # print(f"Loaded {len(self.images)} images into memory")
+    
+    def __len__(self):
+        return len(self.images)
+    
+    def __getitem__(self, idx):
+        img = self.images[idx]
+        label = self.labels[idx]
+        
+        if self.transform:
+            img = self.transform(img)
+        
+        return img, label
 
 from .retinoto_py import get_preprocess
-def get_loader(args, DATA_DIR, angle_min=None, angle_max=None):
+def get_dataset(args, DATA_DIR, angle_min=None, angle_max=None, in_memory=False):
     preprocess = get_preprocess(args, angle_min=angle_min, angle_max=angle_max)
     # --- 2. Create Dataset and DataLoader using ImageFolder ---
     # ImageFolder automatically infers class names from directory names
     # and maps them to integer indices.
-    val_dataset = datasets.ImageFolder(root=DATA_DIR, transform=preprocess)
+    if in_memory:
+        # Use in-memory dataset instead of ImageFolder
+        dataset = InMemoryImageDataset(root=DATA_DIR, transform=preprocess)
+    else:    
+        dataset = datasets.ImageFolder(root=DATA_DIR, transform=preprocess)
 
     # The dataset provides a mapping from class index to class name (folder name)
-    class_to_idx = val_dataset.class_to_idx
+    class_to_idx = dataset.class_to_idx
     # We often want the inverse mapping for printing results
     idx_to_class = {v: k for k, v in class_to_idx.items()}
+    return dataset, class_to_idx, idx_to_class
 
+def get_loader(args, dataset):
     # The DataLoader handles batching, shuffling (for training), and loading data efficiently.
     # For evaluation, we don't need to shuffle.
     # A batch size of 1 is simplest for per-image analysis, but you can use larger batches.
-    val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=args.batch_size, shuffle=args.shuffle)
+    val_loader = DataLoader(dataset, batch_size=args.batch_size, shuffle=args.shuffle)
 
-    return val_loader, class_to_idx, idx_to_class
+    return val_loader
 
 import torchvision.models as models
 def load_model(args, model_path=None):

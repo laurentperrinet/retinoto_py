@@ -9,18 +9,19 @@ from dataclasses import dataclass
 @dataclass
 class Params:
     
-    DATAROOT = Path.home() / 'data'
+    DATAROOT = Path.home() / 'data' / 'Imagenet'
 
     image_size: int = 224 # base resolution of the image (224, 224)
     do_mask: bool = True # Whether apply a circular mask to the image
     seed: int = 1998 # Set the seed for reproducibility 
     batch_size: int = 64 # Set number of images per input batch
-    num_workers:int = 4
+    num_workers:int = 16
 
     # interpolation = T.InterpolationMode.BILINEAR
     # padding_mode = "border"
 
-    model_name: str = 'resnet50' # Name of the model to use
+    # model_name: str = 'resnet50' # Name of the model to use
+    model_name: str = 'resnet101' # Name of the model to use
     do_scratch: bool = False # Whether to train from scratch (True) or use pretrained weights (False)
 
     batch_size = 250 # Set the batch size for training and validation
