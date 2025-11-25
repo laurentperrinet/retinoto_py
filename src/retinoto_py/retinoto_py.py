@@ -84,7 +84,9 @@ def get_validation_accuracy(args, model, val_loader, desc=None):
     correct_predictions = 0
     total_predictions = 0
 
-    for images, true_labels in tqdm(val_loader, desc=desc, total=n_val_stop//args.batch_size):
+    outer_progress = tqdm(val_loader, desc=desc, total=n_val_stop//args.batch_size)
+
+    for images, true_labels in outer_progress:
         images = images.to(args.device)
         true_labels = true_labels.to(args.device)
 
@@ -107,6 +109,8 @@ def get_validation_accuracy(args, model, val_loader, desc=None):
 
 
     accuracy = correct_predictions / total_predictions
+    outer_progress.set_postfix(f"accuracy={accuracy:.4f}")
+
     return accuracy
 
 import time
@@ -153,7 +157,8 @@ def train_model(args, model, train_loader, val_loader, df_train=None, #each_step
     since = time.time()
     history = []
     total_image = 0
-    for i_epoch in range(i_epoch_start, args.num_epochs):
+    outer_progress = tqdm(range(i_epoch_start, args.num_epochs), desc="Epochs", leave=False)
+    for i_epoch in outer_progress:
         running_loss = 0.0
         running_corrects = 0
         i_image = 0
@@ -181,11 +186,13 @@ def train_model(args, model, train_loader, val_loader, df_train=None, #each_step
             optimizer.step()
 
 
+        loss_train = running_loss / i_image
+        acc_train = running_corrects*1. / i_image
+
         model.eval()  # Set model to evaluation mode
         running_loss_val = 0.0
         running_corrects_val = 0
         i_image = 0
-
         with torch.no_grad():
             for images, true_labels in val_loader:
                 images, true_labels = images.to(args.device), true_labels.to(args.device)
@@ -202,10 +209,9 @@ def train_model(args, model, train_loader, val_loader, df_train=None, #each_step
         loss_val = running_loss_val / n_val_stop
         acc_val = running_corrects_val / n_val_stop
 
-        loss_train = running_loss / i_image
-        acc_train = running_corrects*1. / i_image
+        outer_progress.set_postfix(f"Acc: train={acc_train:.4f} - val={acc_val:.4f}")
         history.append({'epoch': i_epoch, 'i_image':i_image, 'total_image':total_image, 'loss_train':loss_train, 'acc_train':acc_train, 'loss_val':loss_val, 'acc_val':acc_val, 'time':time.time() - since})
-        if verbose:  print(f"{model_filename} \t| Epoch {i_epoch}, i_image {i_image} \t| train= loss: {loss_train:.4f} \t| acc : {acc_train:.4f} - val= loss : {loss_val:.4f} \t| acc : {acc_val:.4f} \t| time:{time.time() - since:.1f}")
+        # if verbose:  print(f"{model_filename} \t| Epoch {i_epoch}, i_image {i_image} \t| train= loss: {loss_train:.4f} \t| acc : {acc_train:.4f} - val= loss : {loss_val:.4f} \t| acc : {acc_val:.4f} \t| time:{time.time() - since:.1f}")
 
     if df_train is None:
         df_train = pd.DataFrame(history)

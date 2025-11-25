@@ -90,7 +90,7 @@ class InMemoryImageDataset(Dataset):
         return img, label
 
 from .retinoto_py import get_preprocess
-def get_dataset(args, DATA_DIR, angle_min=None, angle_max=None, in_memory=False):
+def get_dataset(args, DATA_DIR, angle_min=None, angle_max=None, in_memory=True):
     preprocess = get_preprocess(args, angle_min=angle_min, angle_max=angle_max)
     # --- 2. Create Dataset and DataLoader using ImageFolder ---
     # ImageFolder automatically infers class names from directory names
