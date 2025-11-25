@@ -14,7 +14,7 @@ your documentation source) and adjust the values marked with **TODO**.
 # The title that appears in the generated HTML <title> tag and in the header.
 AUTHOR = 'Laurent Perrinet'                     # TODO: put your name or org
 SITENAME = 'My Project Documentation'   # TODO: project/site title
-SITEURL = ''                             # Empty for local builds; set to the live URL for production
+SITEURL = 'https://retinoto-py.readthedocs.io'                             # Empty for local builds; set to the live URL for production
 
 # Path where your markdown/reStructuredText content lives.
 # Usually “content” is the default for Pelican, but you can point it
@@ -33,14 +33,11 @@ DEFAULT_LANG = 'en'
 # Keep the defaults unless you have a custom extension.
 MARKUP = ('md', 'ipynb')
 
-PLUGIN_PATHS = ['./plugins']
-PLUGINS = ['ipynb.markup']
-IPYNB_USE_METACELL = True
 
 # If you want a blog‑style “articles” section, enable this.
 # If you only have static pages, you can leave ARTICLE_PATHS empty.
-ARTICLE_PATHS = ['articles']   # put article files here (optional)
-PAGE_PATHS = ['pages']         # put pure pages here (e.g., “about”, “install”)
+# ARTICLE_PATHS = ['articles']   # put article files here (optional)
+PAGE_PATHS = ['.']         # put pure pages here (e.g., “about”, “install”)
 
 # What URL format you want for articles/pages.
 # The simple form below works well for documentation sites.
@@ -66,8 +63,9 @@ STATIC_PATHS = ['static']               # folder `docs/static/` will be copied a
 
 # Pelican 4+ uses the “plugins” entry point.  If you need any plugins,
 # install them via pip and list them here.
-PLUGIN_PATHS = ['pelican-plugins']      # folder where you keep plugins (optional)
-PLUGINS = []                            # e.g. ['neighbors', 'sitemap']
+PLUGIN_PATHS = ['./plugins']
+PLUGINS = ['ipynb.markup']
+IPYNB_USE_METACELL = True
 
 ############################
 # Miscellaneous settings   #
