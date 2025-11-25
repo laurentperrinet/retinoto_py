@@ -11,6 +11,7 @@
 
 ## Features
 
+* TODO speed up reading time torchvision.io
 * TODO : use ecoset
 
 ## Credits
