@@ -37,7 +37,7 @@ MARKUP = ('md', 'ipynb')
 # If you want a blog‑style “articles” section, enable this.
 # If you only have static pages, you can leave ARTICLE_PATHS empty.
 # ARTICLE_PATHS = ['articles']   # put article files here (optional)
-PAGE_PATHS = ['.']         # put pure pages here (e.g., “about”, “install”)
+PAGE_PATHS = ['docs']         # put pure pages here (e.g., “about”, “install”)
 
 # What URL format you want for articles/pages.
 # The simple form below works well for documentation sites.
