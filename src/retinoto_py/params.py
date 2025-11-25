@@ -15,7 +15,7 @@ class Params:
     do_mask: bool = True # Whether apply a circular mask to the image
     seed: int = 1998 # Set the seed for reproducibility 
     batch_size: int = 64 # Set number of images per input batch
-    num_workers:int = 16
+    num_workers:int = 4
 
     # interpolation = T.InterpolationMode.BILINEAR
     # padding_mode = "border"

@@ -222,12 +222,14 @@ def train_model(args, model, train_loader, val_loader, df_train=None, #each_step
 
 def do_learning(args, dataset, name):
 
-    from .torch_utils import get_loader, load_model, apply_weights
+    from .torch_utils import get_loader, get_dataset, load_model, apply_weights
 
     TRAIN_DATA_DIR = args.DATAROOT / f'Imagenet_{dataset}' / 'train'
-    train_loader, class_to_idx, idx_to_class = get_loader(args, TRAIN_DATA_DIR)
+    train_dataset, class_to_idx, idx_to_class = get_dataset(args, TRAIN_DATA_DIR)
+    train_loader = get_loader(args, train_dataset)
     VAL_DATA_DIR = args.DATAROOT / f'Imagenet_{dataset}' / 'val'
-    val_loader, class_to_idx, idx_to_class = get_loader(args, VAL_DATA_DIR)
+    val_dataset, class_to_idx, idx_to_class = get_dataset(args, VAL_DATA_DIR)
+    val_loader = get_loader(args, val_dataset)
 
     model_filename = args.data_cache / f'{name}.pth'
     json_filename = args.data_cache / model_filename.name.replace('.pth', '.json')
