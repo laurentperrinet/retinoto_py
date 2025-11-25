@@ -148,7 +148,7 @@ from tqdm.auto import tqdm
 
 def train_model(args, model, train_loader, val_loader, df_train=None, #each_steps=64, 
                 verbose=True, do_save=True, 
-                model_filename='resnet.pth', json_filename='resnet.json'):
+                model_filename='/tmp/resnet.pth', json_filename='/tmp/resnet.json'):
     
     model = model.to(args.device)
     # retraining the full model

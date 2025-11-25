@@ -30,12 +30,12 @@ class Params:
     model_name: str = 'resnet101' # Name of the model to use
     do_scratch: bool = False # Whether to train from scratch (True) or use pretrained weights (False)
 
-    batch_size = 250 # Set the batch size for training and validation
-    batch_size = 64 # Set the batch size for training and validation
+    batch_size: int  = 250 # Set the batch size for training and validation
+    batch_size: int  = 64 # Set the batch size for training and validation
 
     # num_epochs: int = 1
     num_epochs: int = 50 
-    n_stop = 300*batch_size  #HACK pour limiter la mémoire
+    n_stop: int  = 300*batch_size  #HACK pour limiter la mémoire
     n_train_stop: int = 300*batch_size # set for DEBUGging
     n_val_stop: int = 100*batch_size # set for DEBUGging
     # n_train_stop: int = 0 # set to zero to use all images
