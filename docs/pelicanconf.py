@@ -31,7 +31,11 @@ DEFAULT_LANG = 'en'
 
 # List of file extensions Pelican will treat as articles/pages.
 # Keep the defaults unless you have a custom extension.
-MARKUP = ('md', 'rst')
+MARKUP = ('md', 'ipynb')
+
+PLUGIN_PATHS = ['./plugins']
+PLUGINS = ['ipynb.markup']
+IPYNB_USE_METACELL = True
 
 # If you want a blog‑style “articles” section, enable this.
 # If you only have static pages, you can leave ARTICLE_PATHS empty.
