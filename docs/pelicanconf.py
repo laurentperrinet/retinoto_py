@@ -19,7 +19,7 @@ SITEURL = ''                             # Empty for local builds; set to the li
 # Path where your markdown/reStructuredText content lives.
 # Usually “content” is the default for Pelican, but you can point it
 # anywhere you keep the .md/.rst files.
-PATH = 'content'                         # TODO: change if you store docs elsewhere
+PATH = '.'                         # TODO: change if you store docs elsewhere
 
 # Time‑zone and default language – keep the defaults unless you need something else.
 TIMEZONE = 'CET'
