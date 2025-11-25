@@ -59,12 +59,13 @@ from torch.utils.data import Dataset, DataLoader
 
 class InMemoryImageDataset(Dataset):
     """Load entire ImageFolder dataset into memory"""
-    def __init__(self, root, transform=None):
+    def __init__(self, root, transform=None, n_stop=0):
         # Use ImageFolder to handle directory structure and class mapping
         image_folder = datasets.ImageFolder(root=root, transform=None)
         
         self.class_to_idx = image_folder.class_to_idx
         self.idx_to_class = {v: k for k, v in self.class_to_idx.items()}
+        self.classes = image_folder.classes
         self.transform = transform
         
         # Load all images into memory
@@ -72,9 +73,12 @@ class InMemoryImageDataset(Dataset):
         self.images = []
         self.labels = []
 
-        for img, label in image_folder:
+        for i_img, (img, label) in enumerate(image_folder):
             self.images.append(img)
             self.labels.append(label)
+            if n_stop >0:
+                if i_img > n_stop:
+                    break
         # print(f"Loaded {len(self.images)} images into memory")
     
     def __len__(self):
@@ -90,14 +94,14 @@ class InMemoryImageDataset(Dataset):
         return img, label
 
 from .retinoto_py import get_preprocess
-def get_dataset(args, DATA_DIR, angle_min=None, angle_max=None, in_memory=True):
+def get_dataset(args, DATA_DIR, angle_min=None, angle_max=None):
     preprocess = get_preprocess(args, angle_min=angle_min, angle_max=angle_max)
     # --- 2. Create Dataset and DataLoader using ImageFolder ---
     # ImageFolder automatically infers class names from directory names
     # and maps them to integer indices.
-    if in_memory:
+    if args.in_memory:
         # Use in-memory dataset instead of ImageFolder
-        dataset = InMemoryImageDataset(root=DATA_DIR, transform=preprocess)
+        dataset = InMemoryImageDataset(root=DATA_DIR, transform=preprocess, n_stop=args.n_stop)
     else:    
         dataset = datasets.ImageFolder(root=DATA_DIR, transform=preprocess)
 

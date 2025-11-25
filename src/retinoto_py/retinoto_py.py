@@ -42,7 +42,32 @@ class ApplyMask(transforms.PILToTensor):
             torch.Tensor: Tenseur masqué.
         """
         return tensor * self.mask
+
+import torch.nn.functional as nnf
+def get_grid(args, endpoint=False):
+    """
+    Generate a grid for the log-polar mapping
+    """
+
+    rs_ = torch.logspace(args.rs_min, args.rs_max, args.image_size, base=2) # Radial distances (log scale)
+    if endpoint: ## If endpoint is True, include the last point in the range
+        ts_ = torch.linspace(0, torch.pi*2, args.image_size) # Angular positions (full circle)
+    else:
+        ts_ = torch.linspace(0, torch.pi*2, args.image_size+1)[:-1] 
+    grid_xs = torch.outer(rs_, torch.cos(ts_)) # X-coordinates
+    grid_ys = torch.outer(rs_, torch.sin(ts_)) # Y-coordinates	
     
+    return torch.stack((grid_xs, grid_ys), 2)#.to(args.device) # (H_scaled, W_scaled, 2)
+
+# interpolation = T.InterpolationMode.BILINEAR, 
+class transform_apply_grid(object): 
+    def __init__(self, logPolar_grid, padding_mode):
+        self.grid = logPolar_grid
+        self.padding_mode = padding_mode
+
+    def __call__(self, images):
+        return nnf.grid_sample(images.unsqueeze(dim=0), self.grid.unsqueeze(dim=0), 
+                               padding_mode=self.padding_mode, align_corners=False).squeeze(dim=0)
 
 def get_preprocess(args, angle_min=None, angle_max=None):
     # --- 5. Define Image Pre-processing ---
@@ -61,11 +86,15 @@ def get_preprocess(args, angle_min=None, angle_max=None):
     transform_list.append(transforms.ToTensor())  # Convert the image to a PyTorch Tensor
     transform_list.append(transforms.Normalize(mean=im_mean, std=im_std))
 
-    if args.do_mask:
+    if args.do_mask and not(args.do_fovea):
         # Créer le masque une seule fois avec la taille de l'image
         mask = make_mask(image_size=args.image_size)
         # Ajouter notre transform personnalisée à la liste
         transform_list.append(ApplyMask(mask))
+
+    if args.do_fovea: # apply log-polar mapping to the image
+        grid_polar = get_grid(args)
+        transform_list.append(transform_apply_grid(grid_polar, padding_mode=args.padding_mode))
 
     # Créer la chaîne de prétraitement finale
     preprocess = transforms.Compose(transform_list)
@@ -207,9 +236,9 @@ def train_model(args, model, train_loader, val_loader, df_train=None, #each_step
 
 
         loss_val = running_loss_val / n_val_stop
-        acc_val = running_corrects_val / n_val_stop
+        acc_val = running_corrects_val*1. / n_val_stop
 
-        outer_progress.set_postfix(f"Acc: train={acc_train:.4f} - val={acc_val:.4f}")
+        outer_progress.set_postfix_str(f"Acc: train={acc_train:.4f} - val={acc_val:.4f}")
         history.append({'epoch': i_epoch, 'i_image':i_image, 'total_image':total_image, 'loss_train':loss_train, 'acc_train':acc_train, 'loss_val':loss_val, 'acc_val':acc_val, 'time':time.time() - since})
         # if verbose:  print(f"{model_filename} \t| Epoch {i_epoch}, i_image {i_image} \t| train= loss: {loss_train:.4f} \t| acc : {acc_train:.4f} - val= loss : {loss_val:.4f} \t| acc : {acc_val:.4f} \t| time:{time.time() - since:.1f}")
 

@@ -12,10 +12,16 @@ class Params:
     DATAROOT = Path.home() / 'data' / 'Imagenet'
 
     image_size: int = 224 # base resolution of the image (224, 224)
-    do_mask: bool = True # Whether apply a circular mask to the image
+    do_mask: bool = False # Whether apply a circular mask to the image
+    do_fovea: bool = False # Whether apply a log-polar transform to the image
+    rs_min: float = 0.00 # Set minimum radius of the log-polar grid
+    rs_max: float = -5.00 # Set maximum radius of the log-polar grid
+    padding_mode: str = "zeros"
+
     seed: int = 1998 # Set the seed for reproducibility 
     batch_size: int = 64 # Set number of images per input batch
     num_workers:int = 4
+    in_memory:bool = True
 
     # interpolation = T.InterpolationMode.BILINEAR
     # padding_mode = "border"
@@ -29,6 +35,7 @@ class Params:
 
     # num_epochs: int = 1
     num_epochs: int = 50 
+    n_stop = 300*batch_size  #HACK pour limiter la mémoire
     n_train_stop: int = 300*batch_size # set for DEBUGging
     n_val_stop: int = 100*batch_size # set for DEBUGging
     # n_train_stop: int = 0 # set to zero to use all images
