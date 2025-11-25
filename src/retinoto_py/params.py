@@ -27,7 +27,7 @@ class Params:
     batch_size = 250 # Set the batch size for training and validation
     batch_size = 64 # Set the batch size for training and validation
 
-    num_epochs: int = 1
+    # num_epochs: int = 1
     num_epochs: int = 50 
     n_train_stop: int = 300*batch_size # set to 1000 for DEBUGging
     n_val_stop: int = 100*batch_size # set to 1000 for DEBUGging
