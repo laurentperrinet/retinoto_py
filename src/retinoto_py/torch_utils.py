@@ -129,7 +129,7 @@ def get_loader(args, dataset, drop_last=True):
     return val_loader
 
 import torchvision.models as models
-def load_model(args, model_path=None):
+def load_model(args, model_filename=None):
     """
     Load the model from the torchvision library.
     
@@ -145,23 +145,23 @@ def load_model(args, model_path=None):
         raise ValueError(f'Unknown model {args.model_name}')
     model = model.to(args.device)
     
-    if not model_path is None:
-        model = apply_weights(model, model_path, args.device, verbose=args.verbose)
+    if not model_filename is None:
+        model = apply_weights(model, model_filename, args.device, verbose=args.verbose)
 
     return model
 
-def apply_weights(model, model_path, device, verbose=True):
+def apply_weights(model, model_filename, device, verbose=True):
     """
     Apply the weights to the model.
     Args:
         model: torch model, the model to apply the weights to
-        model_path: str, path to the weights file
+        model_filename: str, path to the weights file
         verbose: bool, whether to print the loading message or not
     Returns:    
         model: torch model, the model with the weights applied
         """
-    if verbose: print(f'loading .... {model_path}')
-    model.load_state_dict(torch.load(model_path, map_location=torch.device(device)))
+    if verbose: print(f'loading .... {model_filename}')
+    model.load_state_dict(torch.load(model_filename, map_location=torch.device(device)))
     return model
 
 

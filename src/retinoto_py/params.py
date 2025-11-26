@@ -38,11 +38,11 @@ class Params:
     n_val_stop: int = 64*batch_size # set for DEBUGging
     # n_train_stop: int = 0 # set to zero to use all images
     # n_val_stop: int = 0 # set to zero to use all images
-    lr: float = 1.e-4
-    delta1: float = 0.02
+    lr: float = 3.e-3
+    delta1: float = 30.e-3
     delta2: float = 0.
     weight_decay: float = 0.01
-    label_smoothing: float = 0.0 # See https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html
+    label_smoothing: float = 1e-4 # See https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html
 
     shuffle: bool = True # Whether to shuffle the data during training
     data_cache = Path('cached_data')

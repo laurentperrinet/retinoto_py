@@ -292,7 +292,7 @@ def do_learning(args, dataset, name):
         # we need to train the model or finish a training that already started
         print(f"Training model {args.model_name}, file= {model_filename} - image_size={args.image_size}")
 
-        model = load_model(args, model_path = model_filename if model_filename.is_file() else None)
+        model = load_model(args, model_filename = model_filename if model_filename.is_file() else None)
         if args.verbose:
             num_classes = len(val_loader.dataset.classes)
             num_ftrs = model.fc.out_features

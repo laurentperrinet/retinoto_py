@@ -8,6 +8,7 @@ all_model_names_ls = ['..', '_.', '-']
 all_datasets = ['full', 'bbox']
 all_datasets_color = ['blue', 'orange']
 
+
 #####################################################
 from .params import Params
 from .utils import get_device, set_seed, savefig, make_mp4
@@ -17,6 +18,8 @@ from .retinoto_py import train_model, make_mask, do_learning
 from .retinoto_py import get_validation_accuracy, get_preprocess
 #############################################################
 # Importing libraries
+import warnings
+warnings.filterwarnings("ignore", message=".*application/vnd.jupyter.widget-view+json.*")
 from tqdm.auto import tqdm
 
 import time
