@@ -198,7 +198,7 @@ def train_model(args, model, train_loader, val_loader, df_train=None, #each_step
             images, true_labels = images.to(args.device), true_labels.to(args.device)
             total_image += len(images)
             i_image += len(images)
-            if i_image > n_train_stop: break # early stopping
+            # if i_image > n_train_stop: break # early stopping
 
             # https://pytorch.org/tutorials/recipes/recipes/tuning_guide.html#use-parameter-grad-none-instead-of-model-zero-grad-or-optimizer-zero-grad
             optimizer.zero_grad(set_to_none=True)
@@ -221,7 +221,7 @@ def train_model(args, model, train_loader, val_loader, df_train=None, #each_step
         running_corrects_val = 0
         i_image = 0
         with torch.no_grad():
-            val_progress = tqdm(val_loader, desc=f'Vat @Epoch {i_epoch+1}/{args.num_epochs}', total=n_val_stop, leave=False)
+            val_progress = tqdm(val_loader, desc=f'Vat @Epoch {i_epoch+1}/{args.num_epochs}', total=n_val_stop//args.batch_size, leave=False)
             for images, true_labels in val_progress:
                 images, true_labels = images.to(args.device), true_labels.to(args.device)
                 outputs = model(images)
@@ -233,7 +233,7 @@ def train_model(args, model, train_loader, val_loader, df_train=None, #each_step
                 i_image += len(images)
                 acc_val = running_corrects_val*1. / i_image
                 val_progress.set_postfix_str(f"Acc: train={acc_train:.4f} - val={acc_val:.4f}")
-                if i_image > n_val_stop: break # early stopping
+                # if i_image > n_val_stop: break # early stopping
 
         loss_val = running_loss_val / n_val_stop
         acc_val = running_corrects_val*1. / n_val_stop
