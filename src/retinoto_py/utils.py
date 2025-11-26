@@ -84,7 +84,7 @@ def make_mp4(moviename, fnames, fps, do_delete=True):
         for fname in fnames:
             try:
                 fname.unlink()
-            except Exception:
+            except Exception as e:
                 print('Could not unlink', fname, ' error', e)
 
     return moviename
