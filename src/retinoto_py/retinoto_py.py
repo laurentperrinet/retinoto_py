@@ -167,7 +167,7 @@ def train_model(args, model, train_loader, val_loader, df_train=None, #each_step
                                     weight_decay=args.weight_decay) # to set training variables
     
     # https://pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html 
-    criterion = torch.nn.CrossEntropyLoss()
+    criterion = torch.nn.CrossEntropyLoss(label_smoothing=args.label_smoothing)
 
     # the DataFrame to record from
     if df_train is None:
@@ -190,7 +190,7 @@ def train_model(args, model, train_loader, val_loader, df_train=None, #each_step
         running_loss = 0.0
         running_corrects = 0
         i_image = 0
-        inner_progress = tqdm(etrain_loader, desc=f'epoch={i_epoch+1}/{args.num_epochs}', total=n_train_stop//args.batch_size, leave=False)
+        inner_progress = tqdm(train_loader, desc=f'epoch={i_epoch+1}/{args.num_epochs}', total=n_train_stop//args.batch_size, leave=False)
         for images, true_labels in inner_progress:
 
             model.train()
@@ -202,8 +202,6 @@ def train_model(args, model, train_loader, val_loader, df_train=None, #each_step
 
             # https://pytorch.org/tutorials/recipes/recipes/tuning_guide.html#use-parameter-grad-none-instead-of-model-zero-grad-or-optimizer-zero-grad
             optimizer.zero_grad(set_to_none=True)
-            # for param in model.parameters():
-            #     param.grad = None
 
             outputs = model(images)
             _, predicted_labels = torch.max(outputs, dim=1)

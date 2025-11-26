@@ -4,7 +4,7 @@ Useful torch snippets to use in the main module.
 """
 
 #############################################################
-
+import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib
 import torchvision
@@ -76,13 +76,17 @@ class InMemoryImageDataset(Dataset):
         # print("Loading dataset into memory...")
         self.images = []
         self.labels = []
-        total = len(image_folder) if n_stop==0 else min((n_stop, len(image_folder)))
-        for i_img, (img, label) in tqdm(enumerate(image_folder), desc='Putting images in memory', total=total):
-            self.images.append(img)
-            self.labels.append(label)
-            if n_stop > 0:
-                if i_img > n_stop:
-                    break
+        if n_stop==0:
+            n_total = len(image_folder)
+            idxs = np.arange(n_total) 
+        else:
+            n_total = min((n_stop, len(image_folder)))
+            idxs = np.random.permutation(len(image_folder))[:n_total].astype(int)
+
+        for idx in tqdm(idxs, desc='Putting images in memory', total=n_total):
+            self.images.append(image_folder[idx][0])
+            self.labels.append(image_folder[idx][1])
+
         # print(f"Loaded {len(self.images)} images into memory")
     
     def __len__(self):
