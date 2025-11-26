@@ -190,8 +190,8 @@ def train_model(args, model, train_loader, val_loader, df_train=None, #each_step
         running_loss = 0.0
         running_corrects = 0
         i_image = 0
-        inner_progress = tqdm(enumerate(train_loader), desc=f'epoch={i_epoch+1}/{args.num_epochs}', total=n_train_stop//args.batch_size, leave=False)
-        for i_batch, (images, true_labels) in inner_progress:
+        inner_progress = tqdm(etrain_loader, desc=f'epoch={i_epoch+1}/{args.num_epochs}', total=n_train_stop//args.batch_size, leave=False)
+        for images, true_labels in inner_progress:
 
             model.train()
 
@@ -223,7 +223,7 @@ def train_model(args, model, train_loader, val_loader, df_train=None, #each_step
         running_corrects_val = 0
         i_image = 0
         with torch.no_grad():
-            val_progress = tqdm(val_loader, desc=f'Vat @Epoch {i_epoch+1}/{args.num_epochs}', leave=False)
+            val_progress = tqdm(val_loader, desc=f'Vat @Epoch {i_epoch+1}/{args.num_epochs}', total=n_val_stop, leave=False)
             for images, true_labels in val_progress:
                 images, true_labels = images.to(args.device), true_labels.to(args.device)
                 outputs = model(images)
@@ -281,13 +281,13 @@ def do_learning(args, dataset, name):
         should_resume_training = (df_train['epoch'].max() + 1 < args.num_epochs) and (not lock_filename.exists())
 
     if should_resume_training:
-        from .torch_utils import get_loader, get_dataset, load_model, apply_weights
+        from .torch_utils import get_loader, get_dataset, load_model
 
         TRAIN_DATA_DIR = args.DATAROOT / f'Imagenet_{dataset}' / 'train'
-        train_dataset, class_to_idx, idx_to_class = get_dataset(args, TRAIN_DATA_DIR)
+        train_dataset, class_to_idx, idx_to_class = get_dataset(args, TRAIN_DATA_DIR, n_stop=args.n_train_stop)
         train_loader = get_loader(args, train_dataset)
         VAL_DATA_DIR = args.DATAROOT / f'Imagenet_{dataset}' / 'val'
-        val_dataset, class_to_idx, idx_to_class = get_dataset(args, VAL_DATA_DIR)
+        val_dataset, class_to_idx, idx_to_class = get_dataset(args, VAL_DATA_DIR, n_stop=args.n_val_stop)
         val_loader = get_loader(args, val_dataset)
 
         touch(lock_filename) # as we do a training let's lock it
