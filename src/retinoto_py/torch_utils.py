@@ -76,11 +76,11 @@ class InMemoryImageDataset(Dataset):
         # print("Loading dataset into memory...")
         self.images = []
         self.labels = []
-
-        for i_img, (img, label) in tqdm(enumerate(image_folder), desc='Putting images in memory'):
+        total = len(image_folder) if n_stop==0 else min((n_stop, len(image_folder)))
+        for i_img, (img, label) in tqdm(enumerate(image_folder), desc='Putting images in memory', total=total):
             self.images.append(img)
             self.labels.append(label)
-            if n_stop >0:
+            if n_stop > 0:
                 if i_img > n_stop:
                     break
         # print(f"Loaded {len(self.images)} images into memory")

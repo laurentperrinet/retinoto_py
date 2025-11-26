@@ -34,15 +34,15 @@ class Params:
     batch_size: int  = 64 # Set the batch size for training and validation
 
     # num_epochs: int = 1
-    num_epochs: int = 50 
-    n_stop: int  = 300*batch_size  #HACK pour limiter la mémoire
-    n_train_stop: int = 300*batch_size # set for DEBUGging
-    n_val_stop: int = 100*batch_size # set for DEBUGging
+    num_epochs: int = 10 
+    n_stop: int  = 512*batch_size  #HACK pour limiter la mémoire
+    n_train_stop: int = 512*batch_size # set for DEBUGging
+    n_val_stop: int = 64*batch_size # set for DEBUGging
     # n_train_stop: int = 0 # set to zero to use all images
     # n_val_stop: int = 0 # set to zero to use all images
-    lr: float = 1.e-4
+    lr: float = 1.e-2
     delta1: float = 0.1
-    delta2: float = 0.001
+    delta2: float = 0.
     weight_decay: float = 0.01
     label_smoothing: float = 0.01 # See https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html
 

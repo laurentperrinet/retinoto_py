@@ -190,7 +190,7 @@ def train_model(args, model, train_loader, val_loader, df_train=None, #each_step
         running_loss = 0.0
         running_corrects = 0
         i_image = 0
-        inner_progress = tqdm(enumerate(train_loader), desc=f'epoch={i_epoch+1}/{args.num_epochs}', total=n_train_stop//args.batch_size, leave=True)
+        inner_progress = tqdm(enumerate(train_loader), desc=f'epoch={i_epoch+1}/{args.num_epochs}', total=n_train_stop//args.batch_size, leave=False)
         for i_batch, (images, true_labels) in inner_progress:
 
             model.train()
@@ -223,7 +223,7 @@ def train_model(args, model, train_loader, val_loader, df_train=None, #each_step
         running_corrects_val = 0
         i_image = 0
         with torch.no_grad():
-            val_progress = tqdm(val_loader, desc=f'Epoch {i_epoch+1}/{args.num_epochs} [Val]', leave=False)
+            val_progress = tqdm(val_loader, desc=f'Vat @Epoch {i_epoch+1}/{args.num_epochs}', leave=False)
             for images, true_labels in val_progress:
                 images, true_labels = images.to(args.device), true_labels.to(args.device)
                 outputs = model(images)
@@ -265,14 +265,14 @@ def do_learning(args, dataset, name):
 
     def touch(fname): open(fname, 'w').close()
 
+    model_filename = args.data_cache / f'{name}.pth'
+    json_filename = args.data_cache / model_filename.name.replace('.pth', '.json')
+    lock_filename = args.data_cache / model_filename.name.replace('.pth', '.lock')
+
     # %rm {lock_filename}  # FORCING RECOMPUTE
 
     df_train = None
     should_resume_training = not lock_filename.exists()
-
-        model_filename = args.data_cache / f'{name}.pth'
-        json_filename = args.data_cache / model_filename.name.replace('.pth', '.json')
-        lock_filename = args.data_cache / model_filename.name.replace('.pth', '.lock')
 
     if json_filename.exists():
         print(f"Load JSON from pre-trained resnet {json_filename}")
@@ -306,4 +306,5 @@ def do_learning(args, dataset, name):
         elapsed_time = time.time() - start_time
         print(f"Training completed in {elapsed_time // 60:.0f}m {elapsed_time % 60:.0f}s")
 
+    if lock_filename.exists(): lock_filename.unlink()
     return model_filename, json_filename
