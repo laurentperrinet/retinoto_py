@@ -2,6 +2,8 @@ import torch
 import platform
 from pathlib import Path
 import numpy as np
+import imageio
+from tqdm.auto import tqdm
 
 #############################################################
 
@@ -55,6 +57,37 @@ def print_gpu_memory():
     for var_name, var in globals().items():
         if torch.is_tensor(var) and var.is_cuda:
             print(f"{var_name}: {var.element_size() * var.nelement() / 1024**2:.2f} MB", end='\t')
+
+
+def make_mp4(moviename, fnames, fps, do_delete=True):
+    """Create an MP4 video from a sequence of image files using pathlib paths.
+
+    Args:
+        moviename (str | Path): Path to the output video file.
+        fnames (Iterable[str | Path]): Iterable of input image file paths.
+        fps (int): Frames per second for the output video.
+        do_delete (bool): Whether to delete the input images after making the video.
+
+    Returns:
+    Path: Path to the created video file.
+    """
+
+    moviename = Path(moviename)
+    fnames = [Path(f) for f in fnames]  # materialize and convert to Path
+    moviename.parent.mkdir(parents=True, exist_ok=True)
+
+    with imageio.get_writer(moviename, fps=fps, macro_block_size=1) as writer:
+        for fname in tqdm(fnames, desc="Creating video"):
+            writer.append_data(imageio.v2.imread(fname))
+
+    if do_delete:
+        for fname in fnames:
+            try:
+                fname.unlink()
+            except Exception:
+                print('Could not unlink', fname, ' error', e)
+
+    return moviename
 
 
 def savefig(fig, name:str, exts:list=['pdf', 'png'], figures_folder=Path('figures'), opts_savefig = dict(    bbox_inches='tight', pad_inches=0.1, edgecolor=None)):

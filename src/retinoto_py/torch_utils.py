@@ -4,7 +4,6 @@ Useful torch snippets to use in the main module.
 """
 
 #############################################################
-#############################################################
 
 import matplotlib.pyplot as plt
 import matplotlib
@@ -14,6 +13,8 @@ import numpy as np
 import torchvision.transforms as T
 from torchvision import datasets
 import torchvision.transforms as transforms
+from tqdm.auto import tqdm
+#############################################################
 
 def get_idx_to_label(args):
     ##############
@@ -76,7 +77,7 @@ class InMemoryImageDataset(Dataset):
         self.images = []
         self.labels = []
 
-        for i_img, (img, label) in tqdm(enumerate(image_folder)):
+        for i_img, (img, label) in tqdm(enumerate(image_folder), desc='Putting images in memory'):
             self.images.append(img)
             self.labels.append(label)
             if n_stop >0:
