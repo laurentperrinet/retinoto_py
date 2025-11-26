@@ -260,19 +260,6 @@ def train_model(args, model, train_loader, val_loader, df_train=None, #each_step
 
 def do_learning(args, dataset, name):
 
-    from .torch_utils import get_loader, get_dataset, load_model, apply_weights
-
-    TRAIN_DATA_DIR = args.DATAROOT / f'Imagenet_{dataset}' / 'train'
-    train_dataset, class_to_idx, idx_to_class = get_dataset(args, TRAIN_DATA_DIR)
-    train_loader = get_loader(args, train_dataset)
-    VAL_DATA_DIR = args.DATAROOT / f'Imagenet_{dataset}' / 'val'
-    val_dataset, class_to_idx, idx_to_class = get_dataset(args, VAL_DATA_DIR)
-    val_loader = get_loader(args, val_dataset)
-
-    model_filename = args.data_cache / f'{name}.pth'
-    json_filename = args.data_cache / model_filename.name.replace('.pth', '.json')
-    lock_filename = args.data_cache / model_filename.name.replace('.pth', '.lock')
-
 
     # --- 3. Load the Pre-trained ResNet Model ---
 
@@ -283,6 +270,10 @@ def do_learning(args, dataset, name):
     df_train = None
     should_resume_training = not lock_filename.exists()
 
+        model_filename = args.data_cache / f'{name}.pth'
+        json_filename = args.data_cache / model_filename.name.replace('.pth', '.json')
+        lock_filename = args.data_cache / model_filename.name.replace('.pth', '.lock')
+
     if json_filename.exists():
         print(f"Load JSON from pre-trained resnet {json_filename}")
         df_train = pd.read_json(json_filename, orient='records')
@@ -290,6 +281,15 @@ def do_learning(args, dataset, name):
         should_resume_training = (df_train['epoch'].max() + 1 < args.num_epochs) and (not lock_filename.exists())
 
     if should_resume_training:
+        from .torch_utils import get_loader, get_dataset, load_model, apply_weights
+
+        TRAIN_DATA_DIR = args.DATAROOT / f'Imagenet_{dataset}' / 'train'
+        train_dataset, class_to_idx, idx_to_class = get_dataset(args, TRAIN_DATA_DIR)
+        train_loader = get_loader(args, train_dataset)
+        VAL_DATA_DIR = args.DATAROOT / f'Imagenet_{dataset}' / 'val'
+        val_dataset, class_to_idx, idx_to_class = get_dataset(args, VAL_DATA_DIR)
+        val_loader = get_loader(args, val_dataset)
+
         touch(lock_filename) # as we do a training let's lock it
         # we need to train the model or finish a training that already started
         print(f"Training model {args.model_name}, file= {model_filename} - image_size={args.image_size}")
