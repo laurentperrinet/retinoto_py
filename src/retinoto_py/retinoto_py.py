@@ -138,7 +138,7 @@ def get_validation_accuracy(args, model, val_loader, desc=None):
 
 
     accuracy = correct_predictions / total_predictions
-    outer_progress.set_postfix(f"accuracy={accuracy:.4f}")
+    outer_progress.set_postfix_str(f"accuracy={accuracy:.4f}")
 
     return accuracy
 
@@ -275,7 +275,7 @@ def do_learning(args, dataset, name):
 
     def touch(fname): open(fname, 'w').close()
 
-    # %rm {lock_filename}
+    # %rm {lock_filename}  # FORCING RECOMPUTE
 
     df_train = None
     should_resume_training = not lock_filename.exists()
