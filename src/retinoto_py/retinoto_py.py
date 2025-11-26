@@ -144,9 +144,8 @@ def get_validation_accuracy(args, model, val_loader, desc=None):
 
     return accuracy
 
-def train_model(args, model, train_loader, val_loader, df_train=None, #each_steps=64, 
-                verbose=True, do_save=True, 
-                model_filename='/tmp/resnet.pth', json_filename='/tmp/resnet.json'):
+def train_model(args, model, train_loader, val_loader, df_train=None, 
+                model_filename=None, json_filename=None):
     
     model = model.to(args.device)
     # retraining the full model
@@ -172,10 +171,10 @@ def train_model(args, model, train_loader, val_loader, df_train=None, #each_step
     # the DataFrame to record from
     if df_train is None:
         i_epoch_start = 0
-        if verbose: print(f"Starting learning...")
+        if args.verbose: print(f"Starting learning...")
     else:
         i_epoch_start = df_train['epoch'].max() + 1
-        if verbose: print(f"Starting from epoch {i_epoch_start} with {len(df_train)} records")
+        if args.verbose: print(f"Starting from epoch {i_epoch_start} with {len(df_train)} records")
         # # reset the index
         # df_train.reset_index(drop=True, inplace=True)
         # make a copy of the DataFrame to avoid modifying the original one
@@ -185,7 +184,7 @@ def train_model(args, model, train_loader, val_loader, df_train=None, #each_step
     history = []
     max_acc_train, max_acc_val = 0., 0.
     total_image = 0
-    outer_progress = tqdm(range(i_epoch_start, args.num_epochs), desc="Epochs", leave=False)
+    outer_progress = tqdm(range(i_epoch_start, args.num_epochs), desc="Epochs", leave=False, disable=(args.num_epochs==1))
     for i_epoch in outer_progress:
         running_loss = 0.0
         running_corrects = 0
@@ -241,18 +240,19 @@ def train_model(args, model, train_loader, val_loader, df_train=None, #each_step
         max_acc_train, max_acc_val = max((max_acc_train, acc_train)), max((max_acc_val, acc_val))
         outer_progress.set_postfix_str(f"Acc: train={max_acc_train:.4f} - val={max_acc_val:.4f}")
         history.append({'epoch': i_epoch, 'i_image':i_image, 'total_image':total_image, 'loss_train':loss_train, 'acc_train':acc_train, 'loss_val':loss_val, 'acc_val':acc_val, 'time':time.time() - since})
-        # if verbose:  print(f"{model_filename} \t| Epoch {i_epoch}, i_image {i_image} \t| train= loss: {loss_train:.4f} \t| acc : {acc_train:.4f} - val= loss : {loss_val:.4f} \t| acc : {acc_val:.4f} \t| time:{time.time() - since:.1f}")
+        # if args.verbose:  print(f"{model_filename} \t| Epoch {i_epoch}, i_image {i_image} \t| train= loss: {loss_train:.4f} \t| acc : {acc_train:.4f} - val= loss : {loss_val:.4f} \t| acc : {acc_val:.4f} \t| time:{time.time() - since:.1f}")
 
     if df_train is None:
         df_train = pd.DataFrame(history)
     else:
         df_new_row = pd.DataFrame(history)
         df_train = pd.concat([df_train, df_new_row], ignore_index=True)
-    if do_save:
-        if verbose:  print(f"Saving...{model_filename}")
-        torch.save(model.state_dict(), model_filename)
+    if not(json_filename is None):
         df_train.to_json(json_filename, orient='records', indent=2)
 
+    if not(model_filename is None):
+        if args.verbose:  print(f"Saving...{model_filename}")
+        torch.save(model.state_dict(), model_filename)
 
     return model, df_train
 
@@ -279,6 +279,7 @@ def do_learning(args, dataset, name):
         should_resume_training = (df_train['epoch'].max() + 1 < args.num_epochs) and (not lock_filename.exists())
 
     if should_resume_training:
+        touch(lock_filename) # as we do a training let's lock it
         from .torch_utils import get_loader, get_dataset, load_model
 
         TRAIN_DATA_DIR = args.DATAROOT / f'Imagenet_{dataset}' / 'train'
@@ -288,7 +289,6 @@ def do_learning(args, dataset, name):
         val_dataset, class_to_idx, idx_to_class = get_dataset(args, VAL_DATA_DIR, n_stop=args.n_val_stop)
         val_loader = get_loader(args, val_dataset)
 
-        touch(lock_filename) # as we do a training let's lock it
         # we need to train the model or finish a training that already started
         print(f"Training model {args.model_name}, file= {model_filename} - image_size={args.image_size}")
 

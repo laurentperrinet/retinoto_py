@@ -120,11 +120,11 @@ def get_dataset(args, DATA_DIR, angle_min=None, angle_max=None, in_memory=None, 
     idx_to_class = {v: k for k, v in class_to_idx.items()}
     return dataset, class_to_idx, idx_to_class
 
-def get_loader(args, dataset):
+def get_loader(args, dataset, drop_last=True):
     # The DataLoader handles batching, shuffling (for training), and loading data efficiently.
     # For evaluation, we don't need to shuffle.
     # A batch size of 1 is simplest for per-image analysis, but you can use larger batches.
-    val_loader = DataLoader(dataset, batch_size=args.batch_size, shuffle=args.shuffle)
+    val_loader = DataLoader(dataset, batch_size=args.batch_size, shuffle=args.shuffle, drop_last=drop_last)
 
     return val_loader
 
