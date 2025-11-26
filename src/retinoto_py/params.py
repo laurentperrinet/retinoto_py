@@ -38,7 +38,7 @@ class Params:
     n_val_stop: int = 64*batch_size # set for DEBUGging
     # n_train_stop: int = 0 # set to zero to use all images
     # n_val_stop: int = 0 # set to zero to use all images
-    lr: float = 1.e-5
+    lr: float = 1.e-6
     delta1: float = 0.1
     delta2: float = 0.
     weight_decay: float = 0.01
