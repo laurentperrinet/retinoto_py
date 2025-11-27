@@ -17,14 +17,13 @@ class Params:
     rs_min: float = 0.00 # Set minimum radius of the log-polar grid
     rs_max: float = -5.00 # Set maximum radius of the log-polar grid
     padding_mode: str = "zeros"
+    # padding_mode = "border"
 
     seed: int = 1998 # Set the seed for reproducibility 
     batch_size: int = 64 # Set number of images per input batch
     num_workers: int = 4
     in_memory: bool = True
 
-    # interpolation = T.InterpolationMode.BILINEAR
-    # padding_mode = "border"
 
     # model_name: str = 'resnet50' # Name of the model to use
     model_name: str = 'resnet101' # Name of the model to use
@@ -38,11 +37,11 @@ class Params:
     n_val_stop: int = 64*batch_size # set for DEBUGging
     # n_train_stop: int = 0 # set to zero to use all images
     # n_val_stop: int = 0 # set to zero to use all images
-    lr: float = 3.e-3
-    delta1: float = 30.e-3
+    lr: float = 1.e-3
+    delta1: float = 0.05
     delta2: float = 0.
-    weight_decay: float = 0.01
-    label_smoothing: float = 1e-4 # See https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html
+    weight_decay: float = 3.e-3
+    label_smoothing: float = 1.e-4 # See https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html
 
     shuffle: bool = True # Whether to shuffle the data during training
     data_cache = Path('cached_data')

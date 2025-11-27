@@ -1,13 +1,14 @@
 """Main module."""
 
 #############################################################
-#############################################################
 import numpy as np
 import torch
 import torchvision.transforms as transforms
+import torchvision.transforms.functional as TF
 import time
 import pandas as pd
 from tqdm.auto import tqdm
+#############################################################
 
 # https://github.com/laurentperrinet/2024-12-09-normalizing-images-in-convolutional-neural-networks
 im_mean = np.array([0.485, 0.456, 0.406])
@@ -61,17 +62,19 @@ def get_grid(args, endpoint=False):
     
     return torch.stack((grid_xs, grid_ys), 2)#.to(args.device) # (H_scaled, W_scaled, 2)
 
-# interpolation = T.InterpolationMode.BILINEAR, 
 class transform_apply_grid(object): 
-    def __init__(self, logPolar_grid, padding_mode):
+    def __init__(self, logPolar_grid, padding_mode, interpolation):
         self.grid = logPolar_grid
         self.padding_mode = padding_mode
+        self.interpolation = interpolation
 
     def __call__(self, images):
-        return torch.nn.functional.grid_sample(images.unsqueeze(dim=0), self.grid.unsqueeze(dim=0), 
-                               padding_mode=self.padding_mode, align_corners=False).squeeze(dim=0)
+        return torch.nn.functional.grid_sample(images.unsqueeze(dim=0), 
+                                               self.grid.unsqueeze(dim=0), 
+                                               padding_mode=self.padding_mode, align_corners=False, 
+                                               interpolation=self.interpolation).squeeze(dim=0)
 
-def get_preprocess(args, angle_min=None, angle_max=None):
+def get_preprocess(args, angle_min=None, angle_max=None, interpolation=TF.InterpolationMode.BILINEAR):
     # --- 5. Define Image Pre-processing ---
     # The images must be pre-processed in the exact same way the model was trained on.
     # This includes resizing, cropping, and normalizing.
@@ -81,7 +84,7 @@ def get_preprocess(args, angle_min=None, angle_max=None):
                         
     # Si les deux angles ne sont pas None, on applique la rotation
     if angle_min is not None and angle_max is not None:
-        transform_list.append(transforms.RandomRotation(degrees=(angle_min, angle_max)))
+        transform_list.append(transforms.RandomRotation(degrees=(angle_min, angle_max), interpolation=interpolation))
     
     transform_list.append(transforms.RandomHorizontalFlip())
 
@@ -96,7 +99,7 @@ def get_preprocess(args, angle_min=None, angle_max=None):
 
     if args.do_fovea: # apply log-polar mapping to the image
         grid_polar = get_grid(args)
-        transform_list.append(transform_apply_grid(grid_polar, padding_mode=args.padding_mode))
+        transform_list.append(transform_apply_grid(grid_polar, padding_mode=args.padding_mode, interpolation=interpolation))
 
     # Créer la chaîne de prétraitement finale
     preprocess = transforms.Compose(transform_list)
