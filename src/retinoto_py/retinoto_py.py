@@ -63,18 +63,20 @@ def get_grid(args, endpoint=False):
     return torch.stack((grid_xs, grid_ys), 2)#.to(args.device) # (H_scaled, W_scaled, 2)
 
 class transform_apply_grid(object): 
-    def __init__(self, logPolar_grid, padding_mode, interpolation):
+    # https://docs.pytorch.org/docs/stable/generated/torch.nn.functional.grid_sample.html
+    def __init__(self, logPolar_grid, padding_mode, mode):
         self.grid = logPolar_grid
         self.padding_mode = padding_mode
-        self.interpolation = interpolation
+        self.mode = mode
 
     def __call__(self, images):
         return torch.nn.functional.grid_sample(images.unsqueeze(dim=0), 
                                                self.grid.unsqueeze(dim=0), 
                                                padding_mode=self.padding_mode, align_corners=False, 
-                                               interpolation=self.interpolation).squeeze(dim=0)
+                                               mode=self.mode).squeeze(dim=0)
 
-def get_preprocess(args, angle_min=None, angle_max=None, interpolation=TF.InterpolationMode.BILINEAR):
+def get_preprocess(args, angle_min=None, angle_max=None, 
+                   interpolation=TF.InterpolationMode.BILINEAR, mode='bilinear'):
     # --- 5. Define Image Pre-processing ---
     # The images must be pre-processed in the exact same way the model was trained on.
     # This includes resizing, cropping, and normalizing.
@@ -99,7 +101,7 @@ def get_preprocess(args, angle_min=None, angle_max=None, interpolation=TF.Interp
 
     if args.do_fovea: # apply log-polar mapping to the image
         grid_polar = get_grid(args)
-        transform_list.append(transform_apply_grid(grid_polar, padding_mode=args.padding_mode, interpolation=interpolation))
+        transform_list.append(transform_apply_grid(grid_polar, padding_mode=args.padding_mode, mode=mode))
 
     # Créer la chaîne de prétraitement finale
     preprocess = transforms.Compose(transform_list)
