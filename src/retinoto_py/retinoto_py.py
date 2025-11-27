@@ -169,7 +169,7 @@ def train_model(args, model, train_loader, val_loader, df_train=None,
         # if args.verbose:  print(f"{model_filename} \t| Epoch {i_epoch}, i_image {i_image} \t| train= loss: {loss_train:.3f} \t| acc : {acc_train:.3f} - val= loss : {loss_val:.3f} \t| acc : {acc_val:.3f} \t| time:{time.time() - since:.1f}")
 
         if not(model_filename is None):
-            if args.verbose:  print(f"Saving...{model_filename}")
+            # if args.verbose:  print(f"Saving...{model_filename}")
             torch.save(model.state_dict(), model_filename)
 
     if df_train is None:

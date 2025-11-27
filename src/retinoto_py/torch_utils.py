@@ -270,7 +270,10 @@ def get_dataset(args, DATA_DIR, angle_min=None, angle_max=None, in_memory=None, 
         # Use in-memory dataset instead of ImageFolder
         dataset = InMemoryImageDataset(root=DATA_DIR, transform=preprocess, n_stop=n_stop, is_valid_file=is_valid_file, do_pil=do_pil)
     else:    
-        dataset = datasets.ImageFolder(root=DATA_DIR, transform=preprocess, is_valid_file=is_valid_file, loader=torch_loader, do_pil=do_pil)
+        if do_pil:
+            dataset = datasets.ImageFolder(root=DATA_DIR, transform=preprocess, is_valid_file=is_valid_file)
+        else:
+            dataset = datasets.ImageFolder(root=DATA_DIR, transform=preprocess, is_valid_file=is_valid_file, loader=torch_loader)
         if n_stop>0: raise('not implemented')
     # # The dataset provides a mapping from class index to class name (folder name)
     # class_to_idx = dataset.class_to_idx
