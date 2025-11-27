@@ -29,7 +29,7 @@ class Params:
     model_name: str = 'resnet101' # Name of the model to use
     do_scratch: bool = False # Whether to train from scratch (True) or use pretrained weights (False)
 
-    batch_size: int  = 64 # Set the batch size for training and validation
+    batch_size: int  = 80 # Set the batch size for training and validation
 
     # num_epochs: int = 1
     num_epochs: int = 10 

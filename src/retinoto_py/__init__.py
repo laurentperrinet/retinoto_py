@@ -13,7 +13,7 @@ all_datasets_color = ['blue', 'orange']
 
 #####################################################
 from .params import Params
-from .utils import get_device, set_seed, savefig, make_mp4
+from .utils import get_device, set_seed, savefig, make_mp4, plot_model_comparison
 from .torch_utils import imshow, get_idx_to_label, get_loader, get_dataset, imgs_to_np
 from .torch_utils import load_model, count_parameters, count_layers, apply_weights
 from .torch_utils import make_mask, get_preprocess
@@ -33,16 +33,7 @@ import numpy as np
 
 import pandas as pd # to store results
 import torch
-import torch.nn.functional as nnf
-import torchvision
-from torchvision.io import read_image
-# https://pytorch.org/vision/main/generated/torchvision.transforms.functional.crop.html
-# from torchvision.transforms.functional import crop
-import torchvision.transforms.functional as TF
-# from torchvision import datasets, models, transforms
-# from torchvision.datasets import ImageFolder
-from torchvision.transforms import v2 as T
-import torch.nn as nn
+
 torch.set_printoptions(precision=3, linewidth=140, sci_mode=False)
 
 import matplotlib.pyplot as plt

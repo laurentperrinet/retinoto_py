@@ -10,12 +10,19 @@ import matplotlib
 import torchvision
 import torch
 import numpy as np
-import torchvision.transforms as transforms
-import torchvision.transforms.functional as TF
 from torchvision import datasets
 from tqdm.auto import tqdm
 from torch.utils.data import Dataset, DataLoader
 from torchvision.io import read_image
+import torch.nn.functional as nnf
+# https://pytorch.org/vision/main/generated/torchvision.transforms.functional.crop.html
+# from torchvision.transforms.functional import crop
+import torchvision.transforms as transforms
+import torchvision.transforms.functional as TF
+# from torchvision import datasets, models, transforms
+# from torchvision.datasets import ImageFolder
+# from torchvision.transforms import v2 as T
+import torch.nn as nn
 #############################################################
 import warnings
 warnings.filterwarnings(
@@ -85,7 +92,9 @@ def torch_loader(path: str) -> torch.Tensor:
         Float tensor ready for torchvision transforms.
     """
     # read_image returns a UInt8 tensor (C, H, W) with values 0‑255
-    img = read_image(path)                # still on CPU
+    with warnings.catch_warnings():
+        warnings.filterwarnings('ignore')  # Suppress warnings just for this operation
+        img = read_image(path)                # still on CPU
     # Convert to float and normalise
     img = img.float() / 255.0
 
@@ -166,7 +175,7 @@ def make_mask(image_size: int, radius: float = 1.0):
     mask = (R <= radius).astype(np.float32) # 1.0 pour un cercle complet
     return torch.from_numpy(mask).unsqueeze(0) # Ajoute la dimension du canal
 
-class ApplyMask():
+class ApplyMask(object):
     """Applique un masque circulaire à un tenseur d'image."""
     def __init__(self, mask: torch.Tensor):
         # On stocke le masque. Le .clone() est une bonne pratique pour éviter
@@ -181,7 +190,7 @@ class ApplyMask():
         Returns:
             torch.Tensor: Tenseur masqué.
         """
-        return tensor * self.mask.unsqueeze(0)  # Add channel dim only when needed
+        return tensor * self.mask
 
 # Prefer direct module import to avoid static analysis issues in some environments
 def get_grid(args, endpoint=False):
@@ -204,10 +213,11 @@ class transform_apply_grid(object):
         self.mode = mode
 
     def __call__(self, images):
-        return torch.nn.functional.grid_sample(images.unsqueeze(dim=0), 
-                                               self.grid.unsqueeze(dim=0), 
-                                               padding_mode=self.padding_mode, align_corners=False, 
-                                               mode=self.mode).squeeze(dim=0)
+        result =  nnf.grid_sample(images.unsqueeze(dim=0), 
+                                    self.grid.unsqueeze(dim=0), 
+                                    padding_mode=self.padding_mode, align_corners=False, 
+                                    mode=self.mode)
+        return result.squeeze(0)
 
 def get_preprocess(args, angle_min=None, angle_max=None, 
                    interpolation=TF.InterpolationMode.BILINEAR, mode='bilinear'):
@@ -226,18 +236,17 @@ def get_preprocess(args, angle_min=None, angle_max=None,
     
     transform_list.append(transforms.RandomHorizontalFlip())
 
+    if args.do_fovea: # apply log-polar mapping to the image
+        grid_polar = get_grid(args)
+        transform_list.append(transform_apply_grid(grid_polar, padding_mode=args.padding_mode, mode=mode))
+
+    transform_list.append(transforms.Normalize(mean=im_mean, std=im_std))
 
     if args.do_mask and not(args.do_fovea):
         # Créer le masque une seule fois avec la taille de l'image
         mask = make_mask(image_size=args.image_size)
         # Ajouter notre transform personnalisée à la liste
         transform_list.append(ApplyMask(mask))
-
-    if args.do_fovea: # apply log-polar mapping to the image
-        grid_polar = get_grid(args)
-        transform_list.append(transform_apply_grid(grid_polar, padding_mode=args.padding_mode, mode=mode))
-
-    transform_list.append(transforms.Normalize(mean=im_mean, std=im_std))
 
     # Créer la chaîne de prétraitement finale
     preprocess = transforms.Compose(transform_list)

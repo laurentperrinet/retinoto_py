@@ -89,6 +89,119 @@ def make_mp4(moviename, fnames, fps, do_delete=True):
 
     return moviename
 
+from matplotlib.lines import Line2D
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+def plot_model_comparison(results, model_names, datasets, figures_folder=None, save_name='model_comparison'):
+    """
+    Plot model comparison: inference time vs accuracy and model size vs accuracy.
+    
+    Parameters
+    ----------
+    results : DataFrame
+        Results dataframe with columns: dataset, do_mask, accuracy, wall_clock_time, 
+        total_parameters, model_name
+    model_names : list
+        List of model names to plot
+    datasets : list
+        List of dataset names to plot
+    figures_folder : str, optional
+        Folder to save figures
+    save_name : str
+        Name for saved figure
+    """
+    
+    # Sort results
+    results_sorted = results.sort_values(['dataset', 'do_mask', 'accuracy'])
+    
+    # Setup styles
+    linestyles = {True: '--', False: '-'}
+    markers = {name: marker for name, marker in zip(model_names, 
+                                                     ['o', 's', '^', 'D', 'v', 'p', '*', 'H'][:len(model_names)])}
+    palette = sns.color_palette("husl", len(datasets))
+    dataset_colors = {dataset: palette[i] for i, dataset in enumerate(datasets)}
+    
+    fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+    
+    # Plot both subplots with same logic
+    plot_configs = [
+        (axes[0], 'wall_clock_time', 'Wall Clock Time (s)', 'Inference Time vs Accuracy'),
+        (axes[1], 'total_parameters', 'Total Parameters', 'Model Size vs Accuracy')
+    ]
+    
+    for ax, y_col, y_label, title in plot_configs:
+        for dataset in datasets:
+            for do_mask in [False, True]:
+                data_subset = results_sorted[
+                    (results_sorted['dataset'] == dataset) & 
+                    (results_sorted['do_mask'] == do_mask)
+                ].copy()
+                
+                if len(data_subset) == 0:
+                    continue
+                
+                # Order by model_names
+                data_subset['model_name'] = data_subset['model_name'].astype('category')
+                data_subset['model_name'] = data_subset['model_name'].cat.set_categories(model_names)
+                data_subset = data_subset.sort_values('model_name')
+                
+                # Plot line
+                ax.plot(data_subset['accuracy'], 
+                       data_subset[y_col],
+                       linestyle=linestyles[do_mask],
+                       color=dataset_colors[dataset],
+                       linewidth=2.5)
+                
+                # Add markers
+                for model_name in model_names:
+                    model_data = data_subset[data_subset['model_name'] == model_name]
+                    if len(model_data) > 0:
+                        ax.scatter(model_data['accuracy'], 
+                                  model_data[y_col],
+                                  marker=markers[model_name],
+                                  color=dataset_colors[dataset],
+                                  s=100,
+                                  zorder=5)
+        
+        ax.set_xlabel('Accuracy', fontsize=12)
+        ax.set_ylabel(y_label, fontsize=12)
+        ax.set_title(title, fontsize=13, fontweight='bold')
+        ax.grid(True, alpha=0.3)
+    
+    # Create legend
+    legend_elements = []
+    
+    # Datasets
+    legend_elements.append(Line2D([0], [0], color='none', label='Datasets:', lw=0))
+    for dataset in datasets:
+        legend_elements.append(Line2D([0], [0], color=dataset_colors[dataset], lw=2.5, label=f'  {dataset}'))
+    
+    legend_elements.append(Line2D([0], [0], color='none', label='', lw=0))
+    
+    # Masking
+    legend_elements.append(Line2D([0], [0], color='none', label='Masking:', lw=0))
+    legend_elements.append(Line2D([0], [0], color='black', linestyle='-', lw=2.5, label='  do_mask=False'))
+    legend_elements.append(Line2D([0], [0], color='black', linestyle='--', lw=2.5, label='  do_mask=True'))
+    
+    legend_elements.append(Line2D([0], [0], color='none', label='', lw=0))
+    
+    # Models
+    legend_elements.append(Line2D([0], [0], color='none', label='Models:', lw=0))
+    for model_name in model_names:
+        legend_elements.append(Line2D([0], [0], marker=markers[model_name], color='black', 
+                                     linestyle='none', markersize=8, label=f'  {model_name}'))
+    
+    fig.legend(handles=legend_elements, loc='center left', bbox_to_anchor=(.9, 0.5), fontsize=10)
+    
+    plt.tight_layout()
+    plt.subplots_adjust(right=0.85)
+    
+    if figures_folder:
+        savefig(fig, name=save_name, figures_folder=figures_folder, exts=['pdf'])
+    
+    plt.show()
+    return fig, axes
 
 def savefig(fig, name:str, exts:list=['pdf', 'png'], figures_folder=Path('figures'), opts_savefig = dict(    bbox_inches='tight', pad_inches=0.1, edgecolor=None)):
     for ext in exts: 
