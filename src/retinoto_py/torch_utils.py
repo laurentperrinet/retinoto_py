@@ -141,6 +141,14 @@ def load_model(args, model_filename=None):
         model = models.resnet50(weights=None if args.do_scratch else models.ResNet50_Weights.DEFAULT)
     elif args.model_name=='resnet101':
         model = models.resnet101(weights=None if args.do_scratch else models.ResNet101_Weights.DEFAULT)
+    elif args.model_name=='convnext_tiny':
+        model = models.convnext_tiny(weights=None if args.do_scratch else models.ConvNeXt_Large_Weights.IMAGENET1K_V1)
+    elif args.model_name=='convnext_small':
+        model = models.convnext_small(weights=None if args.do_scratch else models.ConvNeXt_Large_Weights.IMAGENET1K_V1)
+    elif args.model_name=='convnext_base':
+        model = models.convnext_base(weights=None if args.do_scratch else models.ConvNeXt_Base_Weights.IMAGENET1K_V1)
+    elif args.model_name=='convnext_large':
+        model = models.convnext_large(weights=None if args.do_scratch else models.ConvNeXt_Large_Weights.IMAGENET1K_V1)
     else:
         raise ValueError(f'Unknown model {args.model_name}')
     model = model.to(args.device)
