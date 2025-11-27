@@ -4,12 +4,12 @@ Useful torch snippets to use in the main module.
 """
 
 #############################################################
+import random
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib
 import torchvision
 import torch
-import numpy as np
 from torchvision import datasets
 from tqdm.auto import tqdm
 from torch.utils.data import Dataset, DataLoader
@@ -112,13 +112,19 @@ def torch_loader(path: str) -> torch.Tensor:
 
 class InMemoryImageDataset(Dataset):
     """Load entire ImageFolder dataset into memory"""
-    def __init__(self, root, transform=None, n_stop=0, is_valid_file=None):
+    def __init__(self, root, transform=None, n_stop=0, is_valid_file=None, do_pil=True):
         # Use ImageFolder to handle directory structure and class mapping
-        image_folder = datasets.ImageFolder(root=root, 
-                                            loader=torch_loader,
-                                            is_valid_file=is_valid_file,
-                                            transform=None, 
-                                            )
+        if do_pil:
+            image_folder = datasets.ImageFolder(root=root, 
+                                                is_valid_file=is_valid_file,
+                                                transform=None, 
+                                                )
+        else:
+            image_folder = datasets.ImageFolder(root=root, 
+                                                loader=torch_loader,
+                                                is_valid_file=is_valid_file,
+                                                transform=None, 
+                                                )
         
         self.class_to_idx = image_folder.class_to_idx
         self.idx_to_class = {v: k for k, v in self.class_to_idx.items()}
@@ -220,12 +226,12 @@ class transform_apply_grid(object):
         return result.squeeze(0)
 
 def get_preprocess(args, angle_min=None, angle_max=None, 
-                   interpolation=TF.InterpolationMode.BILINEAR, mode='bilinear'):
+                   interpolation=TF.InterpolationMode.BILINEAR, mode='bilinear', do_pil=True):
     # --- 5. Define Image Pre-processing ---
     # The images must be pre-processed in the exact same way the model was trained on.
     # This includes resizing, cropping, and normalizing.
     transform_list = []
-    # transform_list.append(transforms.ToTensor())  # Convert the image to a PyTorch Tensor
+    if do_pil: transform_list.append(transforms.ToTensor())  # Convert the image to a PyTorch Tensor
     transform_list.append(transforms.Lambda(lambda x: TF.resize(x, args.image_size)))
     transform_list.append(transforms.Lambda(lambda x: TF.center_crop(x, args.image_size)))
     
@@ -252,8 +258,8 @@ def get_preprocess(args, angle_min=None, angle_max=None,
     preprocess = transforms.Compose(transform_list)
     return preprocess
 
-def get_dataset(args, DATA_DIR, angle_min=None, angle_max=None, in_memory=None, n_stop=0):
-    preprocess = get_preprocess(args, angle_min=angle_min, angle_max=angle_max)
+def get_dataset(args, DATA_DIR, angle_min=None, angle_max=None, in_memory=None, n_stop=0, do_pil=True):
+    preprocess = get_preprocess(args, angle_min=angle_min, angle_max=angle_max, do_pil=do_pil)
 
     is_valid_file = lambda p: p.lower().endswith(('.png', '.jpg', '.jpeg'))
     # --- 2. Create Dataset and DataLoader using ImageFolder ---
@@ -262,9 +268,9 @@ def get_dataset(args, DATA_DIR, angle_min=None, angle_max=None, in_memory=None, 
     if in_memory is None: in_memory = args.in_memory
     if in_memory:
         # Use in-memory dataset instead of ImageFolder
-        dataset = InMemoryImageDataset(root=DATA_DIR, transform=preprocess, n_stop=n_stop, is_valid_file=is_valid_file)
+        dataset = InMemoryImageDataset(root=DATA_DIR, transform=preprocess, n_stop=n_stop, is_valid_file=is_valid_file, do_pil=do_pil)
     else:    
-        dataset = datasets.ImageFolder(root=DATA_DIR, transform=preprocess, is_valid_file=is_valid_file, loader=torch_loader)
+        dataset = datasets.ImageFolder(root=DATA_DIR, transform=preprocess, is_valid_file=is_valid_file, loader=torch_loader, do_pil=do_pil)
         if n_stop>0: raise('not implemented')
     # # The dataset provides a mapping from class index to class name (folder name)
     # class_to_idx = dataset.class_to_idx
@@ -272,11 +278,20 @@ def get_dataset(args, DATA_DIR, angle_min=None, angle_max=None, in_memory=None, 
     # idx_to_class = {v: k for k, v in class_to_idx.items()}
     return dataset
 
-def get_loader(args, dataset, drop_last=True):
+from .utils import set_seed
+def get_loader(args, dataset, drop_last=True, seed=None):
     # The DataLoader handles batching, shuffling (for training), and loading data efficiently.
     # For evaluation, we don't need to shuffle.
     # A batch size of 1 is simplest for per-image analysis, but you can use larger batches.
-    val_loader = DataLoader(dataset, batch_size=args.batch_size, shuffle=args.shuffle, drop_last=drop_last)
+    if seed is None: seed = args.seed
+    set_seed(seed=args.seed, seed_torch=True, verbose=args.verbose)
+    def seed_worker(worker_id):
+        np.random.seed(seed)
+        random.seed(seed)
+    val_loader = DataLoader(dataset, batch_size=args.batch_size, 
+                            shuffle=args.shuffle, drop_last=drop_last,
+                            worker_init_fn=seed_worker, generator=torch.Generator().manual_seed(seed)
+                            )
 
     return val_loader
 
@@ -323,7 +338,6 @@ def apply_weights(model, model_filename, device, verbose=True):
     if verbose: print(f'loading .... {model_filename}')
     model.load_state_dict(torch.load(model_filename, map_location=torch.device(device)))
     return model
-
 
 
 def count_parameters(model):

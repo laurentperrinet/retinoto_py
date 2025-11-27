@@ -8,7 +8,6 @@ import pandas as pd
 from tqdm.auto import tqdm
 #############################################################
 
-    
 def get_validation_accuracy(args, model, val_loader, desc=None):
     if desc is None:
         desc = f"Evaluating {args.model_name}"
@@ -47,7 +46,7 @@ def get_validation_accuracy(args, model, val_loader, desc=None):
 
 
     accuracy = correct_predictions / total_predictions
-    outer_progress.set_postfix_str(f"accuracy={accuracy:.4f}")
+    outer_progress.set_postfix_str(f"accuracy={accuracy:.3f}")
 
     return accuracy
 
@@ -56,21 +55,41 @@ def train_model(args, model, train_loader, val_loader, df_train=None,
     
     model = model.to(args.device)
     # retraining the full model
-    for param in model.parameters():
-        param.requires_grad = True        
+    if args.do_full_training:
+        for param in model.parameters():
+            param.requires_grad = True        
+
+        # sets the optimizer
+        if args.delta2 > 0.: 
+            optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, betas=(1-args.delta1, 1-args.delta2), 
+                                        weight_decay=args.weight_decay) 
+        else:
+            optimizer = torch.optim.SGD(model.parameters(), lr=args.lr, momentum=1-args.delta1, 
+                                        weight_decay=args.weight_decay) # to set training variables
+    else:
+        # Freeze everything except FC layer
+        for name, param in model.named_parameters():
+            if 'fc' not in name:
+                param.requires_grad = False
+
+        # Optimizer only trains the FC layer
+        optimizer = torch.optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=0.001)
+        for param in model.parameters():
+            param.requires_grad = True        
+
+        # sets the optimizer
+        if args.delta2 > 0.: 
+            optimizer = torch.optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), 
+                                                lr=args.lr, betas=(1-args.delta1, 1-args.delta2), 
+                                                weight_decay=args.weight_decay) 
+        else:
+            optimizer = torch.optim.SGD(filter(lambda p: p.requires_grad, model.parameters()), lr=args.lr, momentum=1-args.delta1, 
+                                        weight_decay=args.weight_decay) # to set training variables
 
     n_train_stop = args.n_train_stop
     if n_train_stop==0: n_train_stop = len(train_loader.dataset)
     n_val_stop = args.n_val_stop
     if n_val_stop==0: n_val_stop = len(val_loader.dataset)
-
-    # sets the optimizer
-    if args.delta2 > 0.: 
-        optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, betas=(1-args.delta1, 1-args.delta2), 
-                                      weight_decay=args.weight_decay) 
-    else:
-        optimizer = torch.optim.SGD(model.parameters(), lr=args.lr, momentum=1-args.delta1, 
-                                    weight_decay=args.weight_decay) # to set training variables
     
     # https://pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html 
     criterion = torch.nn.CrossEntropyLoss(label_smoothing=args.label_smoothing)
@@ -138,16 +157,20 @@ def train_model(args, model, train_loader, val_loader, df_train=None,
                 running_loss_val += loss.item() * images.size(0)
                 i_image += len(images)
                 acc_val = running_corrects_val*1. / i_image
-                val_progress.set_postfix_str(f"Acc: train={acc_train:.4f} - val={acc_val:.4f}")
+                val_progress.set_postfix_str(f"Acc: train={acc_train:.3f} - val={acc_val:.3f}")
                 # if i_image > n_val_stop: break # early stopping
 
         loss_val = running_loss_val / n_val_stop
         acc_val = running_corrects_val*1. / n_val_stop
 
         max_acc_train, max_acc_val = max((max_acc_train, acc_train)), max((max_acc_val, acc_val))
-        outer_progress.set_postfix_str(f"Acc: train={max_acc_train:.4f} - val={max_acc_val:.4f}")
+        outer_progress.set_postfix_str(f"Acc: train={acc_train:.3f} - val={acc_val:.3f} - (Max:train={max_acc_train:.3f} - val={max_acc_val:.3f})")
         history.append({'epoch': i_epoch, 'i_image':i_image, 'total_image':total_image, 'loss_train':loss_train, 'acc_train':acc_train, 'loss_val':loss_val, 'acc_val':acc_val, 'time':time.time() - since})
-        # if args.verbose:  print(f"{model_filename} \t| Epoch {i_epoch}, i_image {i_image} \t| train= loss: {loss_train:.4f} \t| acc : {acc_train:.4f} - val= loss : {loss_val:.4f} \t| acc : {acc_val:.4f} \t| time:{time.time() - since:.1f}")
+        # if args.verbose:  print(f"{model_filename} \t| Epoch {i_epoch}, i_image {i_image} \t| train= loss: {loss_train:.3f} \t| acc : {acc_train:.3f} - val= loss : {loss_val:.3f} \t| acc : {acc_val:.3f} \t| time:{time.time() - since:.1f}")
+
+        if not(model_filename is None):
+            if args.verbose:  print(f"Saving...{model_filename}")
+            torch.save(model.state_dict(), model_filename)
 
     if df_train is None:
         df_train = pd.DataFrame(history)
@@ -157,9 +180,6 @@ def train_model(args, model, train_loader, val_loader, df_train=None,
     if not(json_filename is None):
         df_train.to_json(json_filename, orient='records', indent=2)
 
-    if not(model_filename is None):
-        if args.verbose:  print(f"Saving...{model_filename}")
-        torch.save(model.state_dict(), model_filename)
 
     return model, df_train
 

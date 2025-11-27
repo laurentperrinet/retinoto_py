@@ -176,11 +176,12 @@ def plot_model_comparison(results, model_names, datasets, do_masks=[True, False]
     legend_elements = []
     
     # Datasets
-    legend_elements.append(Line2D([0], [0], color='none', label='Datasets:', lw=0))
-    for dataset in datasets:
-        legend_elements.append(Line2D([0], [0], color=dataset_colors[dataset], lw=2.5, label=f'  {dataset}'))
-    
-    legend_elements.append(Line2D([0], [0], color='none', label='', lw=0))
+    if len(datasets) > 1:
+        legend_elements.append(Line2D([0], [0], color='none', label='Datasets:', lw=0))
+        for dataset in datasets:
+            legend_elements.append(Line2D([0], [0], color=dataset_colors[dataset], lw=2.5, label=f'  {dataset}'))
+        
+        legend_elements.append(Line2D([0], [0], color='none', label='', lw=0))
     
     # Masking
     legend_elements.append(Line2D([0], [0], color='none', label='Masking:', lw=0))
@@ -206,7 +207,7 @@ def plot_model_comparison(results, model_names, datasets, do_masks=[True, False]
     plt.show()
     return fig, axes
 
-def savefig(fig, name:str, exts:list=['pdf', 'png'], figures_folder=Path('figures'), opts_savefig = dict(    bbox_inches='tight', pad_inches=0.1, edgecolor=None)):
-    for ext in exts: 
+def savefig(fig, name, exts=['pdf', 'png'], figures_folder=Path('figures'), opts_savefig = dict(bbox_inches='tight', pad_inches=0.1, edgecolor=None)):
+    for ext in exts:
         fig.savefig(figures_folder / f'{name}.{ext}', **opts_savefig)
 
