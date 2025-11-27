@@ -83,7 +83,7 @@ class InMemoryImageDataset(Dataset):
             n_total = min((n_stop, len(image_folder)))
             idxs = np.random.permutation(len(image_folder))[:n_total].astype(int)
 
-        for idx in tqdm(idxs, desc='Putting images in memory', total=n_total):
+        for idx in tqdm(idxs, desc='Putting images in memory', total=n_total, leave=False):
             self.images.append(image_folder[idx][0])
             self.labels.append(image_folder[idx][1])
 
