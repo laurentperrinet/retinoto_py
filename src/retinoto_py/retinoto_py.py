@@ -107,10 +107,10 @@ def train_model(args, model, train_loader, val_loader, df_train=None,
         df_train = df_train.copy()
 
     since = time.time()
-    history = []
+    # history = []
     max_acc_train, max_acc_val = 0., 0.
     total_image = 0
-    outer_progress = tqdm(range(i_epoch_start, args.num_epochs), desc="Epochs", leave=False, disable=(args.num_epochs==1))
+    outer_progress = tqdm(range(i_epoch_start, args.num_epochs), desc="Epochs", leave=True, disable=(args.num_epochs==1))
     for i_epoch in outer_progress:
         running_loss = 0.0
         running_corrects = 0
@@ -164,31 +164,28 @@ def train_model(args, model, train_loader, val_loader, df_train=None,
         acc_val = running_corrects_val*1. / n_val_stop
 
         max_acc_train, max_acc_val = max((max_acc_train, acc_train)), max((max_acc_val, acc_val))
-        outer_progress.set_postfix_str(f"Acc: train={acc_train:.3f} - val={acc_val:.3f} - (Max:train={max_acc_train:.3f} - val={max_acc_val:.3f})")
-        history.append({'epoch': i_epoch, 'i_image':i_image, 'total_image':total_image, 'loss_train':loss_train, 'acc_train':acc_train, 'loss_val':loss_val, 'acc_val':acc_val, 'time':time.time() - since})
-        # if args.verbose:  print(f"{model_filename} \t| Epoch {i_epoch}, i_image {i_image} \t| train= loss: {loss_train:.3f} \t| acc : {acc_train:.3f} - val= loss : {loss_val:.3f} \t| acc : {acc_val:.3f} \t| time:{time.time() - since:.1f}")
 
+        outer_progress.set_postfix_str(f"Acc: train={acc_train:.3f} - val={acc_val:.3f} - (Max:train={max_acc_train:.3f} - val={max_acc_val:.3f})")
+        
+        result = {'epoch': i_epoch, 'i_image':i_image, 'total_image':total_image, 'loss_train':loss_train, 'acc_train':acc_train, 'loss_val':loss_val, 'acc_val':acc_val, 'time':time.time() - since}
+        
+        # save everything at each epoch
         if not(model_filename is None):
             # if args.verbose:  print(f"Saving...{model_filename}")
             torch.save(model.state_dict(), model_filename)
 
-    if df_train is None:
-        df_train = pd.DataFrame(history)
-    else:
-        df_new_row = pd.DataFrame(history)
-        df_train = pd.concat([df_train, df_new_row], ignore_index=True)
-    if not(json_filename is None):
-        df_train.to_json(json_filename, orient='records', indent=2)
-
+        if df_train is None:
+            df_train = pd.DataFrame(result)
+        else:
+            df_new_row = pd.DataFrame(result)
+            df_train = pd.concat([df_train, df_new_row], ignore_index=True)
+        if not(json_filename is None):
+            df_train.to_json(json_filename, orient='records', indent=2)
 
     return model, df_train
 
 def do_learning(args, dataset, name):
 
-
-    # --- 3. Load the Pre-trained ResNet Model ---
-
-    def touch(fname): open(fname, 'w').close()
 
     model_filename = args.data_cache / f'{name}.pth'
     json_filename = args.data_cache / model_filename.name.replace('.pth', '.json')
@@ -206,7 +203,7 @@ def do_learning(args, dataset, name):
         should_resume_training = (df_train['epoch'].max() + 1 < args.num_epochs) and (not lock_filename.exists())
 
     if should_resume_training:
-        touch(lock_filename) # as we do a training let's lock it
+        lock_filename.touch() # as we do a training let's lock it
         from .torch_utils import get_loader, get_dataset, load_model
 
         TRAIN_DATA_DIR = args.DATAROOT / f'Imagenet_{dataset}' / 'train'
