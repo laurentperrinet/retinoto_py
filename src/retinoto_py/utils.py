@@ -93,7 +93,9 @@ from matplotlib.lines import Line2D
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-def plot_model_comparison(results, model_names, datasets, figures_folder=None, save_name='model_comparison'):
+def plot_model_comparison(results, model_names, datasets, do_masks=[True, False], 
+                          fig=None, axes=None,
+                          figures_folder=None, save_name=None, exts=['pdf']):
     """
     Plot model comparison: inference time vs accuracy and model size vs accuracy.
     
@@ -122,17 +124,17 @@ def plot_model_comparison(results, model_names, datasets, figures_folder=None, s
     palette = sns.color_palette("husl", len(datasets))
     dataset_colors = {dataset: palette[i] for i, dataset in enumerate(datasets)}
     
-    fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+    if fig is None: fig, axes = plt.subplots(1, 2, figsize=(13, 8))
     
     # Plot both subplots with same logic
     plot_configs = [
-        (axes[0], 'wall_clock_time', 'Wall Clock Time (s)', 'Inference Time vs Accuracy'),
+        (axes[0], 'wall_clock_time', 'Wall Clock Time (s/image)', 'Inference Time vs Accuracy'),
         (axes[1], 'total_parameters', 'Total Parameters', 'Model Size vs Accuracy')
     ]
     
     for ax, y_col, y_label, title in plot_configs:
         for dataset in datasets:
-            for do_mask in [False, True]:
+            for do_mask in do_masks:
                 data_subset = results_sorted[
                     (results_sorted['dataset'] == dataset) & 
                     (results_sorted['do_mask'] == do_mask)
@@ -164,9 +166,10 @@ def plot_model_comparison(results, model_names, datasets, figures_folder=None, s
                                   s=100,
                                   zorder=5)
         
-        ax.set_xlabel('Accuracy', fontsize=12)
-        ax.set_ylabel(y_label, fontsize=12)
-        ax.set_title(title, fontsize=13, fontweight='bold')
+        ax.set_xlabel('Accuracy', fontsize=18)
+        ax.set_xscale('logit')
+        ax.set_ylabel(y_label, fontsize=18)
+        ax.set_title(title, fontsize=18, fontweight='bold')
         ax.grid(True, alpha=0.3)
     
     # Create legend
@@ -197,8 +200,8 @@ def plot_model_comparison(results, model_names, datasets, figures_folder=None, s
     plt.tight_layout()
     plt.subplots_adjust(right=0.85)
     
-    if figures_folder:
-        savefig(fig, name=save_name, figures_folder=figures_folder, exts=['pdf'])
+    if not(save_name is None):
+        savefig(fig, name=save_name, figures_folder=figures_folder, exts=exts)
     
     plt.show()
     return fig, axes
