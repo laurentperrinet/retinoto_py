@@ -5,6 +5,8 @@ __email__ = 'laurent.perrinet@cnrs.fr'
 
 all_model_names = ['resnet18', 'resnet50', 'resnet101'] 
 all_model_names_ls = [':', '-.', '-'] 
+all_cn_model_names = ['convnext_tiny', 'convnext_base', 'convnext_large'] #'convnext_small', 
+all_cn_model_names_ls = [':', '-.', '-'] 
 all_datasets = ['full', 'bbox']
 all_datasets_color = ['blue', 'orange']
 
@@ -14,8 +16,8 @@ from .params import Params
 from .utils import get_device, set_seed, savefig, make_mp4
 from .torch_utils import imshow, get_idx_to_label, get_loader, get_dataset, imgs_to_np
 from .torch_utils import load_model, count_parameters, count_layers, apply_weights
-from .retinoto_py import train_model, make_mask, do_learning
-from .retinoto_py import get_validation_accuracy, get_preprocess
+from .torch_utils import make_mask, get_preprocess
+from .retinoto_py import get_validation_accuracy, train_model, do_learning
 #############################################################
 # Importing libraries
 import warnings
@@ -25,7 +27,9 @@ from tqdm.auto import tqdm
 import time
 import numpy as np
 
-from PIL import Image
+# from PIL import Image
+# from PIL import ImageFile
+# ImageFile.MAX_TEXT_CHUNK = 10 * 1024 * 1024   # 10 MiB (choose a value > largest chunk)
 
 import pandas as pd # to store results
 import torch

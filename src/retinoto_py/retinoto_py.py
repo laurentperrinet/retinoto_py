@@ -3,109 +3,11 @@
 #############################################################
 import numpy as np
 import torch
-import torchvision.transforms as transforms
-import torchvision.transforms.functional as TF
 import time
 import pandas as pd
 from tqdm.auto import tqdm
 #############################################################
 
-# https://github.com/laurentperrinet/2024-12-09-normalizing-images-in-convolutional-neural-networks
-im_mean = np.array([0.485, 0.456, 0.406])
-im_std = np.array([0.229, 0.224, 0.225]) 
-
-
-def make_mask(image_size: int, radius: float = 1.0):
-    """
-    Create a circular mask for the image.
-    
-    image_size: int, size of the image (height and width)
-    radius: float, radius of the circle (0.5 means half the image size)"""
-    
-    X, Y = np.meshgrid(np.linspace(-1, 1, image_size), # Coordonnées normalisées de -1 à 1
-                       np.linspace(-1, 1, image_size),
-                       indexing='ij')
-    R = np.sqrt(X**2 + Y**2)
-    mask = (R <= radius).astype(np.float32) # 1.0 pour un cercle complet
-    return torch.from_numpy(mask).unsqueeze(0) # Ajoute la dimension du canal
-
-class ApplyMask(transforms.PILToTensor):
-    """Applique un masque circulaire à un tenseur d'image."""
-    def __init__(self, mask: torch.Tensor):
-        # On stocke le masque. Le .clone() est une bonne pratique pour éviter
-        # des modifications inattendues du masque original.
-        self.mask = mask.clone()
-
-    def __call__(self, tensor: torch.Tensor) -> torch.Tensor:
-        """
-        Applique le masque à un tenseur d'image.
-        Args:
-            tensor (torch.Tensor): Tenseur d'image de forme (C, H, W).
-        Returns:
-            torch.Tensor: Tenseur masqué.
-        """
-        return tensor * self.mask
-
-# Prefer direct module import to avoid static analysis issues in some environments
-def get_grid(args, endpoint=False):
-    """
-    Generate a grid for the log-polar mapping
-    """
-
-    rs_ = torch.logspace(args.rs_min, args.rs_max, args.image_size, base=2) # Radial distances (log scale)
-    if endpoint: ## If endpoint is True, include the last point in the range
-        ts_ = torch.linspace(0, torch.pi*2, args.image_size) # Angular positions (full circle)
-    else:
-        ts_ = torch.linspace(0, torch.pi*2, args.image_size+1)[:-1] 
-    grid_xs = torch.outer(rs_, torch.cos(ts_)) # X-coordinates
-    grid_ys = torch.outer(rs_, torch.sin(ts_)) # Y-coordinates	
-    
-    return torch.stack((grid_xs, grid_ys), 2)#.to(args.device) # (H_scaled, W_scaled, 2)
-
-class transform_apply_grid(object): 
-    # https://docs.pytorch.org/docs/stable/generated/torch.nn.functional.grid_sample.html
-    def __init__(self, logPolar_grid, padding_mode, mode):
-        self.grid = logPolar_grid
-        self.padding_mode = padding_mode
-        self.mode = mode
-
-    def __call__(self, images):
-        return torch.nn.functional.grid_sample(images.unsqueeze(dim=0), 
-                                               self.grid.unsqueeze(dim=0), 
-                                               padding_mode=self.padding_mode, align_corners=False, 
-                                               mode=self.mode).squeeze(dim=0)
-
-def get_preprocess(args, angle_min=None, angle_max=None, 
-                   interpolation=TF.InterpolationMode.BILINEAR, mode='bilinear'):
-    # --- 5. Define Image Pre-processing ---
-    # The images must be pre-processed in the exact same way the model was trained on.
-    # This includes resizing, cropping, and normalizing.
-    transform_list = []
-    transform_list.append(transforms.Resize(args.image_size))
-    transform_list.append(transforms.CenterCrop(args.image_size))
-                        
-    # Si les deux angles ne sont pas None, on applique la rotation
-    if angle_min is not None and angle_max is not None:
-        transform_list.append(transforms.RandomRotation(degrees=(angle_min, angle_max), interpolation=interpolation))
-    
-    transform_list.append(transforms.RandomHorizontalFlip())
-
-    transform_list.append(transforms.ToTensor())  # Convert the image to a PyTorch Tensor
-    transform_list.append(transforms.Normalize(mean=im_mean, std=im_std))
-
-    if args.do_mask and not(args.do_fovea):
-        # Créer le masque une seule fois avec la taille de l'image
-        mask = make_mask(image_size=args.image_size)
-        # Ajouter notre transform personnalisée à la liste
-        transform_list.append(ApplyMask(mask))
-
-    if args.do_fovea: # apply log-polar mapping to the image
-        grid_polar = get_grid(args)
-        transform_list.append(transform_apply_grid(grid_polar, padding_mode=args.padding_mode, mode=mode))
-
-    # Créer la chaîne de prétraitement finale
-    preprocess = transforms.Compose(transform_list)
-    return preprocess
     
 def get_validation_accuracy(args, model, val_loader, desc=None):
     if desc is None:
@@ -288,10 +190,10 @@ def do_learning(args, dataset, name):
         from .torch_utils import get_loader, get_dataset, load_model
 
         TRAIN_DATA_DIR = args.DATAROOT / f'Imagenet_{dataset}' / 'train'
-        train_dataset, class_to_idx, idx_to_class = get_dataset(args, TRAIN_DATA_DIR, n_stop=args.n_train_stop)
+        train_dataset = get_dataset(args, TRAIN_DATA_DIR, n_stop=args.n_train_stop)
         train_loader = get_loader(args, train_dataset)
         VAL_DATA_DIR = args.DATAROOT / f'Imagenet_{dataset}' / 'val'
-        val_dataset, class_to_idx, idx_to_class = get_dataset(args, VAL_DATA_DIR, n_stop=args.n_val_stop)
+        val_dataset = get_dataset(args, VAL_DATA_DIR, n_stop=args.n_val_stop)
         val_loader = get_loader(args, val_dataset)
 
         # we need to train the model or finish a training that already started
