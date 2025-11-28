@@ -6,7 +6,6 @@ import imageio
 from tqdm.auto import tqdm
 
 #############################################################
-
 def get_device(verbose):
 
     if verbose: 

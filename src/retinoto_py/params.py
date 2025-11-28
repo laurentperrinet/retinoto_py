@@ -38,7 +38,7 @@ class Params:
     do_full_training: bool = False
     # n_train_stop: int = 0 # set to zero to use all images
     # n_val_stop: int = 0 # set to zero to use all images
-    lr: float = 1.e-5
+    lr: float = 1.e-4
     delta1: float = 0.05
     delta2: float = 0.
     weight_decay: float = 0.
