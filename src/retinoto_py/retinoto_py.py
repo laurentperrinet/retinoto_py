@@ -3,6 +3,7 @@
 #############################################################
 import numpy as np
 import torch
+import torch.nn as nn
 import time
 import pandas as pd
 from tqdm.auto import tqdm
@@ -50,6 +51,21 @@ def get_validation_accuracy(args, model, val_loader, desc=None):
 
     return accuracy
 
+
+class StochasticDepth(nn.Module):
+    def __init__(self, survival_prob=1.0):
+        super().__init__()
+        self.survival_prob = survival_prob
+
+    def forward(self, x, residual):
+        if self.training:
+            if torch.rand(1).item() < self.survival_prob:
+                return x + residual
+            else:
+                return x
+        else:
+            return x + self.survival_prob * residual
+
 def train_model(args, model, train_loader, val_loader, df_train=None, 
                 model_filename=None, json_filename=None):
     
@@ -73,13 +89,12 @@ def train_model(args, model, train_loader, val_loader, df_train=None,
                 param.requires_grad = False
 
         # Optimizer only trains the FC layer
-        optimizer = torch.optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=0.001)
         for param in model.parameters():
             param.requires_grad = True        
 
         # sets the optimizer
         if args.delta2 > 0.: 
-            optimizer = torch.optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), 
+            optimizer = torch.optim.AdamW(filter(lambda p: p.requires_grad, model.parameters()), 
                                                 lr=args.lr, betas=(1-args.delta1, 1-args.delta2), 
                                                 weight_decay=args.weight_decay) 
         else:
@@ -90,9 +105,17 @@ def train_model(args, model, train_loader, val_loader, df_train=None,
     if n_train_stop==0: n_train_stop = len(train_loader.dataset)
     n_val_stop = args.n_val_stop
     if n_val_stop==0: n_val_stop = len(val_loader.dataset)
-    
+
+
+    # # Learning rate scheduler (cosine decay with warmup)
+    # scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+    #     optimizer,
+    #     T_max=300 - 20,  # Total epochs minus warmup
+    #     eta_min=1e-5
+    # )
+
     # https://pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html 
-    criterion = torch.nn.CrossEntropyLoss(label_smoothing=args.label_smoothing)
+    criterion = nn.CrossEntropyLoss(label_smoothing=args.label_smoothing)
 
     # the DataFrame to record from
     if df_train is None:

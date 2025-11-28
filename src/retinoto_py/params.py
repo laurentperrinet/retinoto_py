@@ -35,14 +35,14 @@ class Params:
     num_epochs: int = 20 
     n_train_stop: int = 512*batch_size # set for DEBUGging
     n_val_stop: int = 64*batch_size # set for DEBUGging
-    do_full_training: bool = False
+    do_full_training: bool = True
     # n_train_stop: int = 0 # set to zero to use all images
     # n_val_stop: int = 0 # set to zero to use all images
-    lr: float = 1.e-4
-    delta1: float = 0.05
+    lr: float = 4.e-3
+    delta1: float = 0.1
     delta2: float = 0.
-    weight_decay: float = 0.
-    label_smoothing: float = 0. # See https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html
+    weight_decay: float = 0.05
+    label_smoothing: float = 0.1 # See https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html
 
     shuffle: bool = True # Whether to shuffle the data during training
     data_cache = Path('cached_data')
