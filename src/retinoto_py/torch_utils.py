@@ -287,7 +287,7 @@ def get_loader(args, dataset, drop_last=True, seed=None):
     # For evaluation, we don't need to shuffle.
     # A batch size of 1 is simplest for per-image analysis, but you can use larger batches.
     if seed is None: seed = args.seed
-    set_seed(seed=args.seed, seed_torch=True, verbose=args.verbose)
+    set_seed(seed=seed, seed_torch=True, verbose=False)
     def seed_worker(worker_id):
         np.random.seed(seed)
         random.seed(seed)

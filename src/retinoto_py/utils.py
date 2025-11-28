@@ -42,12 +42,9 @@ def set_seed(seed=None, seed_torch=True, verbose=False):
     "Define a random seed or use a predefined seed for repeatability"
     if seed is None:
         seed = np.random.choice(2 ** 32)
-
     np.random.seed(seed)
-
     if seed_torch:
         torch.manual_seed(seed)
-
     if verbose: print(f'Random seed {seed} has been set.')    
 
 def print_gpu_memory():
