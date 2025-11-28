@@ -205,6 +205,7 @@ def get_grid(args, endpoint=False):
     """
 
     rs_ = torch.logspace(args.rs_min, args.rs_max, args.image_size, base=2) # Radial distances (log scale)
+    # TODO : add a margin in angles in order to get an overrepresentation
     ts_ = torch.linspace(0, torch.pi*2, args.image_size+1)[:-1] 
     grid_xs = torch.outer(rs_, torch.cos(ts_)) # X-coordinates
     grid_ys = torch.outer(rs_, torch.sin(ts_)) # Y-coordinates	
