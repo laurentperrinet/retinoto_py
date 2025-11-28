@@ -240,10 +240,10 @@ def do_learning(args, dataset, name):
         print(f"Training model {args.model_name}, file= {model_filename} - image_size={args.image_size}")
 
         model = load_model(args, model_filename = model_filename if model_filename.is_file() else None)
-        if args.verbose:
-            num_classes = len(val_loader.dataset.classes)
-            num_ftrs = model.fc.out_features
-            print(f'Model has {num_ftrs} output features to final FC layer for {num_classes} classes.')
+        # if args.verbose:
+        #     num_classes = len(val_loader.dataset.classes)
+        #     num_ftrs = model.fc.out_features
+        #     print(f'Model has {num_ftrs} output features to final FC layer for {num_classes} classes.')
 
                 
         start_time = time.time()
