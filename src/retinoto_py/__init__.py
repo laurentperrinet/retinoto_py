@@ -34,6 +34,9 @@ import numpy as np
 # from PIL import ImageFile
 # ImageFile.MAX_TEXT_CHUNK = 10 * 1024 * 1024   # 10 MiB (choose a value > largest chunk)
 
+from PIL import Image, PngImagePlugin
+PngImagePlugin.MAX_TEXT_CHUNK = 10 * 1024 * 1024   # 10 MiB (choose a value > largest chunk)
+
 import pandas as pd # to store results
 import torch
 
