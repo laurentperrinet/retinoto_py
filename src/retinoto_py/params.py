@@ -27,7 +27,7 @@ class Params:
 
 
     # model_name: str = 'resnet50' # Name of the model to use
-    model_name: str = 'resnet101' # Name of the model to use
+    model_name: str = 'convnext_base' # Name of the model to use
     do_scratch: bool = False # Whether to train from scratch (True) or use pretrained weights (False)
 
     batch_size: int  = 80 # Set the batch size for training and validation
@@ -39,11 +39,11 @@ class Params:
     do_full_training: bool = False
     # n_train_stop: int = 0 # set to zero to use all images
     # n_val_stop: int = 0 # set to zero to use all images
-    lr: float = 4.e-3
-    delta1: float = 0.1
-    delta2: float = 0.
+    lr: float = 5.e-6
+    delta1: float = 0.3
+    delta2: float = 0.05
     weight_decay: float = 0.05
-    label_smoothing: float = 0.1 # See https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html
+    label_smoothing: float = 0.03 # See https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html
 
     shuffle: bool = True # Whether to shuffle the data during training
     data_cache = Path('cached_data')
