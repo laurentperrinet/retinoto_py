@@ -232,9 +232,10 @@ def get_preprocess(args, angle_min=None, angle_max=None,
     # This includes resizing, cropping, and normalizing.
     transform_list = []
     if do_pil: transform_list.append(transforms.ToTensor())  # Convert the image to a PyTorch Tensor
-    transform_list.append(transforms.Lambda(lambda x: TF.resize(x, args.image_size)))
-    transform_list.append(transforms.Lambda(lambda x: TF.center_crop(x, args.image_size)))
-    
+    # transform_list.append(transforms.Lambda(lambda x: TF.resize(x, args.image_size)))
+    # transform_list.append(transforms.Lambda(lambda x: TF.center_crop(x, args.image_size)))
+    transform_list.append(transforms.Resize((args.image_size, args.image_size)))
+    transform_list.append(transforms.CenterCrop(args.image_size))
                
     # Si les deux angles ne sont pas None, on applique la rotation
     if angle_min is not None and angle_max is not None:
@@ -293,6 +294,10 @@ def get_loader(args, dataset, drop_last=True, seed=None):
         random.seed(seed)
     val_loader = DataLoader(dataset, batch_size=args.batch_size, 
                             shuffle=args.shuffle, drop_last=drop_last,
+                            num_workers=args.num_workers,
+                            pin_memory=args.in_memory,                             # unified memory – no benefit
+                            persistent_workers=False,                     # recreate workers each epoch
+                            # prefetch_factor=2,                            # default, keep it small                            
                             worker_init_fn=seed_worker, generator=torch.Generator().manual_seed(seed)
                             )
 
