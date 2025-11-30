@@ -34,9 +34,8 @@ class Params:
 
     # num_epochs: int = 1
     num_epochs: int = 20 
-    n_train_stop: int = 512*batch_size # set for DEBUGging
-    n_val_stop: int = 64*batch_size # set for DEBUGging
-    do_full_training: bool = False
+    n_train_stop: int = 1024*batch_size # set for DEBUGging
+    n_val_stop: int = 128*batch_size # set for DEBUGging
     # n_train_stop: int = 0 # set to zero to use all images
     # n_val_stop: int = 0 # set to zero to use all images
     lr: float = 5.e-6

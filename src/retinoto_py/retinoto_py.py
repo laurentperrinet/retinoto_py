@@ -71,36 +71,17 @@ def train_model(args, model, train_loader, val_loader, df_train=None,
     
     model = model.to(args.device)
     # retraining the full model
-    if args.do_full_training:
-        for param in model.parameters():
-            param.requires_grad = True        
+    for param in model.parameters():
+        param.requires_grad = True        
 
-        # sets the optimizer
-        if args.delta2 > 0.: 
-            optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, betas=(1-args.delta1, 1-args.delta2), 
-                                        weight_decay=args.weight_decay) 
-        else:
-            optimizer = torch.optim.SGD(model.parameters(), lr=args.lr, momentum=1-args.delta1, 
-                                        weight_decay=args.weight_decay) # to set training variables
+    # sets the optimizer
+    if args.delta2 > 0.: 
+        optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, betas=(1-args.delta1, 1-args.delta2), 
+                                    weight_decay=args.weight_decay) 
     else:
-        # Freeze everything except FC layer
-        for name, param in model.named_parameters():
-            if 'fc' not in name:
-                param.requires_grad = False
-
-        # Optimizer only trains the FC layer
-        for param in model.parameters():
-            param.requires_grad = True        
-
-        # sets the optimizer
-        if args.delta2 > 0.: 
-            optimizer = torch.optim.AdamW(filter(lambda p: p.requires_grad, model.parameters()), 
-                                                lr=args.lr, betas=(1-args.delta1, 1-args.delta2), 
-                                                weight_decay=args.weight_decay) 
-        else:
-            optimizer = torch.optim.SGD(filter(lambda p: p.requires_grad, model.parameters()), lr=args.lr, momentum=1-args.delta1, 
-                                        weight_decay=args.weight_decay) # to set training variables
-
+        optimizer = torch.optim.SGD(model.parameters(), lr=args.lr, momentum=1-args.delta1, 
+                                    weight_decay=args.weight_decay) # to set training variables
+ 
     n_train_stop = args.n_train_stop
     if n_train_stop==0: n_train_stop = len(train_loader.dataset)
     n_val_stop = args.n_val_stop
