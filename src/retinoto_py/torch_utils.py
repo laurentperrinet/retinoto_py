@@ -166,7 +166,6 @@ class InMemoryImageDataset(Dataset):
 im_mean = np.array([0.485, 0.456, 0.406])
 im_std = np.array([0.229, 0.224, 0.225]) 
 
-
 def make_mask(image_size: int, radius: float = 1.0):
     """
     Create a circular mask for the image.

@@ -9,7 +9,7 @@ import pandas as pd
 from tqdm.auto import tqdm
 #############################################################
 
-def get_validation_accuracy(args, model, val_loader, desc=None):
+def get_validation_accuracy(args, model, val_loader, desc=None, leave=True):
     if desc is None:
         desc = f"Evaluating {args.model_name}"
 
@@ -18,39 +18,43 @@ def get_validation_accuracy(args, model, val_loader, desc=None):
     if n_val_stop==0: n_val_stop = len(val_loader.dataset)
 
     model.eval()
+    with torch.no_grad():
 
-    correct_predictions = 0
-    total_predictions = 0
+        correct_predictions = 0
+        total_predictions = 0
+        # running_loss_val = 0.0
 
-    outer_progress = tqdm(val_loader, desc=desc, total=n_val_stop//args.batch_size)
+        outer_progress = tqdm(val_loader, desc=desc, total=n_val_stop//args.batch_size, leave=leave)
 
-    for images, true_labels in outer_progress:
-        images = images.to(args.device)
-        true_labels = true_labels.to(args.device)
+        for images, true_labels in outer_progress:
+            images = images.to(args.device)
+            true_labels = true_labels.to(args.device)
 
-        # Get predictions (no need for gradients)
-        with torch.no_grad():
+            # Get predictions (no need for gradients)
             outputs = model(images)
             _, predicted_labels = torch.max(outputs, dim=1)
 
-        # Check if the prediction was correct for the entire batch
-        # The comparison produces a tensor of booleans (True/False)
-        correct_predictions_in_batch = (predicted_labels == true_labels)
+            # loss = criterion(outputs, true_labels)
+            # running_loss_val += loss.item() * images.size(0)
 
-        # Sum the boolean tensor to get the number of correct predictions in the batch
-        # .item() extracts the number from the tensor
-        correct_predictions += correct_predictions_in_batch.sum().item()
+            # Check if the prediction was correct for the entire batch
+            # The comparison produces a tensor of booleans (True/False)
+            correct_predictions_in_batch = (predicted_labels == true_labels)
 
-        # The total number of predictions is the batch size
-        total_predictions += true_labels.size(0)
-        if total_predictions > n_val_stop: break # early stopping
+            # Sum the boolean tensor to get the number of correct predictions in the batch
+            # .item() extracts the number from the tensor
+            correct_predictions += correct_predictions_in_batch.sum().item()
+
+            # The total number of predictions is the batch size
+            total_predictions += true_labels.size(0)
+            # if total_predictions > n_val_stop: break # early stopping
 
 
-    accuracy = correct_predictions / total_predictions
-    outer_progress.set_postfix_str(f"accuracy={accuracy:.3f}")
+        acc_val = correct_predictions / total_predictions
+        # loss_val = running_loss_val / total_predictions
+        outer_progress.set_postfix_str(f"accuracy={acc_val:.3f}")
 
-    return accuracy
-
+    return acc_val #, loss_val
 
 class StochasticDepth(nn.Module):
     def __init__(self, survival_prob=1.0):
@@ -119,16 +123,14 @@ def train_model(args, model, train_loader, val_loader, df_train=None,
         running_loss = 0.0
         running_corrects = 0
         i_image = 0
-        inner_progress = tqdm(train_loader, desc=f'epoch={i_epoch+1}/{args.num_epochs}', total=n_train_stop//args.batch_size, leave=False)
+        inner_progress = tqdm(train_loader, desc=f'Epoch={i_epoch+1}/{args.num_epochs}', 
+                              total=n_train_stop//args.batch_size, leave=False)
         for images, true_labels in inner_progress:
 
             model.train()
-
             images, true_labels = images.to(args.device), true_labels.to(args.device)
             total_image += len(images)
             i_image += len(images)
-            # if i_image > n_train_stop: break # early stopping
-
             # https://pytorch.org/tutorials/recipes/recipes/tuning_guide.html#use-parameter-grad-none-instead-of-model-zero-grad-or-optimizer-zero-grad
             optimizer.zero_grad(set_to_none=True)
 
@@ -145,33 +147,34 @@ def train_model(args, model, train_loader, val_loader, df_train=None,
         loss_train = running_loss / i_image
         acc_train = running_corrects*1. / i_image
 
-        model.eval()  # Set model to evaluation mode
-        running_loss_val = 0.0
-        running_corrects_val = 0
-        i_image = 0
-        with torch.no_grad():
-            val_progress = tqdm(val_loader, desc=f'Vat @Epoch {i_epoch+1}/{args.num_epochs}', total=n_val_stop//args.batch_size, leave=False)
-            for images, true_labels in val_progress:
-                images, true_labels = images.to(args.device), true_labels.to(args.device)
-                outputs = model(images)
-                _, predicted_labels = torch.max(outputs, dim=1)
-                running_corrects_val += (predicted_labels == true_labels).sum().item()
+        acc_val = get_validation_accuracy(args, model, val_loader, leave=False)    
+        # model.eval()  # Set model to evaluation mode
+        # running_loss_val = 0.0
+        # running_corrects_val = 0
+        # i_image = 0
+        # with torch.no_grad():
+        #     val_progress = tqdm(val_loader, desc=f'Val @Epoch {i_epoch+1}/{args.num_epochs}', total=n_val_stop//args.batch_size, leave=False)
+        #     for images, true_labels in val_progress:
+        #         images, true_labels = images.to(args.device), true_labels.to(args.device)
+        #         outputs = model(images)
+        #         _, predicted_labels = torch.max(outputs, dim=1)
+        #         running_corrects_val += (predicted_labels == true_labels).sum().item()
 
-                loss = criterion(outputs, true_labels)
-                running_loss_val += loss.item() * images.size(0)
-                i_image += len(images)
-                acc_val = running_corrects_val*1. / i_image
-                val_progress.set_postfix_str(f"Acc: train={acc_train:.3f} - val={acc_val:.3f}")
-                # if i_image > n_val_stop: break # early stopping
+        #         loss = criterion(outputs, true_labels)
+        #         running_loss_val += loss.item() * images.size(0)
+        #         i_image += len(images)
+        #         acc_val = running_corrects_val*1. / i_image
+        #         val_progress.set_postfix_str(f"Acc: train={acc_train:.3f} - val={acc_val:.3f}")
+        #         # if i_image > n_val_stop: break # early stopping
 
-        loss_val = running_loss_val / n_val_stop
-        acc_val = running_corrects_val*1. / n_val_stop
+        # loss_val = running_loss_val / n_val_stop
+        # acc_val = running_corrects_val*1. / n_val_stop
 
         max_acc_train, max_acc_val = max((max_acc_train, acc_train)), max((max_acc_val, acc_val))
 
         outer_progress.set_postfix_str(f"Acc: train={acc_train:.3f} - val={acc_val:.3f} - (Max:train={max_acc_train:.3f} - val={max_acc_val:.3f})")
         
-        result = [{'epoch': i_epoch, 'i_image':i_image, 'total_image':total_image, 'loss_train':loss_train, 'acc_train':acc_train, 'loss_val':loss_val, 'acc_val':acc_val, 'time':time.time() - since}]
+        result = [{'epoch': i_epoch, 'i_image':i_image, 'total_image':total_image, 'loss_train':loss_train, 'acc_train':acc_train, 'acc_val':acc_val, 'time':time.time() - since}] # 'loss_val':loss_val, 
         
         # save everything at each epoch
         if not(model_filename is None):
