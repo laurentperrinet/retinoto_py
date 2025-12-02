@@ -22,7 +22,7 @@ class Params:
 
     seed: int = 2018 # Set the seed for reproducibility 
     batch_size: int = 64 # Set number of images per input batch
-    num_workers: int = 4
+    num_workers: int = 0
     in_memory: bool = True
 
 
@@ -30,18 +30,18 @@ class Params:
     model_name: str = 'convnext_base' # Name of the model to use
     do_scratch: bool = False # Whether to train from scratch (True) or use pretrained weights (False)
 
-    batch_size: int  = 80 # Set the batch size for training and validation
+    batch_size: int  = 256 # Set the batch size for training and validation
 
     # num_epochs: int = 1
     num_epochs: int = 20 
-    n_train_stop: int = 512*batch_size # set for DEBUGging
-    n_val_stop: int = 128*batch_size # set for DEBUGging
+    n_train_stop: int = 256*batch_size # set for DEBUGging
+    n_val_stop: int = 64*batch_size # set for DEBUGging
     # n_train_stop: int = 0 # set to zero to use all images
     # n_val_stop: int = 0 # set to zero to use all images
-    lr: float = 5.e-6
-    delta1: float = 0.3
-    delta2: float = 0.05
-    weight_decay: float = 0.05
+    lr: float = 3.e-6
+    delta1: float = 0.05
+    delta2: float = 0.01
+    weight_decay: float = 0.02
     label_smoothing: float = 0.03 # See https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html
 
     shuffle: bool = True # Whether to shuffle the data during training

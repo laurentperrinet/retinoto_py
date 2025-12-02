@@ -12,7 +12,6 @@ def get_device(verbose):
         print('Welcome on', platform.platform(), end='\t')
         print(f" user {Path.home().owner() if hasattr(Path.home(), 'owner') else Path.home().name}", end='\t')
 
-
     if torch.backends.mps.is_available():
         device = torch.device('mps')
         if verbose:

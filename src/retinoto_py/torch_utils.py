@@ -231,11 +231,11 @@ def get_preprocess(args, angle_min=None, angle_max=None,
     # The images must be pre-processed in the exact same way the model was trained on.
     # This includes resizing, cropping, and normalizing.
     transform_list = []
+    transform_list.append(transforms.Resize((args.image_size, args.image_size)))
+    transform_list.append(transforms.CenterCrop(args.image_size))
     if do_pil: transform_list.append(transforms.ToTensor())  # Convert the image to a PyTorch Tensor
     # transform_list.append(transforms.Lambda(lambda x: TF.resize(x, args.image_size)))
     # transform_list.append(transforms.Lambda(lambda x: TF.center_crop(x, args.image_size)))
-    transform_list.append(transforms.Resize((args.image_size, args.image_size)))
-    transform_list.append(transforms.CenterCrop(args.image_size))
                
     # Si les deux angles ne sont pas None, on applique la rotation
     if angle_min is not None and angle_max is not None:
@@ -283,25 +283,52 @@ def get_dataset(args, DATA_DIR, angle_min=None, angle_max=None, in_memory=None, 
     return dataset
 
 from .utils import set_seed
+
+import random, numpy as np, torch
+
+def _seed_worker(seed: int):
+    """
+    This function will be executed **once** in each DataLoader worker
+    (after the process is spawned).  It only sets the NumPy and Python
+    random seeds – everything else (torch seed) is handled by the
+    `generator` argument of DataLoader.
+    """
+    np.random.seed(seed)
+    random.seed(seed)
+
 def get_loader(args, dataset, drop_last=True, seed=None):
     # The DataLoader handles batching, shuffling (for training), and loading data efficiently.
     # For evaluation, we don't need to shuffle.
     # A batch size of 1 is simplest for per-image analysis, but you can use larger batches.
-    if seed is None: seed = args.seed
-    set_seed(seed=seed, seed_torch=True, verbose=False)
-    def seed_worker(worker_id):
-        np.random.seed(seed)
-        random.seed(seed)
-    val_loader = DataLoader(dataset, batch_size=args.batch_size, 
-                            shuffle=args.shuffle, drop_last=drop_last,
-                            num_workers=args.num_workers,
-                            pin_memory=args.in_memory,                             # unified memory – no benefit
-                            persistent_workers=False,                     # recreate workers each epoch
-                            # prefetch_factor=2,                            # default, keep it small                            
-                            worker_init_fn=seed_worker, generator=torch.Generator().manual_seed(seed)
-                            )
+    # if seed is None: seed = args.seed
+    # set_seed(seed=seed, seed_torch=True, verbose=False)
+    # val_loader = DataLoader(dataset, batch_size=args.batch_size, 
+    #                         shuffle=args.shuffle, drop_last=drop_last,
+    #                         num_workers=args.num_workers,
+    #                         pin_memory=args.in_memory,                             # unified memory – no benefit
+    #                         persistent_workers=False,                     # recreate workers each epoch
+    #                         # prefetch_factor=2,                            # default, keep it small                            
+    #                         worker_init_fn=seed_worker, generator=torch.Generator().manual_seed(seed)
+    #                         )
+    if seed is None:
+        seed = getattr(args, "seed", 0)
 
-    return val_loader
+    # `worker_init_fn` receives the worker id, we ignore it and just call the top‑level function.
+    worker_init = lambda wid: _seed_worker(seed)   # simple closure over an int → picklable
+
+    loader = DataLoader(
+        dataset,
+        batch_size=args.batch_size,
+        shuffle=args.shuffle,
+        drop_last=drop_last,
+        num_workers=args.num_workers,
+        # worker_init_fn=worker_init,
+        generator=torch.Generator().manual_seed(seed),  # deterministic shuffling
+        pin_memory=False,               # unified memory → no need for pinned host memory
+        persistent_workers=False,       # workers are spawned each epoch (safer for transform changes)
+        # prefetch_factor=2,              # a small pre‑fetch queue is enough on M‑series
+    )
+    return loader
 
 import torchvision.models as models
 def load_model(args, model_filename=None):
