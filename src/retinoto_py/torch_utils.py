@@ -120,7 +120,7 @@ def torch_loader(path: str) -> torch.Tensor:
 
 class InMemoryImageDataset(Dataset):
     """Load entire ImageFolder dataset into memory"""
-    def __init__(self, root, transform=None, n_stop=0, is_valid_file=None, do_pil=True):
+    def __init__(self, root, transform=None, n_stop=0, is_valid_file=None, do_pil=True, seed=None):
         # Use ImageFolder to handle directory structure and class mapping
         if do_pil:
             image_folder = datasets.ImageFolder(root=root, 
@@ -147,7 +147,8 @@ class InMemoryImageDataset(Dataset):
             n_total = len(image_folder)
             idxs = np.arange(n_total) 
         else:
-            n_total = min((n_stop, len(image_folder)))
+            np.random.seed(seed)
+            n_total = min((n_stop, len(image_folder)))            
             idxs = np.random.permutation(len(image_folder))[:n_total].astype(int)
 
         for idx in tqdm(idxs, desc='Putting images in memory', total=n_total, leave=False):
@@ -155,7 +156,7 @@ class InMemoryImageDataset(Dataset):
             self.labels.append(image_folder[idx][1])
 
         # print(f"Loaded {len(self.images)} images into memory")
-    
+        
     def __len__(self):
         return len(self.images)
     
@@ -173,34 +174,35 @@ class InMemoryImageDataset(Dataset):
 im_mean = np.array([0.485, 0.456, 0.406])
 im_std = np.array([0.229, 0.224, 0.225]) 
 
-def pad_and_resize(image, image_size, interpolation=InterpolationMode.BILINEAR):
-    # Get the original image dimensions
-    width, height = image.size
+# def pad_and_resize(image, image_size, interpolation=InterpolationMode.BILINEAR):
+#     # Get the original image dimensions
+#     print(image.shape)
+#     _, width, height = image.shape
 
-    # Determine the scale factor to resize the longer side to target_size
-    new_size = max(width, height)
-    if width==new_size and height==new_size:
-        return image
-    else:
-        # Calculate padding to make the image square
-        padding_left, padding_right = (new_size - width) // 2
-        padding_top, padding_bottom = (new_size - height) // 2
+#     # Determine the scale factor to resize the longer side to target_size
+#     new_size = max(width, height)
+#     if width==new_size and height==new_size:
+#         return image
+#     else:
+#         # Calculate padding to make the image square
+#         padding_left, padding_right = (new_size - width) // 2
+#         padding_top, padding_bottom = (new_size - height) // 2
         
-        # Pad the image
-        padded_image = TF.pad(image, [padding_left, padding_top, padding_right, padding_bottom], fill=0)
+#         # Pad the image
+#         padded_image = TF.pad(image, [padding_left, padding_top, padding_right, padding_bottom], fill=0)
 
-        # Resize the image
-        resized_image = TF.resize(padded_image, (image_size, image_size), interpolation=interpolation, antialias=True)
+#         # Resize the image
+#         resized_image = TF.resize(padded_image, (image_size, image_size), interpolation=interpolation)
 
-        return resized_image
+#         return resized_image
 
-class PadAndResize:
-    def __init__(self, size, interpolation=InterpolationMode.BILINEAR):
-        self.size = size
-        self.interpolation = interpolation
+# class PadAndResize:
+#     def __init__(self, size, interpolation=InterpolationMode.BILINEAR):
+#         self.size = size
+#         self.interpolation = interpolation
 
-    def __call__(self, img):
-        return pad_and_resize(img, self.size, self.interpolation)
+#     def __call__(self, img):
+#         return pad_and_resize(img, self.size, self.interpolation)
 
 
 def make_mask(image_size: int, radius: float = 1.0):
@@ -269,7 +271,11 @@ def get_preprocess(args, angle_min=None, angle_max=None,
     # The images must be pre-processed in the exact same way the model was trained on.
     # This includes resizing, cropping, and normalizing.
     transform_list = []
-    if do_pil: transform_list.append(transforms.ToTensor())  # Convert the image to a PyTorch Tensor
+    # if do_pil: 
+    #     transform_list.append(transforms.ToTensor())  # Convert the image to a PyTorch Tensor
+    if do_pil: 
+        transform_list.append(transforms.ToImage())  
+        transform_list.append(transforms.ToDtype(torch.float32, scale=True)) 
     # transform_list.append(transforms.Lambda(lambda x: TF.resize(x, args.image_size)))
     # transform_list.append(transforms.Lambda(lambda x: TF.center_crop(x, args.image_size)))
                    
@@ -282,9 +288,9 @@ def get_preprocess(args, angle_min=None, angle_max=None,
         grid_polar = get_grid(args)
         transform_list.append(transform_apply_grid(grid_polar, padding_mode=args.padding_mode, mode=mode))
     else:
-        # transform_list.append(transforms.Resize(args.image_size, interpolation=interpolation, antialias=True))
-        transform_list.append(PadAndResize(args.image_size, interpolation=interpolation, antialias=True))
-        # transform_list.append(transforms.CenterCrop((args.image_size, args.image_size)))
+        # transform_list.append(PadAndResize(args.image_size, interpolation=interpolation))
+        transform_list.append(transforms.Resize(args.image_size, interpolation=interpolation, antialias=True))
+        transform_list.append(transforms.CenterCrop((args.image_size, args.image_size)))
 
     transform_list.append(transforms.Normalize(mean=im_mean, std=im_std))
 
@@ -309,7 +315,7 @@ def get_dataset(args, DATA_DIR, angle_min=None, angle_max=None, in_memory=None, 
     if in_memory is None: in_memory = args.in_memory
     if in_memory:
         # Use in-memory dataset instead of ImageFolder
-        dataset = InMemoryImageDataset(root=DATA_DIR, transform=preprocess, n_stop=n_stop, is_valid_file=is_valid_file, do_pil=do_pil)
+        dataset = InMemoryImageDataset(root=DATA_DIR, transform=preprocess, n_stop=n_stop, is_valid_file=is_valid_file, do_pil=do_pil, seed=args.seed)
     else:    
         if do_pil:
             dataset = datasets.ImageFolder(root=DATA_DIR, transform=preprocess, is_valid_file=is_valid_file)
@@ -351,7 +357,7 @@ def get_loader(args, dataset, drop_last=True, seed=None):
         seed = getattr(args, "seed", 0)
 
     # `worker_init_fn` receives the worker id, we ignore it and just call the top‑level function.
-    worker_init = lambda wid: _seed_worker(seed)   # simple closure over an int → picklable
+    # worker_init = lambda wid: _seed_worker(seed)   # simple closure over an int → picklable
 
     loader = DataLoader(
         dataset,
