@@ -4,12 +4,15 @@ from pathlib import Path
 import numpy as np
 import imageio
 from tqdm.auto import tqdm
+from time import strftime, gmtime
 
 #############################################################
 def get_device(verbose):
 
     if verbose: 
         print('Welcome on', platform.platform(), end='\t')
+        # Format: YYYY-MM-DD_HH-MM-SS (UTC)
+        print('- Timestamp (UTC) ', strftime("%Y-%m-%d_%H-%M-%S", gmtime()), end='\t')
         print(f" user {Path.home().owner() if hasattr(Path.home(), 'owner') else Path.home().name}", end='\t')
 
     if torch.backends.mps.is_available():
