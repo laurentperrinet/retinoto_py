@@ -238,12 +238,13 @@ def do_learning(args, dataset, name):
     if lock_filename.exists(): lock_filename.unlink()
     return model_filename, json_filename
 
-from torchvision.transforms.functional import crop
+# from torchvision.transforms.functional import crop, resize
 from .torch_utils import get_preprocess
 import torchvision.transforms.functional as TF
+from torchvision.transforms import InterpolationMode
 
 def compute_likelihood_map(args, model, full_image,
-                            resolution = (11, 11), # how many fixation points to use
+                            resolution = (15, 15), # how many fixation points to use
                             size_ratio = 0.618 # how much of the image to use relative to radius                        
                             ):
 
@@ -264,17 +265,19 @@ def compute_likelihood_map(args, model, full_image,
     preprocess = get_preprocess(args)
     pil_image = TF.to_pil_image(full_image)
 
-    cropped_images = torch.empty((N_fixations, 3, box_size, box_size))
+    cropped_images = torch.empty((N_fixations, 3, args.image_size, args.image_size))
     for i_fixation, (h, w) in enumerate(zip(pos_H.ravel(), pos_W.ravel())):
         h, w = int(h), int(w)
-        cropped_image = crop(pil_image, h-box_size//2, w-box_size//2, box_size, box_size)
-        cropped_images[i_fixation, ...] = preprocess(cropped_image)
-
+        cropped = TF.crop(pil_image, h-box_size//2, w-box_size//2, box_size, box_size)
+        # resized = TF.resize(cropped, [args.image_size, args.image_size], interpolation=InterpolationMode.BILINEAR, antialias=True)
+        cropped_images[i_fixation, ...] = preprocess(cropped)
+ 
 
     with torch.no_grad():
 
         cropped_images = cropped_images.to(args.device)
         outputs = torch.nn.functional.softmax(model(cropped_images), dim=1)
 
+    print(args.image_size)
 
     return pos_H, pos_W, outputs

@@ -17,12 +17,16 @@ from torchvision.io import read_image
 import torch.nn.functional as nnf
 # https://pytorch.org/vision/main/generated/torchvision.transforms.functional.crop.html
 # from torchvision.transforms.functional import crop
-import torchvision.transforms as transforms
+# import torchvision.transforms as transforms
 # from torchvision.transforms import v2 as transforms TODO use v2 !!
+from torchvision.transforms import v2 as transforms
 import torchvision.transforms.functional as TF
 # from torchvision import datasets, models, transforms
 # from torchvision.datasets import ImageFolder
 import torch.nn as nn
+from torchvision.transforms import InterpolationMode
+from .utils import set_seed
+import random
 #############################################################
 import warnings
 warnings.filterwarnings(
@@ -165,10 +169,39 @@ class InMemoryImageDataset(Dataset):
         return img, label
 
 
-
 # https://github.com/laurentperrinet/2024-12-09-normalizing-images-in-convolutional-neural-networks
 im_mean = np.array([0.485, 0.456, 0.406])
 im_std = np.array([0.229, 0.224, 0.225]) 
+
+def pad_and_resize(image, image_size, interpolation=InterpolationMode.BILINEAR):
+    # Get the original image dimensions
+    width, height = image.size
+
+    # Determine the scale factor to resize the longer side to target_size
+    new_size = max(width, height)
+    if width==new_size and height==new_size:
+        return image
+    else:
+        # Calculate padding to make the image square
+        padding_left, padding_right = (new_size - width) // 2
+        padding_top, padding_bottom = (new_size - height) // 2
+        
+        # Pad the image
+        padded_image = TF.pad(image, [padding_left, padding_top, padding_right, padding_bottom], fill=0)
+
+        # Resize the image
+        resized_image = TF.resize(padded_image, (image_size, image_size), interpolation=interpolation, antialias=True)
+
+        return resized_image
+
+class PadAndResize:
+    def __init__(self, size, interpolation=InterpolationMode.BILINEAR):
+        self.size = size
+        self.interpolation = interpolation
+
+    def __call__(self, img):
+        return pad_and_resize(img, self.size, self.interpolation)
+
 
 def make_mask(image_size: int, radius: float = 1.0):
     """
@@ -229,31 +262,34 @@ class transform_apply_grid(object):
                                     mode=self.mode)
         return result.squeeze(0)
 
+
 def get_preprocess(args, angle_min=None, angle_max=None, 
-                   interpolation=TF.InterpolationMode.BILINEAR, mode='bilinear', do_pil=True):
+                   interpolation=InterpolationMode.BILINEAR, mode='bilinear', do_pil=True):
     # --- 5. Define Image Pre-processing ---
     # The images must be pre-processed in the exact same way the model was trained on.
     # This includes resizing, cropping, and normalizing.
     transform_list = []
-    transform_list.append(transforms.Resize((args.image_size, args.image_size)))
-    transform_list.append(transforms.CenterCrop(args.image_size))
     if do_pil: transform_list.append(transforms.ToTensor())  # Convert the image to a PyTorch Tensor
     # transform_list.append(transforms.Lambda(lambda x: TF.resize(x, args.image_size)))
     # transform_list.append(transforms.Lambda(lambda x: TF.center_crop(x, args.image_size)))
-               
+                   
     # Si les deux angles ne sont pas None, on applique la rotation
     if angle_min is not None and angle_max is not None:
         transform_list.append(transforms.RandomRotation(degrees=(angle_min, angle_max), interpolation=interpolation))
-    
     transform_list.append(transforms.RandomHorizontalFlip())
 
     if args.do_fovea: # apply log-polar mapping to the image
         grid_polar = get_grid(args)
         transform_list.append(transform_apply_grid(grid_polar, padding_mode=args.padding_mode, mode=mode))
+    else:
+        # transform_list.append(transforms.Resize(args.image_size, interpolation=interpolation, antialias=True))
+        transform_list.append(PadAndResize(args.image_size, interpolation=interpolation, antialias=True))
+        # transform_list.append(transforms.CenterCrop((args.image_size, args.image_size)))
 
     transform_list.append(transforms.Normalize(mean=im_mean, std=im_std))
 
-    if args.do_mask and not(args.do_fovea):
+    if args.do_mask:
+        if args.do_fovea: raise(BaseException, 'Something is wrong here')
         # Créer le masque une seule fois avec la taille de l'image
         mask = make_mask(image_size=args.image_size)
         # Ajouter notre transform personnalisée à la liste
@@ -286,9 +322,6 @@ def get_dataset(args, DATA_DIR, angle_min=None, angle_max=None, in_memory=None, 
     # idx_to_class = {v: k for k, v in class_to_idx.items()}
     return dataset
 
-from .utils import set_seed
-
-import random, numpy as np, torch
 
 def _seed_worker(seed: int):
     """
