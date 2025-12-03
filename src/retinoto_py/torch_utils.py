@@ -18,10 +18,10 @@ import torch.nn.functional as nnf
 # https://pytorch.org/vision/main/generated/torchvision.transforms.functional.crop.html
 # from torchvision.transforms.functional import crop
 import torchvision.transforms as transforms
+# from torchvision.transforms import v2 as transforms TODO use v2 !!
 import torchvision.transforms.functional as TF
 # from torchvision import datasets, models, transforms
 # from torchvision.datasets import ImageFolder
-# from torchvision.transforms import v2 as T
 import torch.nn as nn
 #############################################################
 import warnings
@@ -70,6 +70,10 @@ def get_idx_to_label(args):
         exit()
     if args.verbose: print(f'Got a list with {len(idx2label)} labels in {LABELS_FILE} ')
 
+def get_label_to_idx(args):
+    idx2label = get_idx_to_label(args)  # Get the list of labels
+    label2idx = {label: idx for idx, label in enumerate(idx2label)}
+    return label2idx
 
 # https://github.com/laurentperrinet/2024-12-09-normalizing-images-in-convolutional-neural-networks
 im_mean = np.array([0.485, 0.456, 0.406])

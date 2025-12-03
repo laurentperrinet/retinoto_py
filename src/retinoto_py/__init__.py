@@ -17,10 +17,11 @@ all_datasets_ls = ['-', '-']
 #####################################################
 from .params import Params
 from .utils import get_device, set_seed, savefig, make_mp4, plot_model_comparison
-from .torch_utils import imshow, get_idx_to_label, get_loader, get_dataset, imgs_to_np
+from .torch_utils import imshow, get_idx_to_label, get_label_to_idx, get_loader, get_dataset, imgs_to_np
 from .torch_utils import load_model, count_parameters, count_layers, apply_weights
 from .torch_utils import make_mask, get_preprocess, TF
 from .retinoto_py import get_validation_accuracy, train_model, do_learning
+from .retinoto_py import compute_likelihood_map
 #############################################################
 # Importing libraries
 import warnings
