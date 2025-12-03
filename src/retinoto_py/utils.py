@@ -199,7 +199,7 @@ def plot_model_comparison(results, model_names, datasets, do_masks=[True, False]
     if not(save_name is None):
         savefig(fig, name=save_name, figures_folder=figures_folder, exts=exts)
     
-    plt.show()
+    # plt.show()
     return fig, axes
 
 def savefig(fig, name, exts=['pdf', 'png'], figures_folder=Path('figures'), opts_savefig = dict(bbox_inches='tight', pad_inches=0.1, edgecolor=None)):
