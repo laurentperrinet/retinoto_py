@@ -191,7 +191,7 @@ def train_model(args, model, train_loader, val_loader, df_train=None,
 
     return model, df_train
 
-def do_learning(args, dataset, name):
+def do_learning(args, dataset, name, model_filename_init=None):
 
 
     model_filename = args.data_cache / f'{name}.pth'
@@ -222,6 +222,11 @@ def do_learning(args, dataset, name):
 
         # we need to train the model or finish a training that already started
         print(f"Training model {args.model_name}, file= {model_filename} - image_size={args.image_size}")
+
+        if model_filename.is_file(): 
+            model_filename_train = model_filename
+        elif not(model_filename_init is None):
+            model_filename_train = model_filename_init # we use 
 
         model = load_model(args, model_filename = model_filename if model_filename.is_file() else None)
         # if args.verbose:

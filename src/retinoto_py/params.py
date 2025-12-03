@@ -22,6 +22,7 @@ class Params:
 
     seed: int = 2018 # Set the seed for reproducibility 
     batch_size: int = 64 # Set number of images per input batch
+    batch_size: int  = 256 # Set the batch size for training and validation
     num_workers: int = 0
     in_memory: bool = True
 
@@ -30,7 +31,6 @@ class Params:
     model_name: str = 'convnext_base' # Name of the model to use
     do_scratch: bool = False # Whether to train from scratch (True) or use pretrained weights (False)
 
-    batch_size: int  = 256 # Set the batch size for training and validation
 
     # num_epochs: int = 1
     num_epochs: int = 20 
