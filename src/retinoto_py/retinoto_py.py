@@ -226,13 +226,9 @@ def do_learning(args, dataset, name, model_filename_init=None):
         if model_filename.is_file(): 
             model_filename_train = model_filename
         elif not(model_filename_init is None):
-            model_filename_train = model_filename_init # we use 
+            model_filename_train = model_filename_init # we use a stored file for learning
 
-        model = load_model(args, model_filename = model_filename if model_filename.is_file() else None)
-        # if args.verbose:
-        #     num_classes = len(val_loader.dataset.classes)
-        #     num_ftrs = model.fc.out_features
-        #     print(f'Model has {num_ftrs} output features to final FC layer for {num_classes} classes.')
+        model = load_model(args, model_filename=model_filename_train)
 
                 
         start_time = time.time()
