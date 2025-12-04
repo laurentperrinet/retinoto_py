@@ -266,7 +266,7 @@ def compute_likelihood_map(args, model, full_image,
     pos_w = np.linspace(0, W, resolution[1]+2, endpoint=True)[1:-1]
     pos_H, pos_W = np.meshgrid(pos_h, pos_w)
 
-    args.image_size = box_size
+    # args.image_size = box_size
     preprocess = get_preprocess(args)
     pil_image = TF.to_pil_image(full_image)
 
@@ -277,12 +277,8 @@ def compute_likelihood_map(args, model, full_image,
         # resized = TF.resize(cropped, [args.image_size, args.image_size], interpolation=InterpolationMode.BILINEAR, antialias=True)
         cropped_images[i_fixation, ...] = preprocess(cropped)
  
-
     with torch.no_grad():
-
         cropped_images = cropped_images.to(args.device)
         outputs = torch.nn.functional.softmax(model(cropped_images), dim=1)
-
-    print(args.image_size)
 
     return pos_H, pos_W, outputs
