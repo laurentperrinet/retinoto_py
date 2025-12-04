@@ -11,7 +11,7 @@
 
 ## Features
 
-* TODO speed up reading time torchvision.io
+* TODO : use Subset instead of n_val_stop
 * TODO : use ecoset
 
 ## Credits

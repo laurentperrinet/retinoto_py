@@ -21,8 +21,8 @@ class Params:
     # padding_mode = "border"
 
     seed: int = 2018 # Set the seed for reproducibility 
-    batch_size: int = 64 # Set number of images per input batch
-    batch_size: int  = 256 # Set the batch size for training and validation
+    # batch_size: int = 64 # Set number of images per input batch
+    batch_size: int  = 80 # Set the batch size for training and validation
     num_workers: int = 0
     in_memory: bool = True
 
