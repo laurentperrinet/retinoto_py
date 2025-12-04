@@ -118,7 +118,7 @@ def plot_model_comparison(results, model_names, datasets, do_masks=[True, False]
     # Setup styles
     linestyles = {True: '--', False: '-'}
     markers = {name: marker for name, marker in zip(model_names, 
-                                                     ['o', 's', '^', 'D', 'v', 'p', '*', 'H'][:len(model_names)])}
+                                                     ['o', 's', 'D', '^', 'v', '>', 'p', '*', 'H', '+'][:len(model_names)])}
     palette = sns.color_palette("husl", len(datasets))
     dataset_colors = {dataset: palette[i] for i, dataset in enumerate(datasets)}
     
@@ -126,8 +126,8 @@ def plot_model_comparison(results, model_names, datasets, do_masks=[True, False]
     
     # Plot both subplots with same logic
     plot_configs = [
-        (axes[0], 'wall_clock_time', 'Wall Clock Time (s/image)', 'Inference Time vs Accuracy'),
-        (axes[1], 'total_parameters', 'Total Parameters', 'Model Size vs Accuracy')
+        (axes[0], 'total_parameters', 'Total Parameters', 'Model Size vs Accuracy'),
+        (axes[1], 'wall_clock_time', 'Wall Clock Time (s/image)', 'Inference Time vs Accuracy'),
     ]
     
     for ax, y_col, y_label, title in plot_configs:

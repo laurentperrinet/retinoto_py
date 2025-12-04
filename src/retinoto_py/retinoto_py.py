@@ -123,6 +123,7 @@ def train_model(args, model, train_loader, val_loader, df_train=None,
         running_loss = 0.0
         running_corrects = 0
         i_image = 0
+        # training on one set
         inner_progress = tqdm(train_loader, desc=f'Epoch={i_epoch+1}/{args.num_epochs}', 
                               total=n_train_stop//args.batch_size, leave=False)
         for images, true_labels in inner_progress:
@@ -147,29 +148,8 @@ def train_model(args, model, train_loader, val_loader, df_train=None,
         loss_train = running_loss / i_image
         acc_train = running_corrects*1. / i_image
 
-        acc_val = get_validation_accuracy(args, model, val_loader, leave=False)    
-        # model.eval()  # Set model to evaluation mode
-        # running_loss_val = 0.0
-        # running_corrects_val = 0
-        # i_image = 0
-        # with torch.no_grad():
-        #     val_progress = tqdm(val_loader, desc=f'Val @Epoch {i_epoch+1}/{args.num_epochs}', total=n_val_stop//args.batch_size, leave=False)
-        #     for images, true_labels in val_progress:
-        #         images, true_labels = images.to(args.device), true_labels.to(args.device)
-        #         outputs = model(images)
-        #         _, predicted_labels = torch.max(outputs, dim=1)
-        #         running_corrects_val += (predicted_labels == true_labels).sum().item()
-
-        #         loss = criterion(outputs, true_labels)
-        #         running_loss_val += loss.item() * images.size(0)
-        #         i_image += len(images)
-        #         acc_val = running_corrects_val*1. / i_image
-        #         val_progress.set_postfix_str(f"Acc: train={acc_train:.3f} - val={acc_val:.3f}")
-        #         # if i_image > n_val_stop: break # early stopping
-
-        # loss_val = running_loss_val / n_val_stop
-        # acc_val = running_corrects_val*1. / n_val_stop
-
+        # validation on the ohter set
+        acc_val = get_validation_accuracy(args, model, val_loader, leave=False)
         max_acc_train, max_acc_val = max((max_acc_train, acc_train)), max((max_acc_val, acc_val))
 
         outer_progress.set_postfix_str(f"Acc: train={acc_train:.3f} - val={acc_val:.3f} - (Max:train={max_acc_train:.3f} - val={max_acc_val:.3f})")
