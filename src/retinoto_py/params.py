@@ -24,12 +24,11 @@ class Params:
     # batch_size: int = 64 # Set number of images per input batch
     batch_size: int  = 80 # Set the batch size for training and validation
     num_workers: int = 4
-    in_memory: bool = True
+    in_memory: bool = False
 
 
     # model_name: str = 'resnet50' # Name of the model to use
     model_name: str = 'convnext_base' # Name of the model to use
-    do_scratch: bool = False # Whether to train from scratch (True) or use pretrained weights (False)
 
 
     # num_epochs: int = 1
