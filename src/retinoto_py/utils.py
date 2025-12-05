@@ -8,7 +8,6 @@ from time import strftime, gmtime
 
 #############################################################
 def get_device(verbose):
-    print('verbose', verbose)
 
     if verbose: 
         print('Welcome on', platform.platform(), '- Timestamp (UTC) ', strftime("%Y-%m-%d_%H-%M-%S", gmtime()), f" user {Path.home().owner() if hasattr(Path.home(), 'owner') else Path.home().name}", f'>  pytorch=={torch.__version__}')

@@ -16,8 +16,6 @@ from torchvision.io import read_image
 import torch.nn.functional as nnf
 # https://pytorch.org/vision/main/generated/torchvision.transforms.functional.crop.html
 # from torchvision.transforms.functional import crop
-# import torchvision.transforms as transforms
-# from torchvision.transforms import v2 as transforms TODO use v2 !!
 from torchvision.transforms import v2 as transforms
 import torchvision.transforms.functional as TF
 # from torchvision import datasets, models, transforms
