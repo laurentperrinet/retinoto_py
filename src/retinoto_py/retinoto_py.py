@@ -146,7 +146,7 @@ def train_model(args, model, train_loader, val_loader, df_train=None,
             running_corrects += (predicted_labels == true_labels).sum().item()
              
             true_labels_onehot = nnf.one_hot(true_labels, num_classes=num_classes).float()
-            true_labels_onehot = args.label_smoothing + (1-args.label_smoothing)*true_labels_onehot
+            true_labels_onehot = args.label_smoothing/num_classes + (1-args.label_smoothing)*true_labels_onehot
             loss = criterion(outputs, true_labels_onehot)
             running_loss += loss.item() * images.size(0)
             loss.backward()
