@@ -5,6 +5,7 @@ from .utils import get_device, set_seed
 import platform
 # https://docs.python.org/3/library/dataclasses.html?highlight=dataclass#module-dataclasses
 from dataclasses import dataclass
+verbose = False
 
 @dataclass
 class Params:
@@ -42,10 +43,24 @@ class Params:
 
     shuffle: bool = True # Whether to shuffle the data during training
     data_cache = Path('cached_data')
-    data_cache.mkdir(exist_ok=True)
     figures_folder = Path('figures')
-    figures_folder.mkdir(exist_ok=True)
+    verbose: bool = verbose
 
-    verbose: bool = True
-    device = get_device(verbose=verbose)
-    set_seed(seed=seed, seed_torch=True, verbose=verbose)
+    def __post_init__(self):
+        self.data_cache.mkdir(exist_ok=True)
+        self.figures_folder.mkdir(exist_ok=True)
+        self.device = get_device(verbose=self.verbose)
+        set_seed(seed=self.seed, seed_torch=True, verbose=self.verbose)
+
+
+
+
+all_model_names = ['resnet18', 'resnet50', 'resnet101'] 
+all_model_names_ls = [':', '-.', '-'] 
+all_model_names_color = ['blue', 'blue', 'blue']
+all_cn_model_names = ['convnext_tiny', 'convnext_base', 'convnext_large'] #'convnext_small', 
+all_cn_model_names_color = ['blue', 'blue', 'blue']
+all_cn_model_names_ls = [':', '-.', '-'] 
+all_datasets = ['full', 'bbox']
+all_datasets_color = ['blue', 'orange']
+all_datasets_ls = ['-', '-']

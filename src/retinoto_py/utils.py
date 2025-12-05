@@ -8,33 +8,24 @@ from time import strftime, gmtime
 
 #############################################################
 def get_device(verbose):
+    print('verbose', verbose)
 
     if verbose: 
-        print('Welcome on', platform.platform(), end='\t')
-        # Format: YYYY-MM-DD_HH-MM-SS (UTC)
-        print('- Timestamp (UTC) ', strftime("%Y-%m-%d_%H-%M-%S", gmtime()), end='\t')
-        print(f" user {Path.home().owner() if hasattr(Path.home(), 'owner') else Path.home().name}", end='\t')
+        print('Welcome on', platform.platform(), '- Timestamp (UTC) ', strftime("%Y-%m-%d_%H-%M-%S", gmtime()), f" user {Path.home().owner() if hasattr(Path.home(), 'owner') else Path.home().name}", f'>  pytorch=={torch.__version__}')
 
     if torch.backends.mps.is_available():
         device = torch.device('mps')
         if verbose:
-            print('Running on MPS device (Apple Silicon/MacOS)', end='\t')
-            try:
-                if hasattr(torch.backends.mps, 'metal_version'):
-                    print(f' - metal_version = {torch.backends.mps.metal_version()}', end='\t')
-            except:
-                pass
-            print(f' - macos_version = {platform.mac_ver()[0]}', end='\t')
+            print(f'> device (Apple Silicon/MacOS) - macos_version = {platform.mac_ver()[0]}')
+
     elif torch.cuda.is_available():
         device = torch.device('cuda')
-        if verbose: print('Running on GPU : ', torch.cuda.get_device_name(), '#GPU=', torch.cuda.device_count(), end='\t')
+        if verbose: print('Running on GPU : ', torch.cuda.get_device_name(), '#GPU=', torch.cuda.device_count())
         torch.cuda.empty_cache()
         print_gpu_memory()
     else:
         device = torch.device('cpu')
 
-    if verbose: 
-        print(f' with device {device}, pytorch=={torch.__version__}')
     return device
 
 

@@ -4,7 +4,6 @@ Useful torch snippets to use in the main module.
 """
 
 #############################################################
-import random
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib
@@ -223,7 +222,7 @@ def get_grid(args, endpoint=False):
     grid_xs = torch.outer(rs_, torch.cos(ts_)) # X-coordinates
     grid_ys = torch.outer(rs_, torch.sin(ts_)) # Y-coordinates	
     
-    return torch.stack((grid_xs, grid_ys), 2)#.to(args.device) # (H_scaled, W_scaled, 2)
+    return torch.stack((grid_xs, grid_ys), 2) # (H_scaled, W_scaled, 2)
 
 class transform_apply_grid(object): 
     # https://docs.pytorch.org/docs/stable/generated/torch.nn.functional.grid_sample.html
@@ -290,18 +289,13 @@ def get_dataset(args, DATA_DIR, angle_min=None, angle_max=None, in_memory=None):
 
     if in_memory is None: in_memory = args.in_memory
     if in_memory:
-        # Use in-memory dataset instead of ImageFolder
         dataset = InMemoryImageDataset(dataset, is_valid_file=is_valid_file, seed=args.seed)
-
 
     if args.subset_factor > 1:
         dataset.class_to_idx = dataset.dataset.class_to_idx
-        dataset.idx_to_class = {v: k for k, v in dataset.class_to_idx.items()}
         dataset.classes = dataset.dataset.classes
-    # # The dataset provides a mapping from class index to class name (folder name)
-    # class_to_idx = dataset.class_to_idx
-    # # We often want the inverse mapping for printing results
-    # idx_to_class = {v: k for k, v in class_to_idx.items()}
+
+    dataset.idx_to_class = {v: k for k, v in dataset.class_to_idx.items()}
     return dataset
 
 

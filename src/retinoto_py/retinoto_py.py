@@ -202,6 +202,7 @@ def do_learning(args, dataset, name, model_filename_init=None):
         print(f"Training model {args.model_name}, file= {model_filename} - image_size={args.image_size}")
 
         if model_filename.is_file(): 
+            # print('Using', model_filename)
             model_filename_train = model_filename
         else:
             model_filename_train = model_filename_init # we use a stored file for learning or None
