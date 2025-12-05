@@ -101,12 +101,10 @@ def train_model(args, model, train_loader, val_loader, df_train=None,
     # )
 
     # https://pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html 
-    # criterion = nn.CrossEntropyLoss(label_smoothing=
-    )
+    # criterion = nn.CrossEntropyLoss(label_smoothing=args.label_smoothing)
     # https://pytorch.org/docs/stable/generated/torch.nn.BCEWithLogitsLoss.html 
     criterion = nn.BCEWithLogitsLoss()
-    num_classes = train_loader.dataset.num_classes
-
+    num_classes = len(train_loader.dataset.classes)
 
     # the DataFrame to record from
     if df_train is None:
