@@ -84,55 +84,16 @@ im_mean = np.array([0.485, 0.456, 0.406])
 im_std = np.array([0.229, 0.224, 0.225]) 
 
 
-def torch_loader(path: str) -> torch.Tensor:
-    """
-    Load an image file using torchvision.io.read_image.
-    The returned tensor is float32 in the range [0, 1] and has shape (C, H, W).
-
-    Parameters
-    ----------
-    path : str
-        Full path to the image file.
-
-    Returns
-    -------
-    torch.Tensor
-        Float tensor ready for torchvision transforms.
-    """
-    # read_image returns a UInt8 tensor (C, H, W) with values 0‑255
-    with warnings.catch_warnings():
-        warnings.filterwarnings('ignore')  # Suppress warnings just for this operation
-        img = read_image(path)                # still on CPU
-    # Convert to float and normalise
-    img = img.float() / 255.0
-
-    # -----------------------------------------------------------------
-    # 2‑channel / 1‑channel handling (most transforms expect 3 channels)
-    # -----------------------------------------------------------------
-    if img.shape[0] == 1:                 # grayscale → replicate to 3 channels
-        img = img.repeat(3, 1, 1)
-    elif img.shape[0] == 4:               # RGBA → drop alpha (or you could blend)
-        img = img[:3, :, :]                # keep only RGB
-    elif img.shape[0] not in (3,):
-        raise RuntimeError(f"Unsupported number of channels ({img.shape[0]}) in {path}")
-
-    return img
 
 class InMemoryImageDataset(Dataset):
     """Load entire ImageFolder dataset into memory"""
-    def __init__(self, root, transform=None, n_stop=0, is_valid_file=None, do_pil=True, seed=None):
+    def __init__(self, root, transform=None, n_stop=0, is_valid_file=None, seed=None):
         # Use ImageFolder to handle directory structure and class mapping
-        if do_pil:
-            image_folder = datasets.ImageFolder(root=root, 
-                                                is_valid_file=is_valid_file,
-                                                transform=None, 
-                                                )
-        else:
-            image_folder = datasets.ImageFolder(root=root, 
-                                                loader=torch_loader,
-                                                is_valid_file=is_valid_file,
-                                                transform=None, 
-                                                )
+        image_folder = datasets.ImageFolder(root=root, 
+                                            is_valid_file=is_valid_file,
+                                            transform=None, 
+                                            )
+
         
         self.class_to_idx = image_folder.class_to_idx
         self.idx_to_class = {v: k for k, v in self.class_to_idx.items()}
@@ -266,18 +227,14 @@ class transform_apply_grid(object):
 
 
 def get_preprocess(args, angle_min=None, angle_max=None, 
-                   interpolation=InterpolationMode.BILINEAR, mode='bilinear', do_pil=True):
+                   interpolation=InterpolationMode.BILINEAR, mode='bilinear'):
     # --- 5. Define Image Pre-processing ---
     # The images must be pre-processed in the exact same way the model was trained on.
     # This includes resizing, cropping, and normalizing.
     transform_list = []
-    # if do_pil: 
-    #     transform_list.append(transforms.ToTensor())  # Convert the image to a PyTorch Tensor
-    if do_pil: 
-        transform_list.append(transforms.ToImage())  
-        transform_list.append(transforms.ToDtype(torch.float32, scale=True)) 
-    # transform_list.append(transforms.Lambda(lambda x: TF.resize(x, args.image_size)))
-    # transform_list.append(transforms.Lambda(lambda x: TF.center_crop(x, args.image_size)))
+ 
+    transform_list.append(transforms.ToImage())  
+    transform_list.append(transforms.ToDtype(torch.float32, scale=True)) 
                    
     # Si les deux angles ne sont pas None, on applique la rotation
     if angle_min is not None and angle_max is not None:
@@ -305,8 +262,8 @@ def get_preprocess(args, angle_min=None, angle_max=None,
     preprocess = transforms.Compose(transform_list)
     return preprocess
 
-def get_dataset(args, DATA_DIR, angle_min=None, angle_max=None, in_memory=None, n_stop=0, do_pil=True):
-    preprocess = get_preprocess(args, angle_min=angle_min, angle_max=angle_max, do_pil=do_pil)
+def get_dataset(args, DATA_DIR, angle_min=None, angle_max=None, in_memory=None, n_stop=0):
+    preprocess = get_preprocess(args, angle_min=angle_min, angle_max=angle_max)
 
     is_valid_file = lambda p: p.lower().endswith(('.png', '.jpg', '.jpeg'))
     # --- 2. Create Dataset and DataLoader using ImageFolder ---
@@ -315,12 +272,9 @@ def get_dataset(args, DATA_DIR, angle_min=None, angle_max=None, in_memory=None, 
     if in_memory is None: in_memory = args.in_memory
     if in_memory:
         # Use in-memory dataset instead of ImageFolder
-        dataset = InMemoryImageDataset(root=DATA_DIR, transform=preprocess, n_stop=n_stop, is_valid_file=is_valid_file, do_pil=do_pil, seed=args.seed)
+        dataset = InMemoryImageDataset(root=DATA_DIR, transform=preprocess, n_stop=n_stop, is_valid_file=is_valid_file, seed=args.seed)
     else:    
-        if do_pil:
-            dataset = datasets.ImageFolder(root=DATA_DIR, transform=preprocess, is_valid_file=is_valid_file)
-        else:
-            dataset = datasets.ImageFolder(root=DATA_DIR, transform=preprocess, is_valid_file=is_valid_file, loader=torch_loader)
+        dataset = datasets.ImageFolder(root=DATA_DIR, transform=preprocess, is_valid_file=is_valid_file)
         if n_stop>0: raise('not implemented')
     # # The dataset provides a mapping from class index to class name (folder name)
     # class_to_idx = dataset.class_to_idx
