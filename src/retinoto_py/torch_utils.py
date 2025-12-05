@@ -12,7 +12,7 @@ import torchvision
 import torch
 from torchvision import datasets
 from tqdm.auto import tqdm
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset, DataLoader, Subset
 from torchvision.io import read_image
 import torch.nn.functional as nnf
 # https://pytorch.org/vision/main/generated/torchvision.transforms.functional.crop.html
@@ -83,38 +83,55 @@ def get_label_to_idx(args):
 im_mean = np.array([0.485, 0.456, 0.406])
 im_std = np.array([0.229, 0.224, 0.225]) 
 
+def get_smaller_balanced_dataset(dataset, subset_factor=10, seed=42):
+    """
+    Create a smaller, balanced subset of the dataset.
 
+    Args:
+        dataset: The full ImageFolder dataset.
+        fraction: Fraction of the dataset to use (default: 0.1).
+        seed: Random seed for reproducibility.
+
+    Returns:
+        Subset of the dataset with balanced classes.
+    """
+    np.random.seed(seed)
+
+    # Get all targets
+    targets = np.array(dataset.targets)
+
+    # Get unique classes and their indices
+    classes, counts = np.unique(targets, return_counts=True)
+
+    # Calculate the number of samples per class in the subset
+    n_per_class = min(counts) // subset_factor
+
+    # Sample indices for each class
+    subset_indices = []
+    for cls in classes:
+        cls_indices = np.where(targets == cls)[0]
+        np.random.shuffle(cls_indices)
+        subset_indices.extend(cls_indices[:n_per_class])
+
+    # Shuffle the subset indices
+    np.random.shuffle(subset_indices)
+
+    return subset_indices
 
 class InMemoryImageDataset(Dataset):
     """Load entire ImageFolder dataset into memory"""
-    def __init__(self, root, transform=None, n_stop=0, is_valid_file=None, seed=None):
-        # Use ImageFolder to handle directory structure and class mapping
-        image_folder = datasets.ImageFolder(root=root, 
-                                            is_valid_file=is_valid_file,
-                                            transform=None, 
-                                            )
-
-        
-        self.class_to_idx = image_folder.class_to_idx
-        self.idx_to_class = {v: k for k, v in self.class_to_idx.items()}
-        self.classes = image_folder.classes
-        self.transform = transform
-        
+    def __init__(self, dataset, seed=None):
         # Load all images into memory
         # print("Loading dataset into memory...")
         self.images = []
         self.labels = []
-        if n_stop==0:
-            n_total = len(image_folder)
-            idxs = np.arange(n_total) 
-        else:
-            np.random.seed(seed)
-            n_total = min((n_stop, len(image_folder)))            
-            idxs = np.random.permutation(len(image_folder))[:n_total].astype(int)
 
-        for idx in tqdm(idxs, desc='Putting images in memory', total=n_total, leave=False):
-            self.images.append(image_folder[idx][0])
-            self.labels.append(image_folder[idx][1])
+        np.random.seed(seed)
+        n_total = len(dataset)
+
+        for idx in tqdm(range(n_total), desc='Putting images in memory', total=n_total, leave=False):
+            self.images.append(dataset[idx][0])
+            self.labels.append(dataset[idx][1])
 
         # print(f"Loaded {len(self.images)} images into memory")
         
@@ -124,9 +141,6 @@ class InMemoryImageDataset(Dataset):
     def __getitem__(self, idx):
         img = self.images[idx]
         label = self.labels[idx]
-        
-        if self.transform:
-            img = self.transform(img)
         
         return img, label
 
@@ -262,20 +276,28 @@ def get_preprocess(args, angle_min=None, angle_max=None,
     preprocess = transforms.Compose(transform_list)
     return preprocess
 
-def get_dataset(args, DATA_DIR, angle_min=None, angle_max=None, in_memory=None, n_stop=0):
+def get_dataset(args, DATA_DIR, angle_min=None, angle_max=None, in_memory=None):
     preprocess = get_preprocess(args, angle_min=angle_min, angle_max=angle_max)
 
     is_valid_file = lambda p: p.lower().endswith(('.png', '.jpg', '.jpeg'))
     # --- 2. Create Dataset and DataLoader using ImageFolder ---
     # ImageFolder automatically infers class names from directory names
     # and maps them to integer indices.
+    dataset = datasets.ImageFolder(root=DATA_DIR, transform=preprocess, is_valid_file=is_valid_file)
+    if args.subset_factor > 1:
+        subset_indices = get_smaller_balanced_dataset(dataset, subset_factor=args.subset_factor, seed=args.seed)
+        dataset = Subset(dataset, subset_indices)
+
     if in_memory is None: in_memory = args.in_memory
     if in_memory:
         # Use in-memory dataset instead of ImageFolder
-        dataset = InMemoryImageDataset(root=DATA_DIR, transform=preprocess, n_stop=n_stop, is_valid_file=is_valid_file, seed=args.seed)
-    else:    
-        dataset = datasets.ImageFolder(root=DATA_DIR, transform=preprocess, is_valid_file=is_valid_file)
-        if n_stop>0: raise('not implemented')
+        dataset = InMemoryImageDataset(dataset, is_valid_file=is_valid_file, seed=args.seed)
+
+
+    if args.subset_factor > 1:
+        dataset.class_to_idx = dataset.dataset.class_to_idx
+        dataset.idx_to_class = {v: k for k, v in dataset.class_to_idx.items()}
+        dataset.classes = dataset.dataset.classes
     # # The dataset provides a mapping from class index to class name (folder name)
     # class_to_idx = dataset.class_to_idx
     # # We often want the inverse mapping for printing results
@@ -283,36 +305,11 @@ def get_dataset(args, DATA_DIR, angle_min=None, angle_max=None, in_memory=None, 
     return dataset
 
 
-def _seed_worker(seed: int):
-    """
-    This function will be executed **once** in each DataLoader worker
-    (after the process is spawned).  It only sets the NumPy and Python
-    random seeds – everything else (torch seed) is handled by the
-    `generator` argument of DataLoader.
-    """
-    np.random.seed(seed)
-    random.seed(seed)
-
 def get_loader(args, dataset, drop_last=True, seed=None):
-    # The DataLoader handles batching, shuffling (for training), and loading data efficiently.
-    # For evaluation, we don't need to shuffle.
-    # A batch size of 1 is simplest for per-image analysis, but you can use larger batches.
-    # if seed is None: seed = args.seed
-    # set_seed(seed=seed, seed_torch=True, verbose=False)
-    # val_loader = DataLoader(dataset, batch_size=args.batch_size, 
-    #                         shuffle=args.shuffle, drop_last=drop_last,
-    #                         num_workers=args.num_workers,
-    #                         pin_memory=args.in_memory,                             # unified memory – no benefit
-    #                         persistent_workers=False,                     # recreate workers each epoch
-    #                         # prefetch_factor=2,                            # default, keep it small                            
-    #                         worker_init_fn=seed_worker, generator=torch.Generator().manual_seed(seed)
-    #                         )
+
     if seed is None:
         seed = getattr(args, "seed", 0)
-
-    # `worker_init_fn` receives the worker id, we ignore it and just call the top‑level function.
-    # worker_init = lambda wid: _seed_worker(seed)   # simple closure over an int → picklable
-
+        
     loader = DataLoader(
         dataset,
         batch_size=args.batch_size,
@@ -321,8 +318,8 @@ def get_loader(args, dataset, drop_last=True, seed=None):
         num_workers=args.num_workers,
         # worker_init_fn=worker_init,
         generator=torch.Generator().manual_seed(seed),  # deterministic shuffling
-        pin_memory=False,               # unified memory → no need for pinned host memory
-        persistent_workers=False,       # workers are spawned each epoch (safer for transform changes)
+        # pin_memory=False,               # unified memory → no need for pinned host memory
+        # persistent_workers=False,       # workers are spawned each epoch (safer for transform changes)
         # prefetch_factor=2,              # a small pre‑fetch queue is enough on M‑series
     )
     return loader

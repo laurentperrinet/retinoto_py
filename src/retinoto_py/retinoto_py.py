@@ -15,8 +15,6 @@ def get_validation_accuracy(args, model, val_loader, desc=None, leave=True):
         desc = f"Evaluating {args.model_name}"
 
     model = model.to(args.device)
-    n_val_stop = args.n_val_stop
-    if n_val_stop==0: n_val_stop = len(val_loader.dataset)
 
     model.eval()
     with torch.no_grad():
@@ -25,7 +23,7 @@ def get_validation_accuracy(args, model, val_loader, desc=None, leave=True):
         total_predictions = 0
         # running_loss_val = 0.0
 
-        outer_progress = tqdm(val_loader, desc=desc, total=n_val_stop//args.batch_size, leave=leave)
+        outer_progress = tqdm(val_loader, desc=desc, total=len(val_loader.dataset)//args.batch_size, leave=leave)
 
         for images, true_labels in outer_progress:
             images = images.to(args.device)
@@ -48,7 +46,6 @@ def get_validation_accuracy(args, model, val_loader, desc=None, leave=True):
 
             # The total number of predictions is the batch size
             total_predictions += true_labels.size(0)
-            # if total_predictions > n_val_stop: break # early stopping
 
 
         acc_val = correct_predictions / total_predictions
@@ -87,11 +84,6 @@ def train_model(args, model, train_loader, val_loader, df_train=None,
         optimizer = torch.optim.SGD(model.parameters(), lr=args.lr, momentum=1-args.delta1, 
                                     weight_decay=args.weight_decay) # to set training variables
  
-    n_train_stop = args.n_train_stop
-    if n_train_stop==0: n_train_stop = len(train_loader.dataset)
-    n_val_stop = args.n_val_stop
-    if n_val_stop==0: n_val_stop = len(val_loader.dataset)
-
 
     # # Learning rate scheduler (cosine decay with warmup)
     # scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
@@ -129,7 +121,7 @@ def train_model(args, model, train_loader, val_loader, df_train=None,
         i_image = 0
         # training on one set
         inner_progress = tqdm(train_loader, desc=f'Epoch={i_epoch+1}/{args.num_epochs}', 
-                              total=n_train_stop//args.batch_size, leave=False)
+                              total=len(train_loader.dataset)//args.batch_size, leave=False)
         for images, true_labels in inner_progress:
 
             model.train()
@@ -200,10 +192,10 @@ def do_learning(args, dataset, name, model_filename_init=None):
         from .torch_utils import get_loader, get_dataset, load_model
 
         TRAIN_DATA_DIR = args.DATAROOT / f'Imagenet_{dataset}' / 'train'
-        train_dataset = get_dataset(args, TRAIN_DATA_DIR, n_stop=args.n_train_stop)
+        train_dataset = get_dataset(args, TRAIN_DATA_DIR)
         train_loader = get_loader(args, train_dataset)
         VAL_DATA_DIR = args.DATAROOT / f'Imagenet_{dataset}' / 'val'
-        val_dataset = get_dataset(args, VAL_DATA_DIR, n_stop=args.n_val_stop)
+        val_dataset = get_dataset(args, VAL_DATA_DIR)
         val_loader = get_loader(args, val_dataset)
 
         # we need to train the model or finish a training that already started

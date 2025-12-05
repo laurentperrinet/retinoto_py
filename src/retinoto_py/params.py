@@ -33,10 +33,7 @@ class Params:
 
     # num_epochs: int = 1
     num_epochs: int = 24 
-    n_train_stop: int = 256*batch_size # set for DEBUGging
-    n_val_stop: int = 64*batch_size # set for DEBUGging
-    # n_train_stop: int = 0 # set to zero to use all images
-    # n_val_stop: int = 0 # set to zero to use all images
+    subset_factor: int = 1 # set for DEBUGging
     lr: float = 1.e-6
     delta1: float = 0.1
     delta2: float = 0.007
