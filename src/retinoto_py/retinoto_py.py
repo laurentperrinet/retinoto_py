@@ -4,6 +4,7 @@
 import numpy as np
 import torch
 import torch.nn as nn
+import torch.nn.functional as nnf
 import time
 import pandas as pd
 from tqdm.auto import tqdm
@@ -100,7 +101,12 @@ def train_model(args, model, train_loader, val_loader, df_train=None,
     # )
 
     # https://pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html 
-    criterion = nn.CrossEntropyLoss(label_smoothing=args.label_smoothing)
+    # criterion = nn.CrossEntropyLoss(label_smoothing=
+    )
+    # https://pytorch.org/docs/stable/generated/torch.nn.BCEWithLogitsLoss.html 
+    criterion = nn.BCEWithLogitsLoss()
+    num_classes = train_loader.dataset.num_classes
+
 
     # the DataFrame to record from
     if df_train is None:
@@ -139,7 +145,9 @@ def train_model(args, model, train_loader, val_loader, df_train=None,
             _, predicted_labels = torch.max(outputs, dim=1)
             running_corrects += (predicted_labels == true_labels).sum().item()
              
-            loss = criterion(outputs, true_labels)
+            true_labels_onehot = nnf.one_hot(true_labels, num_classes=num_classes).float()
+            true_labels_onehot = args.label_smoothing + (1-args.label_smoothing)*true_labels_onehot
+            loss = criterion(outputs, true_labels_onehot)
             running_loss += loss.item() * images.size(0)
             loss.backward()
             optimizer.step()
@@ -205,8 +213,8 @@ def do_learning(args, dataset, name, model_filename_init=None):
 
         if model_filename.is_file(): 
             model_filename_train = model_filename
-        elif not(model_filename_init is None):
-            model_filename_train = model_filename_init # we use a stored file for learning
+        else:
+            model_filename_train = model_filename_init # we use a stored file for learning or None
 
         model = load_model(args, model_filename=model_filename_train)
 
@@ -255,6 +263,6 @@ def compute_likelihood_map(args, model, full_image,
  
     with torch.no_grad():
         cropped_images = cropped_images.to(args.device)
-        outputs = torch.nn.functional.softmax(model(cropped_images), dim=1)
+        outputs = nnf.softmax(model(cropped_images), dim=1)
 
     return pos_H, pos_W, outputs
