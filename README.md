@@ -11,7 +11,7 @@
 
 ## Features
 
-* TODO : use Subset instead of n_val_stop
+* DONE : use Subset instead of n_val_stop
 * TODO : use ecoset
 
 ## Credits
