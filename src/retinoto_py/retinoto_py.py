@@ -83,6 +83,8 @@ def train_model(args, model, train_loader, val_loader, df_train=None,
         optimizer = torch.optim.SGD(model.parameters(), lr=args.lr, momentum=1-args.delta1, 
                                     weight_decay=args.weight_decay) # to set training variables
  
+    # https://pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html 
+    # criterion = torch.nn.CrossEntropyLoss(label_smoothing=args.label_smoothing)
     # https://pytorch.org/docs/stable/generated/torch.nn.BCEWithLogitsLoss.html 
     criterion = nn.BCEWithLogitsLoss()
     num_classes = len(train_loader.dataset.classes)
@@ -118,7 +120,8 @@ def train_model(args, model, train_loader, val_loader, df_train=None,
             outputs = model(images)
             _, predicted_labels = torch.max(outputs, dim=1)
             running_corrects += (predicted_labels == true_labels).sum().item()
-             
+
+            # loss = criterion(outputs, true_labels)             
             true_labels_onehot = nnf.one_hot(true_labels, num_classes=num_classes).float()
             true_labels_onehot = args.label_smoothing/num_classes + (1-args.label_smoothing)*true_labels_onehot
             loss = criterion(outputs, true_labels_onehot)
@@ -223,7 +226,7 @@ def compute_likelihood_map(args, model, full_image,
     min_size = np.min((H, W))
     aspect_ratio = H/W
     box_size = int(min_size*size_ratio)
-
+    
 
     if isinstance(resolution, int):
         N_fixations = resolution

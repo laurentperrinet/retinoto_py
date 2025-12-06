@@ -10,7 +10,6 @@ verbose = False
 @dataclass
 class Params:
     
-    DATAROOT = Path('/data') / 'Imagenet'
     DATAROOT = Path.home() / 'data' / 'Imagenet'
 
     image_size: int = 224 # base resolution of the image (224, 224)

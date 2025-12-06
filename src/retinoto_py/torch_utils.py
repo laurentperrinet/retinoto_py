@@ -112,21 +112,21 @@ def get_smaller_balanced_dataset(dataset, subset_factor=10, seed=42):
 
     # Shuffle the subset indices
     np.random.shuffle(subset_indices)
+    subset_indices = [int(idx) for idx in subset_indices]
+
+    assert len(subset_indices) > 0, "Subset is empty!"
+    assert max(subset_indices) < len(dataset), "Index out of bounds"
 
     return subset_indices
 
 class InMemoryImageDataset(Dataset):
     """Load entire ImageFolder dataset into memory"""
-    def __init__(self, dataset, seed=None):
-        # Load all images into memory
-        # print("Loading dataset into memory...")
+    def __init__(self, dataset,  seed=None):
         self.images = []
         self.labels = []
 
         np.random.seed(seed)
         n_total = len(dataset)
-        # TODO subset_indices = get_smaller_balanced_dataset(dataset, subset_factor=args.subset_factor, seed=args.seed)
-
         for idx in tqdm(range(n_total), desc='Putting images in memory', total=n_total, leave=False):
             self.images.append(dataset[idx][0])
             self.labels.append(dataset[idx][1])
@@ -262,6 +262,7 @@ def get_dataset(args, DATA_DIR, angle_min=None, angle_max=None, in_memory=None):
     if args.subset_factor > 1:
         dataset.class_to_idx = dataset.dataset.class_to_idx
         dataset.classes = dataset.dataset.classes
+        dataset.targets = [dataset.dataset.targets[i] for i in subset_indices]
 
     dataset.idx_to_class = {v: k for k, v in dataset.class_to_idx.items()}
     return dataset
