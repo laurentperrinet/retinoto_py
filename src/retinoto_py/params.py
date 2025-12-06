@@ -17,11 +17,11 @@ class Params:
     do_mask: bool = False # Whether apply a circular mask to the image
     do_fovea: bool = False # Whether apply a log-polar transform to the image
     rs_min: float = 0.00 # Set minimum radius of the log-polar grid
-    rs_max: float = -6.00 # Set maximum radius of the log-polar grid
+    rs_max: float = -7.50 # Set maximum radius of the log-polar grid
     padding_mode: str = "zeros"
     # padding_mode = "border"
 
-    seed: int = 2018 # Set the seed for reproducibility 
+    seed: int = 2025 # Set the seed for reproducibility 
     # batch_size: int = 64 # Set number of images per input batch
     batch_size: int  = 80 # Set the batch size for training and validation
     num_workers: int = 1
@@ -33,13 +33,13 @@ class Params:
 
 
     # num_epochs: int = 1
-    num_epochs: int = 40
+    num_epochs: int = 41
     subset_factor: int = 1 # set for DEBUGging
-    lr: float = 1.e-6
-    delta1: float = 0.1
-    delta2: float = 0.001
-    weight_decay: float = 0.03
-    label_smoothing: float = 0.1 # See https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html
+    lr: float = 2.e-7
+    delta1: float = 0.2
+    delta2: float = 0.007
+    weight_decay: float = 0.003
+    label_smoothing: float = 0.05 # See https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html
 
     shuffle: bool = True # Whether to shuffle the data during training
     data_cache = Path('cached_data')
