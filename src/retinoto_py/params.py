@@ -53,8 +53,8 @@ class Params:
         set_seed(seed=self.seed, seed_torch=True, verbose=self.verbose)
 
 
-
-
+#############################################################
+#############################################################
 all_model_names = ['resnet18', 'resnet50', 'resnet101'] 
 all_model_names_ls = [':', '-.', '-'] 
 all_model_names_color = ['blue', 'blue', 'blue']
@@ -64,3 +64,5 @@ all_cn_model_names_ls = [':', '-.', '-']
 all_datasets = ['full', 'bbox']
 all_datasets_color = ['blue', 'orange']
 all_datasets_ls = ['-', '-']
+#############################################################
+#############################################################

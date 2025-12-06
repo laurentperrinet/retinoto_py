@@ -15,7 +15,6 @@ def get_validation_accuracy(args, model, val_loader, desc=None, leave=True):
         desc = f"Evaluating {args.model_name}"
 
     model = model.to(args.device)
-
     model.eval()
     with torch.no_grad():
 
@@ -84,16 +83,6 @@ def train_model(args, model, train_loader, val_loader, df_train=None,
         optimizer = torch.optim.SGD(model.parameters(), lr=args.lr, momentum=1-args.delta1, 
                                     weight_decay=args.weight_decay) # to set training variables
  
-
-    # # Learning rate scheduler (cosine decay with warmup)
-    # scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
-    #     optimizer,
-    #     T_max=300 - 20,  # Total epochs minus warmup
-    #     eta_min=1e-5
-    # )
-
-    # https://pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html 
-    # criterion = nn.CrossEntropyLoss(label_smoothing=args.label_smoothing)
     # https://pytorch.org/docs/stable/generated/torch.nn.BCEWithLogitsLoss.html 
     criterion = nn.BCEWithLogitsLoss()
     num_classes = len(train_loader.dataset.classes)
@@ -105,13 +94,9 @@ def train_model(args, model, train_loader, val_loader, df_train=None,
     else:
         i_epoch_start = df_train['epoch'].max() + 1
         if args.verbose: print(f"Starting from epoch {i_epoch_start} with {len(df_train)} records")
-        # # reset the index
-        # df_train.reset_index(drop=True, inplace=True)
-        # make a copy of the DataFrame to avoid modifying the original one
         df_train = df_train.copy()
 
     since = time.time()
-    # history = []
     max_acc_train, max_acc_val = 0., 0.
     total_image = 0
     outer_progress = tqdm(range(i_epoch_start, args.num_epochs), desc="Epochs", leave=True, disable=(args.num_epochs==1))
@@ -119,12 +104,11 @@ def train_model(args, model, train_loader, val_loader, df_train=None,
         running_loss = 0.0
         running_corrects = 0
         i_image = 0
-        # training on one set
         inner_progress = tqdm(train_loader, desc=f'Epoch={i_epoch+1}/{args.num_epochs}', 
                               total=len(train_loader.dataset)//args.batch_size, leave=False)
+        model.train()
         for images, true_labels in inner_progress:
 
-            model.train()
             images, true_labels = images.to(args.device), true_labels.to(args.device)
             total_image += len(images)
             i_image += len(images)
@@ -147,11 +131,11 @@ def train_model(args, model, train_loader, val_loader, df_train=None,
         acc_train = running_corrects*1. / i_image
 
         # validation on the ohter set
+        model.eval()
         acc_val = get_validation_accuracy(args, model, val_loader, leave=False)
-        max_acc_train, max_acc_val = max((max_acc_train, acc_train)), max((max_acc_val, acc_val))
 
-        outer_progress.set_postfix_str(f"Acc: train={acc_train:.3f} - val={acc_val:.3f} - (Max:train={max_acc_train:.3f} - val={max_acc_val:.3f})")
-        
+        max_acc_train, max_acc_val = max((max_acc_train, acc_train)), max((max_acc_val, acc_val))
+        outer_progress.set_postfix_str(f"Acc: train={acc_train:.3f} - val={acc_val:.3f} - (Max:train={max_acc_train:.3f} - val={max_acc_val:.3f})")    
         result = [{'epoch': i_epoch, 'i_image':i_image, 'total_image':total_image, 'loss_train':loss_train, 'acc_train':acc_train, 'acc_val':acc_val, 'time':time.time() - since}] # 'loss_val':loss_val, 
         
         # save everything at each epoch
@@ -179,16 +163,17 @@ def do_learning(args, dataset, name, model_filename_init=None):
     # %rm {lock_filename}  # FORCING RECOMPUTE
 
     df_train = None
-    should_resume_training = not lock_filename.exists()
+    should_resume_training = not lock_filename.exists() # sets this to True if there is no lock file
 
     if json_filename.exists():
         print(f"Load JSON from pre-trained resnet {json_filename}")
         df_train = pd.read_json(json_filename, orient='records')
-        print(f"{model_filename}: accuracy = {df_train['acc_val'][-5:].mean():.3f}")
+        print(f"{model_filename}: latest accuracy = {df_train['acc_val'][-1]:.3f}")
+        # resume learning if we still have some epochs to run
         should_resume_training = (df_train['epoch'].max() + 1 < args.num_epochs) and (not lock_filename.exists())
 
     if should_resume_training:
-        lock_filename.touch() # as we do a training let's lock it
+        lock_filename.touch() # as we do a training, let's lock it
         from .torch_utils import get_loader, get_dataset, load_model
 
         TRAIN_DATA_DIR = args.DATAROOT / f'Imagenet_{dataset}' / 'train'
@@ -202,14 +187,11 @@ def do_learning(args, dataset, name, model_filename_init=None):
         print(f"Training model {args.model_name}, file= {model_filename} - image_size={args.image_size}")
 
         if model_filename.is_file(): 
-            # print('Using', model_filename)
             model_filename_train = model_filename
         else:
-            model_filename_train = model_filename_init # we use a stored file for learning or None
-
+            model_filename_train = model_filename_init # we use a stored file for learning or None for default weights
         model = load_model(args, model_filename=model_filename_train)
 
-                
         start_time = time.time()
         model_retrain, df_train = train_model(args, model=model, train_loader=train_loader, val_loader=val_loader, df_train=df_train, model_filename=model_filename, json_filename=json_filename)
         elapsed_time = time.time() - start_time
@@ -265,6 +247,7 @@ def compute_likelihood_map(args, model, full_image,
  
     with torch.no_grad():
         cropped_images = cropped_images.to(args.device)
-        outputs = nnf.softmax(model(cropped_images), dim=1)
+        # outputs = nnf.softmax(model(cropped_images), dim=1)
+        outputs = nnf.sigmoid(model(cropped_images))
 
     return pos_H, pos_W, outputs
