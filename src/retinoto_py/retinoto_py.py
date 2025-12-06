@@ -71,9 +71,19 @@ def train_model(args, model, train_loader, val_loader, df_train=None,
                 model_filename=None, json_filename=None):
     
     model = model.to(args.device)
-    # retraining the full model
-    for param in model.parameters():
-        param.requires_grad = True        
+
+    if args.do_full_training:
+        # retraining the full model   
+        for param in model.parameters():
+            param.requires_grad = True        
+
+    else:
+        # Freeze everything except FC layer
+        for name, param in model.named_parameters():
+            if not name.startswith('classifier'):
+                param.requires_grad = False
+            else:
+                param.requires_grad = True
 
     # sets the optimizer
     if args.delta2 > 0.: 
@@ -171,7 +181,7 @@ def do_learning(args, dataset, name, model_filename_init=None):
     if json_filename.exists():
         print(f"Load JSON from pre-trained resnet {json_filename}")
         df_train = pd.read_json(json_filename, orient='records')
-        print(f"{model_filename}: latest accuracy = {df_train['acc_val'][-1]:.3f}")
+        print(f"{model_filename}: latest accuracy = {df_train.tail(1)['acc_val'].item():.3f}")
         # resume learning if we still have some epochs to run
         should_resume_training = (df_train['epoch'].max() + 1 < args.num_epochs) and (not lock_filename.exists())
 
@@ -250,7 +260,7 @@ def compute_likelihood_map(args, model, full_image,
  
     with torch.no_grad():
         cropped_images = cropped_images.to(args.device)
-        # outputs = nnf.softmax(model(cropped_images), dim=1)
-        outputs = nnf.sigmoid(model(cropped_images))
+        # probas = nnf.softmax(model(cropped_images), dim=1)
+        probas = nnf.sigmoid(model(cropped_images))
 
-    return pos_H, pos_W, outputs
+    return pos_H, pos_W, probas
