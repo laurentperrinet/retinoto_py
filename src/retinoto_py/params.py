@@ -33,13 +33,13 @@ class Params:
 
 
     # num_epochs: int = 1
-    num_epochs: int = 24 
+    num_epochs: int = 40
     subset_factor: int = 1 # set for DEBUGging
     lr: float = 1.e-6
     delta1: float = 0.1
-    delta2: float = 0.007
+    delta2: float = 0.001
     weight_decay: float = 0.03
-    label_smoothing: float = 0.2 # See https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html
+    label_smoothing: float = 0.1 # See https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html
 
     shuffle: bool = True # Whether to shuffle the data during training
     data_cache = Path('cached_data')

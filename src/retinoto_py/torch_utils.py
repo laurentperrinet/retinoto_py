@@ -125,6 +125,7 @@ class InMemoryImageDataset(Dataset):
 
         np.random.seed(seed)
         n_total = len(dataset)
+        # TODO subset_indices = get_smaller_balanced_dataset(dataset, subset_factor=args.subset_factor, seed=args.seed)
 
         for idx in tqdm(range(n_total), desc='Putting images in memory', total=n_total, leave=False):
             self.images.append(dataset[idx][0])
@@ -145,37 +146,6 @@ class InMemoryImageDataset(Dataset):
 # https://github.com/laurentperrinet/2024-12-09-normalizing-images-in-convolutional-neural-networks
 im_mean = np.array([0.485, 0.456, 0.406])
 im_std = np.array([0.229, 0.224, 0.225]) 
-
-# def pad_and_resize(image, image_size, interpolation=InterpolationMode.BILINEAR):
-#     # Get the original image dimensions
-#     print(image.shape)
-#     _, width, height = image.shape
-
-#     # Determine the scale factor to resize the longer side to target_size
-#     new_size = max(width, height)
-#     if width==new_size and height==new_size:
-#         return image
-#     else:
-#         # Calculate padding to make the image square
-#         padding_left, padding_right = (new_size - width) // 2
-#         padding_top, padding_bottom = (new_size - height) // 2
-        
-#         # Pad the image
-#         padded_image = TF.pad(image, [padding_left, padding_top, padding_right, padding_bottom], fill=0)
-
-#         # Resize the image
-#         resized_image = TF.resize(padded_image, (image_size, image_size), interpolation=interpolation)
-
-#         return resized_image
-
-# class PadAndResize:
-#     def __init__(self, size, interpolation=InterpolationMode.BILINEAR):
-#         self.size = size
-#         self.interpolation = interpolation
-
-#     def __call__(self, img):
-#         return pad_and_resize(img, self.size, self.interpolation)
-
 
 def make_mask(image_size: int, radius: float = 1.0):
     """
