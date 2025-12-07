@@ -21,6 +21,7 @@ pyarrow
 scipy
 scikit-learn
 seaborn
+cmocean
 optuna
 optuna-dashboard
 watermark

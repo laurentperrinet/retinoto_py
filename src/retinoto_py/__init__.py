@@ -8,7 +8,7 @@ __email__ = 'laurent.perrinet@cnrs.fr'
 
 #####################################################
 #####################################################
-from .params import Params, all_model_names, all_cn_model_names
+from .params import Params
 from .utils import set_seed, savefig, make_mp4, plot_model_comparison
 from .torch_utils import imshow, get_idx_to_label, get_label_to_idx, get_loader, get_dataset, imgs_to_np
 from .torch_utils import load_model, count_parameters, count_layers, apply_weights
