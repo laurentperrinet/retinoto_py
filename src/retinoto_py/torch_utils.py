@@ -304,6 +304,7 @@ def load_model(args, model_filename=None):
     elif args.model_name=='resnet101':
         model = models.resnet101(weights=models.ResNet101_Weights.DEFAULT)
     elif args.model_name=='convnext_tiny':
+        # https://github.com/facebookresearch/ConvNeXt/
         model = models.convnext_tiny(weights=models.ConvNeXt_Tiny_Weights.IMAGENET1K_V1)
     elif args.model_name=='convnext_small':
         model = models.convnext_small(weights=models.ConvNeXt_Small_Weights.IMAGENET1K_V1)
@@ -315,7 +316,11 @@ def load_model(args, model_filename=None):
         raise ValueError(f'Unknown model {args.model_name}')
     
     model = model.to(args.device)
-    
+
+    # if args.model_name=='convnext_base': # HACK
+    #     model_filename_fb = args.data_cache /  'convnext_base_1k_224_ema.pth'  # Remplacez par le chemin réel
+    #     model = apply_weights(model, model_filename, args.device, verbose=args.verbose)
+
     if not model_filename is None:
         model = apply_weights(model, model_filename, args.device, verbose=args.verbose)
 
@@ -332,7 +337,7 @@ def apply_weights(model, model_filename, device, verbose=True):
         model: torch model, the model with the weights applied
         """
     if verbose: print(f'loading .... {model_filename}')
-    model.load_state_dict(torch.load(model_filename, map_location=torch.device(device)))
+    model.load_state_dict(torch.load(model_filename, map_location=torch.device(device)), strict=True)
     return model
 
 
