@@ -247,7 +247,7 @@ def compute_likelihood_map(args, model, full_image,
     preprocess = get_preprocess(args)
     pil_image = TF.to_pil_image(full_image)
 
-    cropped_images = torch.empty((N_fixations, 3, args.image_size, args.image_size))
+    cropped_images = torch.empty((len(pos_H), 3, args.image_size, args.image_size))
     for i_fixation, (h, w) in enumerate(zip(pos_H, pos_W)):
         # h, w = int(h), int(w)
         cropped = TF.crop(pil_image, int(h-box_size/2), int(w-box_size/2), box_size, box_size)
@@ -258,4 +258,4 @@ def compute_likelihood_map(args, model, full_image,
         cropped_images = cropped_images.to(args.device)
         probas = nnf.sigmoid(model(cropped_images))
 
-    return pos_H, pos_W, probas
+    return probas
