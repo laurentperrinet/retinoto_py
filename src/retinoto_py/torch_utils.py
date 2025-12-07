@@ -178,6 +178,17 @@ class ApplyMask(object):
         """
         return tensor * self.mask
 
+def squarify(image):
+    crop_size = max(image.shape[-2], image.shape[-1])
+    pad_width = max(0, (crop_size - image.shape[-1]) // 2)
+    pad_height = max(0, (crop_size - image.shape[-1]) // 2)
+    transform = transforms.Compose([
+        transforms.Pad((pad_width, pad_width, pad_height, pad_height), padding_mode='reflect'),
+        transforms.CenterCrop(crop_size),
+    ])
+    image = transform(image)     
+    return image.squeeze(0)
+
 # Prefer direct module import to avoid static analysis issues in some environments
 def get_grid(args, endpoint=False):
     """

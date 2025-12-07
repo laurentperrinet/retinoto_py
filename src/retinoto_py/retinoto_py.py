@@ -220,6 +220,11 @@ from torchvision.transforms import InterpolationMode
 
 def get_positions(H, W, resolution=(15, 15)):
 
+    # aspect_ratio = H/W
+    # N_fixations = np.prod(resolution)
+    # resolution = (int(np.sqrt(N_fixations*aspect_ratio)), int(np.sqrt(N_fixations/aspect_ratio)))
+    # N_fixations = np.prod(resolution)
+
     pos_h = np.linspace(0, H, resolution[0]+2, endpoint=True)[1:-1]
     pos_w = np.linspace(0, W, resolution[1]+2, endpoint=True)[1:-1]
     pos_H, pos_W = np.meshgrid(pos_h, pos_w)
@@ -234,20 +239,10 @@ def compute_likelihood_map(args, model, full_image,
     three, H, W = full_image.shape
     assert three == 3
     # max_size = np.max((H, W))
-    min_size = np.min((H, W))
-    box_size = int(min_size*size_ratio)
+    # min_size = np.min((H, W))
+    # box_size = int(min_size*size_ratio)
+    box_size = int(np.sqrt(H*W)*size_ratio)
     
-
-    if isinstance(resolution, int):
-        N_fixations = resolution
-        pos_H, pos_W = np.random.randint(0, H, size=N_fixations), np.random.randint(0, W, size=N_fixations)
-    else:
-        aspect_ratio = H/W
-        N_fixations = np.prod(resolution)
-        resolution = (int(np.sqrt(N_fixations*aspect_ratio)), int(np.sqrt(N_fixations/aspect_ratio)))
-        N_fixations = np.prod(resolution)
-        pos_H, pos_W = get_positions(H, W, resolution=resolution)
-
     # args.image_size = box_size
     preprocess = get_preprocess(args)
     pil_image = TF.to_pil_image(full_image)
