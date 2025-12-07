@@ -207,7 +207,7 @@ class transform_apply_grid(object):
         return result.squeeze(0)
 
 
-def get_preprocess(args, angle_min=None, angle_max=None, 
+def get_preprocess(args, do_full_preprocess=True, angle_min=None, angle_max=None, 
                    interpolation=InterpolationMode.BILINEAR, mode='bilinear'):
     # --- 5. Define Image Pre-processing ---
     # The images must be pre-processed in the exact same way the model was trained on.
@@ -216,36 +216,36 @@ def get_preprocess(args, angle_min=None, angle_max=None,
  
     transform_list.append(transforms.ToImage())  
     transform_list.append(transforms.ToDtype(torch.float32, scale=True)) 
-                   
-    # Si les deux angles ne sont pas None, on applique la rotation
-    if angle_min is not None and angle_max is not None:
-        transform_list.append(transforms.RandomRotation(degrees=(angle_min, angle_max), interpolation=interpolation))
-    transform_list.append(transforms.RandomHorizontalFlip())
+    if do_full_preprocess:
+        # Si les deux angles ne sont pas None, on applique la rotation
+        if angle_min is not None and angle_max is not None:
+            transform_list.append(transforms.RandomRotation(degrees=(angle_min, angle_max), interpolation=interpolation))
+        transform_list.append(transforms.RandomHorizontalFlip())
 
-    if args.do_fovea: # apply log-polar mapping to the image
-        grid_polar = get_grid(args)
-        transform_list.append(transform_apply_grid(grid_polar, padding_mode=args.padding_mode, mode=mode))
-    else:
-        # transform_list.append(PadAndResize(args.image_size, interpolation=interpolation))
-        transform_list.append(transforms.Resize(args.image_size, interpolation=interpolation, antialias=True))
-        transform_list.append(transforms.CenterCrop((args.image_size, args.image_size)))
+        if args.do_fovea: # apply log-polar mapping to the image
+            grid_polar = get_grid(args)
+            transform_list.append(transform_apply_grid(grid_polar, padding_mode=args.padding_mode, mode=mode))
+        else:
+            # transform_list.append(PadAndResize(args.image_size, interpolation=interpolation))
+            transform_list.append(transforms.Resize(args.image_size, interpolation=interpolation, antialias=True))
+            transform_list.append(transforms.CenterCrop((args.image_size, args.image_size)))
 
-    transform_list.append(transforms.Normalize(mean=im_mean, std=im_std))
+        transform_list.append(transforms.Normalize(mean=im_mean, std=im_std))
 
-    if args.do_mask:
-        if args.do_fovea: raise(BaseException, 'Something is wrong here')
-        # Créer le masque une seule fois avec la taille de l'image
-        mask = make_mask(image_size=args.image_size)
-        # Ajouter notre transform personnalisée à la liste
-        transform_list.append(ApplyMask(mask))
+        if args.do_mask:
+            if args.do_fovea: raise(BaseException, 'Something is wrong here')
+            # Créer le masque une seule fois avec la taille de l'image
+            mask = make_mask(image_size=args.image_size)
+            # Ajouter notre transform personnalisée à la liste
+            transform_list.append(ApplyMask(mask))
 
     # Créer la chaîne de prétraitement finale
     preprocess = transforms.Compose(transform_list)
     return preprocess
 
-def get_dataset(args, DATA_DIR, angle_min=None, angle_max=None, in_memory=None):
-    preprocess = get_preprocess(args, angle_min=angle_min, angle_max=angle_max)
-
+def get_dataset(args, DATA_DIR, do_full_preprocess=True, angle_min=None, angle_max=None, in_memory=None):
+    preprocess = get_preprocess(args, do_full_preprocess=do_full_preprocess, angle_min=angle_min, angle_max=angle_max)
+    
     is_valid_file = lambda p: p.lower().endswith(('.png', '.jpg', '.jpeg'))
     # --- 2. Create Dataset and DataLoader using ImageFolder ---
     # ImageFolder automatically infers class names from directory names
@@ -265,6 +265,9 @@ def get_dataset(args, DATA_DIR, angle_min=None, angle_max=None, in_memory=None):
         dataset.targets = [dataset.dataset.targets[i] for i in subset_indices]
 
     dataset.idx_to_class = {v: k for k, v in dataset.class_to_idx.items()}
+    dataset.idx2label = get_idx_to_label(args)
+    dataset.label2idx = get_label_to_idx(args)
+
     return dataset
 
 

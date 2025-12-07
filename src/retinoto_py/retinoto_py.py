@@ -226,12 +226,13 @@ def get_positions(H, W, resolution = (15, 15)):
 
     return pos_H.ravel(), pos_W.ravel()
 
-def compute_likelihood_map(args, model, full_image,
+def compute_likelihood_map(args, model, image,
                             resolution = (15, 15), # how many fixation points to use
                             size_ratio = 0.618 # how much of the image to use relative to radius                        
                             ):
 
-    _, H, W = full_image.shape
+    three, H, W = image.shape
+    assert three == 3
     # max_size = np.max((H, W))
     min_size = np.min((H, W))
     aspect_ratio = H/W
@@ -249,14 +250,14 @@ def compute_likelihood_map(args, model, full_image,
 
     # args.image_size = box_size
     preprocess = get_preprocess(args)
-    pil_image = TF.to_pil_image(full_image)
+    pil_image = TF.to_pil_image(image)
 
     cropped_images = torch.empty((N_fixations, 3, args.image_size, args.image_size))
     for i_fixation, (h, w) in enumerate(zip(pos_H, pos_W)):
         h, w = int(h), int(w)
         cropped = TF.crop(pil_image, h-box_size//2, w-box_size//2, box_size, box_size)
-        # resized = TF.resize(cropped, [args.image_size, args.image_size], interpolation=InterpolationMode.BILINEAR, antialias=True)
-        cropped_images[i_fixation, ...] = preprocess(cropped)
+        resized = TF.resize(cropped, [args.image_size, args.image_size], interpolation=InterpolationMode.BILINEAR, antialias=True)
+        cropped_images[i_fixation, ...] = preprocess(resized)
  
     with torch.no_grad():
         cropped_images = cropped_images.to(args.device)
