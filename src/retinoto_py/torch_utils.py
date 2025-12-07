@@ -33,7 +33,7 @@ warnings.filterwarnings(
 )
 
 
-def get_idx_to_label(args):
+def get_idx_to_label(args, verbose=False):
     ##############
     LABELS_FILE = args.data_cache / 'imagenet_class_index.json' # Local cache file name
 
@@ -46,13 +46,13 @@ def get_idx_to_label(args):
             # --- 4. Download and Load the ImageNet Class Index (with caching) ---
             LABELS_URL = 'https://s3.amazonaws.com/deep-learning-models/image-models/imagenet_class_index.json'
 
-            print(f"Downloading labels to {LABELS_FILE}...")
+            if verbose: print(f"Downloading labels to {LABELS_FILE}...")
             response = requests.get(LABELS_URL)
             response.raise_for_status()
             with open(LABELS_FILE, 'w') as f:
                 json.dump(response.json(), f)
         else:
-            print(f"Loading labels from local cache {LABELS_FILE}...")
+            if verbose: print(f"Loading labels from local cache {LABELS_FILE}...")
             
         # In both cases, load from the local file
         with open(LABELS_FILE, 'r') as f:

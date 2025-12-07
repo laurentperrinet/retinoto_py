@@ -24,27 +24,27 @@ def get_validation_accuracy(args, model, val_loader, desc=None, leave=True):
 
         outer_progress = tqdm(val_loader, desc=desc, total=len(val_loader.dataset)//args.batch_size, leave=leave)
 
-        for images, true_labels in outer_progress:
+        for images, true_idxs in outer_progress:
             images = images.to(args.device)
-            true_labels = true_labels.to(args.device)
+            true_idxs = true_idxs.to(args.device)
 
             # Get predictions (no need for gradients)
             outputs = model(images)
             _, predicted_labels = torch.max(outputs, dim=1)
 
-            # loss = criterion(outputs, true_labels)
+            # loss = criterion(outputs, true_idxs)
             # running_loss_val += loss.item() * images.size(0)
 
             # Check if the prediction was correct for the entire batch
             # The comparison produces a tensor of booleans (True/False)
-            correct_predictions_in_batch = (predicted_labels == true_labels)
+            correct_predictions_in_batch = (predicted_labels == true_idxs)
 
             # Sum the boolean tensor to get the number of correct predictions in the batch
             # .item() extracts the number from the tensor
             correct_predictions += correct_predictions_in_batch.sum().item()
 
             # The total number of predictions is the batch size
-            total_predictions += true_labels.size(0)
+            total_predictions += true_idxs.size(0)
 
 
         acc_val = correct_predictions / total_predictions
@@ -119,9 +119,9 @@ def train_model(args, model, train_loader, val_loader, df_train=None,
         inner_progress = tqdm(train_loader, desc=f'Epoch={i_epoch+1}/{args.num_epochs}', 
                               total=len(train_loader.dataset)//args.batch_size, leave=False)
         model.train()
-        for images, true_labels in inner_progress:
+        for images, true_idxs in inner_progress:
 
-            images, true_labels = images.to(args.device), true_labels.to(args.device)
+            images, true_idxs = images.to(args.device), true_idxs.to(args.device)
             total_image += len(images)
             i_image += len(images)
             # https://pytorch.org/tutorials/recipes/recipes/tuning_guide.html#use-parameter-grad-none-instead-of-model-zero-grad-or-optimizer-zero-grad
@@ -129,12 +129,12 @@ def train_model(args, model, train_loader, val_loader, df_train=None,
 
             outputs = model(images)
             _, predicted_labels = torch.max(outputs, dim=1)
-            running_corrects += (predicted_labels == true_labels).sum().item()
+            running_corrects += (predicted_labels == true_idxs).sum().item()
 
-            # loss = criterion(outputs, true_labels)             
-            true_labels_onehot = nnf.one_hot(true_labels, num_classes=num_classes).float()
-            true_labels_onehot = args.label_smoothing/num_classes + (1-args.label_smoothing)*true_labels_onehot
-            loss = criterion(outputs, true_labels_onehot)
+            # loss = criterion(outputs, true_idxs)             
+            true_idxs_onehot = nnf.one_hot(true_idxs, num_classes=num_classes).float()
+            true_idxs_onehot = args.label_smoothing/num_classes + (1-args.label_smoothing)*true_idxs_onehot
+            loss = criterion(outputs, true_idxs_onehot)
             running_loss += loss.item() * images.size(0)
             loss.backward()
             optimizer.step()
