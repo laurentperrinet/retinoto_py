@@ -3,6 +3,7 @@ from .utils import get_device, set_seed
 #############################################################
 #############################################################
 import platform
+import numpy as np
 # https://docs.python.org/3/library/dataclasses.html?highlight=dataclass#module-dataclasses
 from dataclasses import dataclass
 verbose = False
@@ -17,6 +18,8 @@ class Params:
     do_fovea: bool = False # Whether apply a log-polar transform to the image
     rs_min: float = 0.00 # Set minimum radius of the log-polar grid
     rs_max: float = -7.50 # Set maximum radius of the log-polar grid
+    angle_start: float = -np.pi/4 # Set the intial angle for the grid
+    angle_margin: float = 0 # Set a margin angle to wrap the circle
     padding_mode: str = "zeros"
     # padding_mode = "border"
 

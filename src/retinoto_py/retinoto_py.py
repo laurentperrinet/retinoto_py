@@ -218,36 +218,46 @@ from .torch_utils import get_preprocess
 import torchvision.transforms.functional as TF
 from torchvision.transforms import InterpolationMode
 
-def get_positions(H, W, resolution=(15, 15)):
+def get_positions(H, W, resolution=(15, 15), endpoint=False):
 
     # aspect_ratio = H/W
     # N_fixations = np.prod(resolution)
     # resolution = (int(np.sqrt(N_fixations*aspect_ratio)), int(np.sqrt(N_fixations/aspect_ratio)))
     # N_fixations = np.prod(resolution)
-
-    pos_h = np.linspace(0, H, resolution[0]+2, endpoint=True)[1:-1]
-    pos_w = np.linspace(0, W, resolution[1]+2, endpoint=True)[1:-1]
+    if endpoint:
+        pos_h = np.linspace(0, H, resolution[0], endpoint=True)
+        pos_w = np.linspace(0, W, resolution[1], endpoint=True)
+    else:
+        pos_h = np.linspace(0, H, resolution[0]+2, endpoint=True)[1:-1]
+        pos_w = np.linspace(0, W, resolution[1]+2, endpoint=True)[1:-1]
     pos_H, pos_W = np.meshgrid(pos_h, pos_w)
 
-    return pos_H.ravel(), pos_W.ravel()
+    pos_H, pos_W = pos_H.ravel(), pos_W.ravel()
+    return pos_H, pos_W
 
 def compute_likelihood_map(args, model, full_image,
                            pos_H, pos_W,
-                           size_ratio = 0.618 # how much of the image to use relative to radius                        
+                           size_ratio = 0.618, # how much of the image to use relative to radius
+                           do_min_boxsize = False
                            ):
 
     three, H, W = full_image.shape
     assert three == 3
-    # max_size = np.max((H, W))
-    # min_size = np.min((H, W))
-    # box_size = int(min_size*size_ratio)
-    box_size = int(np.sqrt(H*W)*size_ratio)
+    if do_min_boxsize:
+        max_size = np.max((H, W))
+        min_size = np.min((H, W))
+        box_size = int(min_size*size_ratio)
+    else:
+        box_size = int(np.sqrt(H*W)*size_ratio)
     
     # args.image_size = box_size
     preprocess = get_preprocess(args)
     pil_image = TF.to_pil_image(full_image)
 
-    cropped_images = torch.empty((len(pos_H), 3, args.image_size, args.image_size))
+    N_fixations = len(pos_H)
+    assert N_fixations == len(pos_W)
+
+    cropped_images = torch.empty((N_fixations, 3, args.image_size, args.image_size))
     for i_fixation, (h, w) in enumerate(zip(pos_H, pos_W)):
         # h, w = int(h), int(w)
         cropped = TF.crop(pil_image, int(h-box_size/2), int(w-box_size/2), box_size, box_size)

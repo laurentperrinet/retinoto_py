@@ -179,25 +179,31 @@ class ApplyMask(object):
         return tensor * self.mask
 
 def squarify(image):
+    """
+    Takes an image 
+    
+    :param image: Description
+    """
+
     crop_size = max(image.shape[-2], image.shape[-1])
     pad_width = max(0, (crop_size - image.shape[-1]) // 2)
     pad_height = max(0, (crop_size - image.shape[-1]) // 2)
     transform = transforms.Compose([
         transforms.Pad((pad_width, pad_width, pad_height, pad_height), padding_mode='reflect'),
-        transforms.CenterCrop(crop_size),
+        # transforms.CenterCrop(crop_size),
     ])
     image = transform(image)     
     return image.squeeze(0)
 
 # Prefer direct module import to avoid static analysis issues in some environments
-def get_grid(args, endpoint=False):
+def get_grid(args, angle_start=0, endpoint=False):
     """
     Generate a grid for the log-polar mapping
     """
 
     rs_ = torch.logspace(args.rs_min, args.rs_max, args.image_size, base=2) # Radial distances (log scale)
-    # TODO : add a margin in angles in order to get an overrepresentation
-    ts_ = torch.linspace(0, torch.pi*2, args.image_size+1)[:-1] 
+    # adds a margin in angles in order to get an overrepresentation
+    ts_ = torch.linspace(args.angle_start, args.angle_start+torch.pi*2+args.angle_margin, args.image_size+1)[:-1] 
     grid_xs = torch.outer(rs_, torch.cos(ts_)) # X-coordinates
     grid_ys = torch.outer(rs_, torch.sin(ts_)) # Y-coordinates	
     
