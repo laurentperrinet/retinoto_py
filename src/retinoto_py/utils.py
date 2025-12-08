@@ -199,3 +199,162 @@ def savefig(fig, name, exts=['pdf', 'png'], figures_folder=Path('figures'), opts
     for ext in exts:
         fig.savefig(figures_folder / f'{name}.{ext}', **opts_savefig)
 
+
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from scipy.ndimage import gaussian_filter
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+def visualize_likelihood_map(likelihood_map, sigma=0, color='blue', fig=None, axes=None):
+
+    resolution = (likelihood_map.shape[0], likelihood_map.shape[1])
+    # Lisser la heatmap
+    if sigma >0: likelihood_map = gaussian_filter(likelihood_map, sigma=sigma)
+
+    # Calcul des marginales
+    marginal_H = likelihood_map.mean(axis=1)  # Marginale verticale
+    marginal_W = likelihood_map.mean(axis=0)  # Marginale horizontale
+
+    # Créer la figure et l'axe principal
+    fig, ax = plt.subplots(figsize=(10, 8))
+
+    # Afficher la heatmap
+    contour = ax.contourf(likelihood_map, levels=20, cmap="viridis")
+    fig.colorbar(contour, ax=ax, label='Likelihood')
+    # ax.set_title("Carte de probabilité de vraisemblance")
+    ax.set_xlabel("Position (W)")
+    ax.set_ylabel("Position (H)")
+
+    # Ajouter une grille légère
+    ax.grid(alpha=0.3, linestyle='--')
+
+    # Ajouter les lignes centrales (verticale et horizontale)
+    mid_w = likelihood_map.shape[1] / 2
+    mid_h = likelihood_map.shape[0] / 2
+    ax.axvline(x=mid_w, color='white', linestyle='--', linewidth=2)
+    ax.axhline(y=mid_h, color='white', linestyle='--', linewidth=2)
+
+    # Ajouter des axes pour les marginales
+    divider = make_axes_locatable(ax)
+
+    # Axe pour la marginale horizontale (en haut)
+    ax_top = divider.append_axes("top", 1.2, pad=0.1, sharex=ax)
+    # ax_top.plot(np.linspace(-1, 1, resolution[1]), marginal_W, color='red')
+    ax_top.plot(range(resolution[1]), marginal_W, color=color)
+    # ax_top.set_title("Probabilité marginale (axe horizontal)")
+    # ax_top.set_ylabel("Probabilité")
+    ax_top.set_xticks([])  # Pas de labels sur l'axe x pour éviter la redondance
+
+    # Axe pour la marginale verticale (à droite)
+    ax_right = divider.append_axes("right", 1.2, pad=0.1, sharey=ax)
+    # ax_right.plot(marginal_H, np.linspace(-1, 1, resolution[0]), color='blue')
+    ax_right.plot(marginal_H, range(resolution[0]), color=color)
+    # ax_right.set_title("Probabilité marginale (axe vertical)")
+    # ax_right.set_xlabel("Probabilité")
+    ax_right.set_yticks([])  # Pas de labels sur l'axe y pour éviter la redondance
+
+    plt.tight_layout()
+    axes = (ax, ax_top, ax_right)
+    return fig, axes
+
+
+import numpy as np
+import lmfit
+from lmfit import Parameters, minimize, report_fit
+import pandas as pd
+
+def gaussian_2d_lmfit(params, x, y, data):
+    """
+    2D Gaussian function for lmfit.
+    """
+    amp = params['amplitude']
+    x0 = params['x0']
+    y0 = params['y0']
+    sx = params['sigma_x']
+    sy = params['sigma_y']
+    theta = params['theta']
+
+    a = (np.cos(theta)**2)/(2*sx**2) + (np.sin(theta)**2)/(2*sy**2)
+    b = -(np.sin(2*theta))/(4*sx**2) + (np.sin(2*theta))/(4*sy**2)
+    c = (np.sin(theta)**2)/(2*sx**2) + (np.cos(theta)**2)/(2*sy**2)
+
+    model = amp * np.exp(-(a*((x-x0)**2) + 2*b*(x-x0)*(y-y0) + c*((y-y0)**2)))
+    return model - data  # Residuals for least-squares minimization
+
+def fit_gaussian_lmfit(likelihood_map):
+    """
+    Fit a 2D Gaussian to a likelihood map using lmfit, constraining x0 and y0 to [-1, 1].
+    Returns: amplitude, x0, y0, sigma_x, sigma_y, theta (rotation angle)
+    """
+    # Create a grid of coordinates
+    ny, nx = likelihood_map.shape
+    x = np.linspace(-1, 1, nx)
+    y = np.linspace(-1, 1, ny)
+    x, y = np.meshgrid(x, y)
+
+    # Flatten the likelihood map and coordinates
+    data = likelihood_map.flatten()
+    x_flat = x.flatten()
+    y_flat = y.flatten()
+
+    # Create Parameters object with initial guesses and bounds
+    params = lmfit.Parameters()
+    params.add('amplitude', value=np.max(likelihood_map), min=0, max=1)  # Amplitude must be positive
+    params.add('x0', value=0, min=-1, max=1)  # x0 in [-1, 1]
+    params.add('y0', value=0, min=-1, max=1)  # y0 in [-1, 1]
+    params.add('sigma_x', value=0.5, min=0.01, max=4)  # sigma_x bounds
+    params.add('sigma_y', value=0.5, min=0.01, max=4)  # sigma_y bounds
+    params.add('theta', value=0, min=-np.pi/2, max=np.pi/2)  # theta bounds
+
+    # Minimize the residuals using least-squares
+    result = minimize(
+        gaussian_2d_lmfit,
+        params,
+        args=(x_flat, y_flat, data),
+        # method='leastsq',  # Levenberg-Marquardt algorithm
+        method='lbfgsb',
+        tol=1e-8,
+        # xtol=1e-8,
+        max_nfev=20000
+    )
+
+    # Check if the fit succeeded
+    if not result.success:
+        return np.full(6, np.nan)
+
+    fit_result = {}
+    for name, param in result.params.items():
+        fit_result[name] = param.value
+        # fit_result[f"{name}_error"] = param.stderr
+
+    return fit_result
+
+from scipy.ndimage import gaussian_filter
+def compute_gaussian_params(likelihood_maps, sigma=.5):
+    """
+    Compute Gaussian parameters for each likelihood map in `likelihood_maps`.
+    `likelihood_maps` shape: (height, width, n_images)
+    Returns: pandas DataFrame with columns for each parameter
+    """
+    n_images = likelihood_maps.shape[-1]
+    results = []
+
+    for i_image in tqdm(range(n_images)):
+        likelihood_map = likelihood_maps[:, :, i_image]
+        # Smooth the map to reduce noise
+        likelihood_map = gaussian_filter(likelihood_map, sigma=sigma)
+        # Fit the Gaussian
+        results.append(fit_gaussian_lmfit(likelihood_map))
+
+
+    # Convert the dictionary to a pandas DataFrame
+    gaussian_df = pd.DataFrame(results)
+    gaussian_df["theta_deg"] = np.rad2deg(gaussian_df["theta"])
+    gaussian_df['sigma_major'] = np.where(gaussian_df['sigma_x'] > gaussian_df['sigma_y'], 
+                                          gaussian_df['sigma_x'], gaussian_df['sigma_y'])
+    gaussian_df['sigma_minor'] = np.where(gaussian_df['sigma_x'] < gaussian_df['sigma_y'], 
+                                          gaussian_df['sigma_x'], gaussian_df['sigma_y'])
+
+    gaussian_df["elongation"] = gaussian_df['sigma_major'] / gaussian_df['sigma_minor']
+    gaussian_df["sigma"] = np.sqrt(gaussian_df['sigma_major'] * gaussian_df['sigma_minor'])
+    return gaussian_df
