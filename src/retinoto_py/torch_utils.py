@@ -1,4 +1,5 @@
 """
+
 Useful torch snippets to use in the main module.
 
 """
@@ -180,18 +181,22 @@ class ApplyMask(object):
 
 def squarify(image):
     """
-    Takes an image 
+    Takes an image and pad it to make it square
     
-    :param image: Description
     """
+    three, H, W = image.shape
+    assert three == 3
 
-    crop_size = max(image.shape[-2], image.shape[-1])
-    pad_width = max(0, (crop_size - image.shape[-1]) // 2)
-    pad_height = max(0, (crop_size - image.shape[-1]) // 2)
-    transform = transforms.Compose([
-        transforms.Pad((pad_width, pad_width, pad_height, pad_height), padding_mode='reflect'),
-        # transforms.CenterCrop(crop_size),
-    ])
+    square_image_size = max(H, W)
+    pad_height = (square_image_size - H) // 2
+    pad_width = (square_image_size - W) // 2
+
+    # If a sequence of length 4 is provided
+    #     this is the padding for the left, top, right and bottom borders respectively.
+    transform = transforms.Pad((pad_width, 
+                                pad_height, 
+                                square_image_size - W - pad_width, 
+                                square_image_size - H - pad_height), padding_mode='reflect')
     image = transform(image)     
     return image.squeeze(0)
 
