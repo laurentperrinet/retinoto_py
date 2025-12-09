@@ -263,7 +263,7 @@ def get_preprocess(args, do_full_preprocess=True, angle_min=None, angle_max=None
         transform_list.append(transforms.RandomHorizontalFlip())
 
         if args.do_fovea: # apply log-polar mapping to the image
-            grid_polar = get_grid(args)
+            grid_polar = get_grid(args).to(args.device)
             transform_list.append(transform_apply_grid(grid_polar, padding_mode=args.padding_mode, mode=mode))
         else:
             # transform_list.append(PadAndResize(args.image_size, interpolation=interpolation))
@@ -275,7 +275,7 @@ def get_preprocess(args, do_full_preprocess=True, angle_min=None, angle_max=None
         if args.do_mask:
             if args.do_fovea: raise(BaseException, 'Something is wrong here')
             # Créer le masque une seule fois avec la taille de l'image
-            mask = make_mask(image_size=args.image_size)
+            mask = make_mask(image_size=args.image_size).to(args.device)
             # Ajouter notre transform personnalisée à la liste
             transform_list.append(ApplyMask(mask))
 
