@@ -244,7 +244,7 @@ def compute_likelihood_map(args, model, full_image,
     three, H, W = full_image.shape
     assert three == 3
     if do_min_boxsize:
-        max_size = np.max((H, W))
+        # max_size = np.max((H, W))
         min_size = np.min((H, W))
         box_size = int(min_size*size_ratio)
     else:
