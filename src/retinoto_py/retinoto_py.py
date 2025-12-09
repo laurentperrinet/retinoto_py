@@ -214,23 +214,30 @@ def do_learning(args, dataset, name, model_filename_init=None):
     return model_filename, json_filename
 
 # from torchvision.transforms.functional import crop, resize
-from .torch_utils import get_preprocess
+from .torch_utils import get_preprocess, fixate
 import torchvision.transforms.functional as TF
 from torchvision.transforms import InterpolationMode
 
-def get_positions(H, W, resolution=(15, 15), endpoint=False):
+def get_positions(H, W, resolution=(15, 15), endpoint=False, do_hex=True):
 
-    # aspect_ratio = H/W
-    # N_fixations = np.prod(resolution)
-    # resolution = (int(np.sqrt(N_fixations*aspect_ratio)), int(np.sqrt(N_fixations/aspect_ratio)))
-    # N_fixations = np.prod(resolution)
     if endpoint:
         pos_h = np.linspace(0, H, resolution[0], endpoint=True)
         pos_w = np.linspace(0, W, resolution[1], endpoint=True)
     else:
         pos_h = np.linspace(0, H, resolution[0]+2, endpoint=True)[1:-1]
         pos_w = np.linspace(0, W, resolution[1]+2, endpoint=True)[1:-1]
+
     pos_H, pos_W = np.meshgrid(pos_h, pos_w)
+
+    if do_hex:
+        if H<W:
+            delta = (pos_h[1]-pos_h[0])/4
+            pos_H[::2] += delta
+            pos_H[1::2] -= delta
+        else:
+            delta = (pos_w[1]-pos_w[0])/4
+            pos_W[::2] += delta
+            pos_W[1::2] -= delta                
 
     pos_H, pos_W = pos_H.ravel(), pos_W.ravel()
     return pos_H, pos_W
@@ -252,20 +259,20 @@ def compute_likelihood_map(args, model, full_image,
     
     # args.image_size = box_size
     preprocess = get_preprocess(args)
+
     pil_image = TF.to_pil_image(full_image)
 
     N_fixations = len(pos_H)
     assert N_fixations == len(pos_W)
 
-    cropped_images = torch.empty((N_fixations, 3, args.image_size, args.image_size))
+    gaze_images = torch.empty((N_fixations, 3, args.image_size, args.image_size))
     for i_fixation, (h, w) in enumerate(zip(pos_H, pos_W)):
-        # h, w = int(h), int(w)
-        cropped = TF.crop(pil_image, int(h-box_size/2), int(w-box_size/2), box_size, box_size)
-        resized = TF.resize(cropped, [args.image_size, args.image_size], interpolation=InterpolationMode.BILINEAR, antialias=True)
-        cropped_images[i_fixation, ...] = preprocess(resized)
- 
+        h, w = int(h), int(w) 
+        image_fix = fixate(full_image, h, w, box_size) 
+        gaze_images[i_fixation, ...] = preprocess(image_fix)
+
     with torch.no_grad():
-        cropped_images = cropped_images.to(args.device)
-        probas = nnf.sigmoid(model(cropped_images))
+        gaze_images = gaze_images.to(args.device)
+        probas = nnf.sigmoid(model(gaze_images))
 
     return probas

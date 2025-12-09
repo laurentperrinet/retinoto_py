@@ -200,6 +200,24 @@ def squarify(image):
     image = transform(image)     
     return image.squeeze(0)
 
+def fixate(image, h, w, box_size):
+    three, H, W = image.shape
+    assert three == 3
+
+    b_minus, b_plus = box_size//2, box_size-box_size//2
+    h_min, h_max = max((0, h-b_minus)), min((h+b_plus, H))
+    w_min, w_max = max((0, w-b_minus)), min((w+b_plus, W))
+    image = image[:, h_min:h_max, w_min:w_max]
+
+    # padding for the left, top, right and bottom borders
+    transform = transforms.Pad((max((b_minus-w_min, 0)), 
+                                max((b_minus-h_min, 0)), 
+                                max((b_plus-w_max, 0)), 
+                                max((b_plus-h_max, 0))), padding_mode='reflect')
+    image = transform(image)   
+
+    return image    
+
 # Prefer direct module import to avoid static analysis issues in some environments
 def get_grid(args, angle_start=0, endpoint=False):
     """
@@ -385,33 +403,26 @@ def count_layers(model, layer_type=None):
 
 #############################################################
 
-def imgs_to_np(img_list, im_mean:np.array=im_mean, im_std:np.array=im_std):
-    images = torchvision.utils.make_grid(img_list, nrow=11)
-    """Imshow for Tensor."""
+def imgs_to_np(img_list, im_mean=im_mean, im_std=im_std, nrow=11):
+    images = torchvision.utils.make_grid(img_list, nrow=nrow)
     inp = images.numpy().transpose((1, 2, 0))
     inp = im_std * inp + im_mean
     inp = np.clip(inp, 0, 1)
     return(inp)
 
 from .utils import savefig
-def imshow(img_list, im_mean:np.array=im_mean, im_std:np.array=im_std, 
-           title:str=None, fig_height:float=7., fig=None, ax:matplotlib.axes.Axes=None, 
-           figures_folder:str='figures', fontsize=14, save:bool=False, name:str=None, 
-           dpi = 'figure', exts:list=['pdf', 'png']):
+def imshow(img_list, nrow=11, im_mean=im_mean, im_std=im_std, 
+           title=None, fig_height=7., fig=None, ax=None, 
+           fontsize=14):
     
     if ax is None:
         fig, ax = plt.subplots(figsize=(fig_height*len(img_list), fig_height))
 
-    inp = imgs_to_np(img_list, im_mean=im_mean, im_std=im_std)
+    inp = imgs_to_np(img_list, im_mean=im_mean, im_std=im_std, nrow=nrow)
     ax.imshow(inp)
     ax.set_xticks([])
     ax.set_yticks([])
-    if title != None: 
-        fig.suptitle(title, fontsize=fontsize)
+    if title != None: fig.suptitle(title, fontsize=fontsize)
     fig.set_facecolor(color='white')
     #plt.tight_layout()
-
-    if save:
-        savefig(fig=fig, name=name, exts=exts, dpi=dpi, figures_folder=figures_folder)
-    else:
-        return fig, ax
+    return fig, ax
