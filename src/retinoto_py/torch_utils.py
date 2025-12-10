@@ -186,6 +186,7 @@ def squarify(image):
     """
     three, H, W = image.shape
     assert three == 3
+    print(image.shape)
 
     square_image_size = max(H, W)
     pad_height = (square_image_size - H) // 2
@@ -197,7 +198,7 @@ def squarify(image):
                                 pad_height, 
                                 square_image_size - W - pad_width, 
                                 square_image_size - H - pad_height), padding_mode='reflect')
-    image = transform(image)     
+    image = transform(image.unsqueeze(0))
     return image.squeeze(0)
 
 def fixate(image, h, w, box_size):
