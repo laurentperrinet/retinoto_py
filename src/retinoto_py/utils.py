@@ -64,7 +64,7 @@ def make_mp4(moviename, fnames, fps, do_delete=True):
     fnames = [Path(f) for f in fnames]  # materialize and convert to Path
     moviename.parent.mkdir(parents=True, exist_ok=True)
 
-    with imageio.get_writer(moviename, fps=fps, macro_block_size=1) as writer:
+    with imageio.get_writer(moviename, fps=fps) as writer:
         for fname in tqdm(fnames, desc="Creating video"):
             writer.append_data(imageio.v2.imread(fname))
 

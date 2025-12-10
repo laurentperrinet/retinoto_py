@@ -186,7 +186,6 @@ def squarify(image):
     """
     three, H, W = image.shape
     assert three == 3
-    print(image.shape)
 
     square_image_size = max(H, W)
     pad_height = (square_image_size - H) // 2
