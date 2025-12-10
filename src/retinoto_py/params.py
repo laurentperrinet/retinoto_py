@@ -20,6 +20,7 @@ class Params:
     rs_max: float = -7.50 # Set maximum radius of the log-polar grid
     angle_start: float = -np.pi/4 # Set the intial angle for the grid
     angle_margin: float = 0 # Set a margin angle to wrap the circle
+    mode: str = "bilinear"
     padding_mode: str = "zeros"
     # padding_mode = "border"
 
