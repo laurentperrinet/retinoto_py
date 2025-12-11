@@ -203,20 +203,43 @@ def squarify(image):
 def fixate(image, h, w, box_size, padding_mode='reflect'):
     three, H, W = image.shape
     assert three == 3
+    assert 0 <= h < H
+    assert 0 <= w < W
 
     b_minus, b_plus = box_size//2, box_size-box_size//2
+
     h_min, h_max = max((0, h-b_minus)), min((h+b_plus, H))
     w_min, w_max = max((0, w-b_minus)), min((w+b_plus, W))
-    image = image[:, h_min:h_max, w_min:w_max]
+    box = image[:, h_min:h_max, w_min:w_max]
+
+    # Calcul du padding nécessaire pour atteindre (box_size, box_size)
+    current_height = h_max - h_min
+    current_width = w_max - w_min
+
+    # Padding à gauche/droite et haut/bas
+    pad_left = max(b_minus - (w - w_min), 0)
+    pad_right = max(b_plus - (w_max - w), 0)
+    pad_top = max(b_minus - (h - h_min), 0)
+    pad_bottom = max(b_plus - (h_max - h), 0)
+
+    # Correction pour garantir box_size x box_size
+    total_pad_width = box_size - current_width
+    total_pad_height = box_size - current_height
+
+    # Répartition du padding
+    pad_left = max(pad_left, 0)
+    pad_right = max(total_pad_width - pad_left, 0)
+    pad_top = max(pad_top, 0)
+    pad_bottom = max(total_pad_height - pad_top, 0)
 
     # padding for the left, top, right and bottom borders
-    transform = transforms.Pad((max((b_minus-w_min, 0)), 
-                                max((b_minus-h_min, 0)), 
-                                max((b_plus-w_max, 0)), 
-                                max((b_plus-h_max, 0))), padding_mode=padding_mode)
-    image = transform(image)   
+    transform = transforms.Pad((pad_left, pad_top, pad_right, pad_bottom), padding_mode=padding_mode)
+    box_padded = transform(box)
 
-    return image    
+    # Vérification de la taille
+    assert box_padded.shape[1:] == (box_size, box_size), f"Expected {(box_size, box_size)}, got {box_padded.shape[1:]}"
+
+    return box_padded    
 
 # Prefer direct module import to avoid static analysis issues in some environments
 def get_grid(args):
