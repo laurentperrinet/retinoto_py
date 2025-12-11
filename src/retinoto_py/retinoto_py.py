@@ -257,6 +257,8 @@ def compute_likelihood_map(args, model, full_image,
     else:
         box_size = int(np.sqrt(H*W)*size_ratio)
     
+    # take a smaller box if the image is small
+    # box_size = min(())
     # args.image_size = box_size
     preprocess = get_preprocess(args)
 

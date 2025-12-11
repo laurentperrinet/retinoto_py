@@ -205,6 +205,8 @@ def fixate(image, h, w, box_size, padding_mode='reflect'):
     assert three == 3
     assert 0 <= h < H
     assert 0 <= w < W
+    assert box_size < H
+    assert box_size < W
 
     b_minus, b_plus = box_size//2, box_size-box_size//2
 
