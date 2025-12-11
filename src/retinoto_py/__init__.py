@@ -11,7 +11,8 @@ __email__ = 'laurent.perrinet@cnrs.fr'
 from .params import Params
 from .utils import set_seed, savefig, make_mp4, plot_model_comparison
 from .utils import compute_gaussian_params, visualize_likelihood_map
-from .torch_utils import imshow, get_idx_to_label, get_label_to_idx, get_loader, get_dataset, imgs_to_np
+from .torch_utils import imshow, get_idx_to_label, get_label_to_idx
+from .torch_utils import get_loader, get_dataset, imgs_to_np, transform_apply_grid
 from .torch_utils import load_model, count_parameters, count_layers, apply_weights
 from .torch_utils import make_mask, get_preprocess, TF, squarify, fixate
 from .retinoto_py import get_validation_accuracy, train_model, do_learning

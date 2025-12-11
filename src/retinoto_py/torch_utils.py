@@ -200,7 +200,7 @@ def squarify(image):
     image = transform(image.unsqueeze(0))
     return image.squeeze(0)
 
-def fixate(image, h, w, box_size):
+def fixate(image, h, w, box_size, padding_mode='reflect'):
     three, H, W = image.shape
     assert three == 3
 
@@ -213,17 +213,17 @@ def fixate(image, h, w, box_size):
     transform = transforms.Pad((max((b_minus-w_min, 0)), 
                                 max((b_minus-h_min, 0)), 
                                 max((b_plus-w_max, 0)), 
-                                max((b_plus-h_max, 0))), padding_mode='reflect')
+                                max((b_plus-h_max, 0))), padding_mode=padding_mode)
     image = transform(image)   
 
     return image    
 
 # Prefer direct module import to avoid static analysis issues in some environments
-def get_grid(args, angle_start=0, endpoint=False):
+def get_grid(args):
     """
     Generate a grid for the log-polar mapping
-    """
 
+    """
     rs_ = torch.logspace(args.rs_min, args.rs_max, args.image_size, base=2) # Radial distances (log scale)
     # adds a margin in angles in order to get an overrepresentation
     ts_ = torch.linspace(args.angle_start, args.angle_start+torch.pi*2+args.angle_margin, args.image_size+1)[:-1] 

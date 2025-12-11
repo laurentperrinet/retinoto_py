@@ -22,7 +22,7 @@ class Params:
     angle_margin: float = 0 # Set a margin angle to wrap the circle
     mode: str = "bilinear"
     padding_mode: str = "zeros"
-    # padding_mode = "border"
+    # padding_mode: str = "border"
 
     seed: int = 2025 # Set the seed for reproducibility 
     # batch_size: int = 64 # Set number of images per input batch
