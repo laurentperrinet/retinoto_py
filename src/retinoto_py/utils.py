@@ -117,7 +117,7 @@ def plot_model_comparison(results, model_names, datasets, do_masks=[True, False]
     # Plot both subplots with same logic
     plot_configs = [
         (axes[0], 'total_parameters', 'Total Parameters', 'Model Size vs Accuracy'),
-        (axes[1], 'wall_clock_time', 'Wall Clock Time (s/image)', 'Inference Time vs Accuracy'),
+        (axes[1], 'wall_clock_time_ms', 'Wall Clock Time (ms/image)', 'Inference Time vs Accuracy'),
     ]
     
     for ax, y_col, y_label, title in plot_configs:
