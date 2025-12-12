@@ -102,6 +102,7 @@ def plot_model_comparison(results, model_names, datasets, do_masks=[True, False]
         Name for saved figure
     """
     
+    results['wall_clock_time_ms'] = results['wall_clock_time']*1000
     # Sort results
     results_sorted = results.sort_values(['dataset', 'do_mask', 'accuracy'])
     
