@@ -249,9 +249,9 @@ def get_grid(args):
     Generate a grid for the log-polar mapping
 
     """
-    rs_ = torch.logspace(args.rs_min, args.rs_max, args.image_size, base=2) # Radial distances (log scale)
+    rs_ = torch.logspace(args.rs_min, args.rs_max, args.grid_size, base=2) # Radial distances (log scale)
     # adds a margin in angles in order to get an overrepresentation
-    ts_ = torch.linspace(args.angle_start, args.angle_start+torch.pi*2+args.angle_margin, args.image_size+1)[:-1] 
+    ts_ = torch.linspace(args.angle_start, args.angle_start+torch.pi*2+args.angle_margin, args.grid_size+1)[:-1] 
     grid_xs = torch.outer(rs_, torch.cos(ts_)) # X-coordinates
     grid_ys = torch.outer(rs_, torch.sin(ts_)) # Y-coordinates	
     
@@ -266,9 +266,9 @@ class transform_apply_grid(object):
 
     def __call__(self, images):
         result =  nnf.grid_sample(images.unsqueeze(dim=0), 
-                                    self.grid.unsqueeze(dim=0), 
-                                    padding_mode=self.padding_mode, align_corners=False, 
-                                    mode=self.mode)
+                                  self.grid.unsqueeze(dim=0), 
+                                  padding_mode=self.padding_mode, align_corners=False, 
+                                  mode=self.mode)
         return result.squeeze(0)
 
 

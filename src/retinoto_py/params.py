@@ -14,6 +14,7 @@ class Params:
     DATAROOT = Path.home() / 'data' / 'Imagenet'
 
     image_size: int = 224 # base resolution of the image (224, 224)
+    grid_size: int = 224 # base resolution of the image (224, 224)
     do_mask: bool = False # Whether apply a circular mask to the image
     do_fovea: bool = False # Whether apply a log-polar transform to the image
     rs_min: float = 0.00 # Set minimum radius of the log-polar grid
@@ -27,7 +28,7 @@ class Params:
     seed: int = 2025 # Set the seed for reproducibility 
     # batch_size: int = 64 # Set number of images per input batch
     batch_size: int  = 80 # Set the batch size for training and validation
-    num_workers: int = 1
+    num_workers: int = 0
     in_memory: bool = False
 
 

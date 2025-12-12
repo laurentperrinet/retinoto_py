@@ -66,7 +66,7 @@ def make_mp4(moviename, fnames, fps, do_delete=True):
 
     with imageio.get_writer(moviename, fps=fps) as writer:
         for fname in tqdm(fnames, desc="Creating video"):
-            writer.append_data(imageio.v2.imread(fname))
+            writer.append_data(imageio.imread(fname))
 
     if do_delete:
         for fname in fnames:
