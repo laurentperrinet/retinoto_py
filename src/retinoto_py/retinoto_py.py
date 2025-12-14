@@ -120,7 +120,6 @@ def train_model(args, model, train_loader, val_loader, df_train=None,
                               total=len(train_loader.dataset)//args.batch_size, leave=False)
         model.train()
         for images, true_idxs in inner_progress:
-
             images, true_idxs = images.to(args.device), true_idxs.to(args.device)
             total_image += len(images)
             i_image += len(images)

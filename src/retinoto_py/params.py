@@ -25,7 +25,7 @@ class Params:
     padding_mode: str = "zeros"
     # padding_mode: str = "border"
 
-    seed: int = 2025 # Set the seed for reproducibility 
+    seed: int = 2026 # Set the seed for reproducibility 
     # batch_size: int = 64 # Set number of images per input batch
     batch_size: int  = 80 # Set the batch size for training and validation
     num_workers: int = 0
@@ -44,7 +44,7 @@ class Params:
     delta2: float = 0.007
     weight_decay: float = 0.003
     label_smoothing: float = 0.05 # See https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html
-    do_full_training: bool = False
+    do_full_training: bool = True
 
     shuffle: bool = True # Whether to shuffle the data during training
     data_cache = Path('cached_data')
