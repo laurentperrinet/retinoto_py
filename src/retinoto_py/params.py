@@ -25,7 +25,7 @@ class Params:
     padding_mode: str = "zeros"
     # padding_mode: str = "border"
 
-    seed: int = 2026 # Set the seed for reproducibility 
+    seed: int = 1998 # Set the seed for reproducibility 
     # batch_size: int = 64 # Set number of images per input batch
     batch_size: int  = 80 # Set the batch size for training and validation
     num_workers: int = 0

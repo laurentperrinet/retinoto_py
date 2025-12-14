@@ -260,7 +260,7 @@ def compute_likelihood_map(args, model, full_image,
     # box_size = min(())
     # args.image_size = box_size
     preprocess = get_preprocess(args)
-
+    preprocess = preprocess.to(args.device)
     # pil_image = TF.to_pil_image(full_image)
 
     N_fixations = len(pos_H)

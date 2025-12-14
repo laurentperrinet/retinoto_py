@@ -11,6 +11,7 @@
 
 ## Features
 
+* TODO : pretrain FC pour 20
 * TODO : regénérer bbox avec `fovea.fixate`
 * DONE : use Subset instead of n_val_stop
 * TODO : use ecoset
