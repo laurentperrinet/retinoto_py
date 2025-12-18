@@ -354,12 +354,13 @@ def get_loader(args, dataset, drop_last=True, seed=None):
     )
     return loader
 
-import torchvision.models as models
 def load_model(args, model_filename=None):
     """
     Load the model from the torchvision library.
     
     """
+    import os, torchvision.models as models
+    os.environ.setdefault('TORCH_HOME', str(args.data_cache))
 
     if args.model_name=='resnet18':
         model = models.resnet18(weights=models.ResNet18_Weights.DEFAULT)
