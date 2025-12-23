@@ -257,6 +257,50 @@ def get_grid(args):
     
     return torch.stack((grid_xs, grid_ys), 2) # (H_scaled, W_scaled, 2)
 
+
+def get_grid_hexagonal(args):
+    """
+    Generate a hexagonally-packed grid for the log-polar mapping
+    with staggered rows for better sampling efficiency.
+
+    This creates a pattern similar to hexagonal packing where every
+    second eccentricity row is shifted by half the angular resolution.
+    
+    Args:
+        args: Parameters object containing grid configuration
+        
+    Returns:
+        torch.Tensor: Grid tensor of shape (grid_size, grid_size, 2) containing (x,y) coordinates
+    """
+    rs_ = torch.logspace(args.rs_min, args.rs_max, args.grid_size, base=2)  # Radial distances
+    angular_resolution = 2 * torch.pi / args.grid_size  # Base angular step
+
+    # Create staggered angular coordinates
+    grid_xs_list = []
+    grid_ys_list = []
+
+    for i, r in enumerate(rs_):
+        # Calculate phase shift: alternate between 0 and half angular resolution
+        phase_shift = 0 if i % 2 == 0 else angular_resolution / 2
+
+        # Create angular coordinates for this radial ring
+        ts_i = torch.linspace(args.angle_start + phase_shift,
+                             args.angle_start + 2*torch.pi + args.angle_margin + phase_shift,
+                             args.grid_size + 1)[:-1]
+
+        # Convert to Cartesian coordinates
+        grid_xs_i = r * (-torch.cos(ts_i))
+        grid_ys_i = r * torch.sin(ts_i)
+
+        grid_xs_list.append(grid_xs_i)
+        grid_ys_list.append(grid_ys_i)
+
+    # Stack all rings together
+    grid_xs = torch.stack(grid_xs_list, dim=0)
+    grid_ys = torch.stack(grid_ys_list, dim=0)
+
+    return torch.stack((grid_xs, grid_ys), 2)  # Shape: (grid_size, grid_size, 2)
+
 class transform_apply_grid(object): 
     # https://docs.pytorch.org/docs/stable/generated/torch.nn.functional.grid_sample.html
     def __init__(self, logPolar_grid, padding_mode, mode):
@@ -273,7 +317,8 @@ class transform_apply_grid(object):
 
 
 def get_preprocess(args, do_full_preprocess=True, angle_min=None, angle_max=None, 
-                   interpolation=InterpolationMode.BILINEAR, mode='bilinear'):
+                   interpolation=InterpolationMode.BILINEAR, mode='bilinear', 
+                   use_hexagonal_grid=False):
     # The images must be pre-processed in the exact same way the model was trained on.
     # This includes resizing, cropping, and normalizing.
     transform_list = []
@@ -287,7 +332,14 @@ def get_preprocess(args, do_full_preprocess=True, angle_min=None, angle_max=None
         transform_list.append(transforms.RandomHorizontalFlip())
 
         if args.do_fovea: # apply log-polar mapping to the image
-            grid_polar = get_grid(args)#.to(args.device)
+            # Choose between regular or hexagonal grid
+            # Priority: explicit parameter > args setting > default (False)
+            hexagonal_grid = use_hexagonal_grid if use_hexagonal_grid is not None else getattr(args, 'use_hexagonal_grid', False)
+            if hexagonal_grid:
+                grid_polar = get_grid_hexagonal(args)
+            else:
+                grid_polar = get_grid(args)
+            # grid_polar = grid_polar.to(args.device)
             transform_list.append(transform_apply_grid(grid_polar, padding_mode=args.padding_mode, mode=mode))
         else:
             # transform_list.append(PadAndResize(args.image_size, interpolation=interpolation))
