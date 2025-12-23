@@ -12,6 +12,8 @@
 ## Features
 
 * TODO : regarder https://docs.pytorch.org/vision/main/generated/torchvision.transforms.v2.RandomIoUCrop.html#torchvision.transforms.v2.RandomIoUCrop
+* TODO : hexagonal tiling for log-polar grid
+* TODO : pretrain FC pour 20
 * TODO : do visual search with a prompt
 * TODO : regénérer bbox avec `fovea.fixate` = nouveau dataset `focus`
 * TODO : use ecoset
