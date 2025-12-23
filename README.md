@@ -11,11 +11,12 @@
 
 ## Features
 
-* TODO : pretrain FC pour 20
-* TODO : regénérer bbox avec `fovea.fixate`
-* DONE : use Subset instead of n_val_stop
-* TODO : use ecoset
+* TODO : regarder https://docs.pytorch.org/vision/main/generated/torchvision.transforms.v2.RandomIoUCrop.html#torchvision.transforms.v2.RandomIoUCrop
 * TODO : do visual search with a prompt
+* TODO : regénérer bbox avec `fovea.fixate` = nouveau dataset `focus`
+* TODO : use ecoset
+* DONE : pretrain FC pour 20 epochs
+* DONE : use Subset instead of n_val_stop
 
 
 ## Credits

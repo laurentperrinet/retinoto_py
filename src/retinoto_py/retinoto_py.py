@@ -167,7 +167,6 @@ def train_model(args, model, train_loader, val_loader, df_train=None,
 
 def do_learning(args, dataset, name, model_filename_init=None):
 
-
     model_filename = args.data_cache / f'{name}.pth'
     json_filename = args.data_cache / model_filename.name.replace('.pth', '.json')
     lock_filename = args.data_cache / model_filename.name.replace('.pth', '.lock')
@@ -189,10 +188,10 @@ def do_learning(args, dataset, name, model_filename_init=None):
         from .torch_utils import get_loader, get_dataset, load_model
 
         TRAIN_DATA_DIR = args.DATAROOT / f'Imagenet_{dataset}' / 'train'
-        train_dataset = get_dataset(args, TRAIN_DATA_DIR)
+        train_dataset = get_dataset(args, TRAIN_DATA_DIR, do_augment=args.do_augment)
         train_loader = get_loader(args, train_dataset)
         VAL_DATA_DIR = args.DATAROOT / f'Imagenet_{dataset}' / 'val'
-        val_dataset = get_dataset(args, VAL_DATA_DIR)
+        val_dataset = get_dataset(args, VAL_DATA_DIR, do_augment=False)
         val_loader = get_loader(args, val_dataset)
 
         # we need to train the model or finish a training that already started
@@ -202,6 +201,7 @@ def do_learning(args, dataset, name, model_filename_init=None):
             model_filename_train = model_filename
         else:
             model_filename_train = model_filename_init # we use a stored file for learning or None for default weights
+        print(model_filename_train)
         model = load_model(args, model_filename=model_filename_train)
 
         start_time = time.time()

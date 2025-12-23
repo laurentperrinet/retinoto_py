@@ -29,21 +29,21 @@ class Params:
     # batch_size: int = 64 # Set number of images per input batch
     batch_size: int  = 80 # Set the batch size for training and validation
     num_workers: int = 0
+    do_augment: bool = False
     in_memory: bool = False
 
 
     # model_name: str = 'resnet50' # Name of the model to use
     model_name: str = 'convnext_base' # Name of the model to use
 
-
     # num_epochs: int = 1
     num_epochs: int = 41
     subset_factor: int = 1 # set for DEBUGging
-    lr: float = 2.e-7
-    delta1: float = 0.2
-    delta2: float = 0.007
-    weight_decay: float = 0.003
-    label_smoothing: float = 0.05 # See https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html
+    lr: float = 4.e-6
+    delta1: float = 0.02
+    delta2: float = 5e-6
+    weight_decay: float = 4e-3
+    label_smoothing: float = 0. # See https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html
     do_full_training: bool = True
 
     shuffle: bool = True # Whether to shuffle the data during training

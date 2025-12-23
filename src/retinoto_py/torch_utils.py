@@ -273,18 +273,93 @@ class transform_apply_grid(object):
 
 
 def get_preprocess(args, do_full_preprocess=True, angle_min=None, angle_max=None, 
-                   interpolation=InterpolationMode.BILINEAR, mode='bilinear'):
+                   interpolation=InterpolationMode.BILINEAR, mode='bilinear', do_augment=None):
+    """
+    Defines get_preprocess for the preprocessing 
+    
+    :param args: A containaer for all images
+    :param do_full_preprocess: set to FAlse to bypass the full preprocessing and use that for getting a dataloader providing raw images
+    :param angle_min: Description
+    :param angle_max: Description
+    :param interpolation: Description
+    :param mode: Description
+    :param do_augment: Description
+    """
+
+
+    if do_augment is None: do_augment = args.do_augment # sets to dafault value
+
     # The images must be pre-processed in the exact same way the model was trained on.
     # This includes resizing, cropping, and normalizing.
     transform_list = []
  
     transform_list.append(transforms.ToImage())  
     transform_list.append(transforms.ToDtype(torch.float32, scale=True)) 
+
+
     if do_full_preprocess:
+
+        if do_augment:
+            # transform_list.append(transforms.RandomHorizontalFlip())
+
+            # ----- Augmentations spécifiques au training -----
+            # 1. RandAugment
+            # https://docs.pytorch.org/vision/main/generated/torchvision.transforms.v2.RandAugment.html#torchvision.transforms.v2.RandAugment
+            # --------------------------------------------------------------
+            #  Bloc d’augmentations « full preprocess » (activé seulement
+            #  pendant l’entraînement).  Toutes les opérations ci‑dessous
+            #  conservent la résolution de l’image (pas de crop ou de zoom)
+            #  puisqu’on a déjà fixé la taille avec `Resize` plus haut.
+            # --------------------------------------------------------------
+
+            # 1️⃣ RandAugment – applique N opérations de façon aléatoire
+            #    parmi le catalogue torchvision (rotation, shear, contrast, …)
+            #    * num_ops=2  →  deux opérations sont composées pour chaque image
+            #    * magnitude=9 → intensité élevée (0‑30 ° de rotation, forte
+            #      contraste, etc.) mais toujours dans les limites du même shape
+            #    * interpolation=interpolation → on passe le même mode d’interpolation
+            #      qui a été utilisé pour les éventuelles rotations précédentes
+            transform_list.append(
+                transforms.RandAugment(
+                    num_ops=2,
+                    magnitude=9,
+                    interpolation=interpolation
+                )
+            )
+
+            # 2️⃣ Color jitter appliqué *aléatoirement* (probabilité p=0.8)
+            #    - brightness 0.4, contrast 0.4, saturation 0.4, hue 0.1
+            #    - RandomApply encapsule le jitter pour que 20 % des images
+            #      ne subissent aucune modification de couleur, ce qui diversifie
+            #      le signal d’entraînement sans épuiser le modèle.
+            transform_list.append(
+                transforms.RandomApply(
+                    [transforms.ColorJitter(0.4, 0.4, 0.4, 0.1)],
+                    p=0.8
+                )
+            )
+
+            # 3️⃣ RandomGrayscale – avec probabilité 0.2
+            #    - transforme l’image en niveaux de gris (R=G=B) pour forcer le
+            #      réseau à ne pas dépendre uniquement de la chrominance.
+            transform_list.append(transforms.RandomGrayscale(p=0.2))
+
+            # 4️⃣ RandomErasing – efface un petit patch aléatoire
+            #    - p=0.25   →  25 % des mini‑batches subiront une opération d’effacement
+            #    - scale=(0.02, 0.33) → la surface du patch varie de 2 % à 33 % de l’image
+            #    - ratio=(0.3, 3.3)  → forme du patch (aspect ratio) varie entre 0.3 et 3.3
+            #    Cette technique pousse le modèle à exploiter le contexte global
+            #    plutôt qu’à se focaliser sur de petites régions très discriminantes.
+            transform_list.append(
+                transforms.RandomErasing(
+                    p=0.25,
+                    scale=(0.02, 0.33),
+                    ratio=(0.3, 3.3)
+                )
+            )
         # Si les deux angles ne sont pas None, on applique la rotation
         if angle_min is not None and angle_max is not None:
             transform_list.append(transforms.RandomRotation(degrees=(angle_min, angle_max), interpolation=interpolation))
-        transform_list.append(transforms.RandomHorizontalFlip())
 
         if args.do_fovea: # apply log-polar mapping to the image
             grid_polar = get_grid(args)#.to(args.device)
@@ -307,8 +382,9 @@ def get_preprocess(args, do_full_preprocess=True, angle_min=None, angle_max=None
     preprocess = transforms.Compose(transform_list)
     return preprocess
 
-def get_dataset(args, DATA_DIR, do_full_preprocess=True, angle_min=None, angle_max=None, in_memory=None):
-    preprocess = get_preprocess(args, do_full_preprocess=do_full_preprocess, angle_min=angle_min, angle_max=angle_max)
+def get_dataset(args, DATA_DIR, do_full_preprocess=True, angle_min=None, angle_max=None, 
+                in_memory=None, do_augment=None):
+    preprocess = get_preprocess(args, do_full_preprocess=do_full_preprocess, angle_min=angle_min, angle_max=angle_max, do_augment=do_augment)
     
     is_valid_file = lambda p: p.lower().endswith(('.png', '.jpg', '.jpeg'))
     # --- 2. Create Dataset and DataLoader using ImageFolder ---

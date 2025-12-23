@@ -21,7 +21,7 @@ def get_device(verbose):
         device = torch.device('cuda')
         if verbose: print('Running on GPU : ', torch.cuda.get_device_name(), '#GPU=', torch.cuda.device_count())
         torch.cuda.empty_cache()
-        print_gpu_memory()
+        if verbose: print_gpu_memory()
     else:
         device = torch.device('cpu')
 
