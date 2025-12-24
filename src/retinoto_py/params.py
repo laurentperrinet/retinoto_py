@@ -27,12 +27,10 @@ class Params:
     # padding_mode: str = "border"
 
     seed: int = 1998 # Set the seed for reproducibility 
-    # batch_size: int = 64 # Set number of images per input batch
-    batch_size: int  = 80 # Set the batch size for training and validation
+    batch_size: int = 32 # Set number of images per input batch
     num_workers: int = 0
-    do_augment: bool = False
+    do_augment: bool = True
     in_memory: bool = False
-
 
     # model_name: str = 'resnet50' # Name of the model to use
     model_name: str = 'convnext_base' # Name of the model to use
@@ -40,10 +38,10 @@ class Params:
     # num_epochs: int = 1
     num_epochs: int = 41
     subset_factor: int = 1 # set for DEBUGging
-    lr: float = 4.e-6
-    delta1: float = 0.02
-    delta2: float = 5e-6
-    weight_decay: float = 4e-3
+    lr: float = 3.e-6
+    delta1: float = 0.005
+    delta2: float = 20e-6
+    weight_decay: float = 800e-6
     label_smoothing: float = 0. # See https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html
     do_full_training: bool = True
 

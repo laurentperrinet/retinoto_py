@@ -408,7 +408,7 @@ def get_preprocess(args, do_full_preprocess=True, angle_min=None, angle_max=None
         if args.do_fovea: # apply log-polar mapping to the image
             # Choose between regular or hexagonal grid
             # Priority: explicit parameter > args setting > default (False)
-            hexagonal_grid = use_hexagonal_grid if use_hexagonal_grid is not None else getattr(args, 'use_hexagonal_grid', False)
+            hexagonal_grid = False # use_hexagonal_grid if use_hexagonal_grid is not None else getattr(args, 'use_hexagonal_grid', False)
             if hexagonal_grid:
                 grid_polar = get_grid_hexagonal(args)
             else:
