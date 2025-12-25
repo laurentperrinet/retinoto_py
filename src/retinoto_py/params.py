@@ -27,7 +27,7 @@ class Params:
     # padding_mode: str = "border"
 
     seed: int = 1998 # Set the seed for reproducibility 
-    batch_size: int = 32 # Set number of images per input batch
+    batch_size: int = 256 # Set number of images per input batch
     num_workers: int = 8
     prefetch_factor: int = 2
     do_augment: bool = True
@@ -36,6 +36,7 @@ class Params:
     # model_name: str = 'resnet50' # Name of the model to use
     model_name: str = 'convnext_base' # Name of the model to use
 
+    # https://github.com/pytorch/vision/tree/main/references/classification#convnext
     # num_epochs: int = 1
     num_epochs: int = 41
     subset_factor: int = 1 # set for DEBUGging

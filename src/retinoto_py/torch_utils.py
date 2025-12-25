@@ -122,16 +122,27 @@ def get_label_to_idx(args):
 
 class InMemoryImageDataset(Dataset):
     """Load entire ImageFolder dataset into memory"""
-    def __init__(self, dataset):
+    def __init__(self, dataset, num_workers=8):
         self.dataset = dataset
 
         self.images = []
         self.labels = []
 
+
         n_total = len(dataset)
-        for idx in tqdm(range(n_total), desc='Putting images in memory', total=n_total, leave=False):
-            self.images.append(dataset[idx][0])
-            self.labels.append(dataset[idx][1])
+        if num_workers==1:
+            for idx in tqdm(range(n_total), desc='Putting images in memory', total=n_total, leave=False):
+                self.images.append(dataset[idx][0])
+                self.labels.append(dataset[idx][1])
+        else:
+            def _load_one(idx):
+                return dataset[idx]          # already returns (tensor, label)
+            with torch.multiprocessing.Pool(num_workers) as pool:
+                for img, lbl in tqdm(pool.imap_unordered(_load_one,
+                                                        range(n_total)),
+                                                        total=n_total):
+                    self.images.append(img)
+                    self.labels.append(lbl)
         
     def __len__(self):
         return len(self.images)
@@ -552,8 +563,7 @@ def apply_weights(model, model_filename, device, verbose=True):
         model: torch model, the model with the weights applied
         """
     if verbose: print(f'loading .... {model_filename}')
-    model.load_state_dict(torch.load(model_filename, map_location=torch.device(device), 
-                                     strict=True))
+    model.load_state_dict(torch.load(model_filename, map_location=torch.device(device)), strict=True)
     return model
 
 
