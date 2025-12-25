@@ -119,7 +119,6 @@ def get_label_to_idx(args):
 
 #     return subset_indices
 
-is_valid_file = lambda p: p.lower().endswith(('.png', '.jpg', '.jpeg'))
 
 class InMemoryImageDataset(Dataset):
     """Load entire ImageFolder dataset into memory"""
@@ -142,7 +141,6 @@ class InMemoryImageDataset(Dataset):
         label = self.labels[idx]
         
         return img, label
-
 
 # https://github.com/laurentperrinet/2024-12-09-normalizing-images-in-convolutional-neural-networks
 im_mean = np.array([0.485, 0.456, 0.406])
@@ -441,6 +439,8 @@ def _core_dataset(ds):
         # Subset possède l’attribut .dataset ; les autres variantes sont gérées de façon similaire
         ds = ds.dataset
     return ds
+
+is_valid_file = lambda p: p.lower().endswith(('.png', '.jpg', '.jpeg'))
 
 def get_dataset(args, DATA_DIR, do_full_preprocess=True, angle_min=None, angle_max=None, 
                 in_memory=None, do_augment=None):
