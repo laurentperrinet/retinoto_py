@@ -5,8 +5,8 @@ __email__ = 'laurent.perrinet@cnrs.fr'
 
 
 import multiprocessing
-multiprocessing.set_start_method('fork', force=True)
-
+# multiprocessing.set_start_method('fork', force=True)
+multiprocessing.set_start_method('spawn', force=True)   # <‑‑ préférer sur M‑series
 
 #####################################################
 #####################################################

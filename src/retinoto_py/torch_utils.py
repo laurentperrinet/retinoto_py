@@ -6,6 +6,10 @@ Useful torch snippets to use in the main module.
 
 #############################################################
 import numpy as np
+# https://github.com/laurentperrinet/2024-12-09-normalizing-images-in-convolutional-neural-networks
+im_mean = np.array([0.485, 0.456, 0.406])
+im_std = np.array([0.229, 0.224, 0.225]) 
+#############################################################
 import matplotlib.pyplot as plt
 import matplotlib
 import torchvision
@@ -26,12 +30,12 @@ from torchvision.transforms import InterpolationMode
 from .utils import set_seed
 import random
 #############################################################
-import warnings
-warnings.filterwarnings(
-    "ignore",
-    message=r"iCCP: profile",
-    category=UserWarning,
-)
+# import warnings
+# warnings.filterwarnings(
+#     "ignore",
+#     message=r"iCCP: profile",
+#     category=UserWarning,
+# )
 
 
 def get_idx_to_label(args, verbose=False):
@@ -43,7 +47,6 @@ def get_idx_to_label(args, verbose=False):
         # Check if we already have the file
         if not LABELS_FILE.exists():
             import requests
-
             # --- 4. Download and Load the ImageNet Class Index (with caching) ---
             LABELS_URL = 'https://s3.amazonaws.com/deep-learning-models/image-models/imagenet_class_index.json'
 
@@ -77,62 +80,59 @@ def get_label_to_idx(args):
     label2idx = {label: idx for idx, label in enumerate(idx2label)}
     return label2idx
 
-# https://github.com/laurentperrinet/2024-12-09-normalizing-images-in-convolutional-neural-networks
-im_mean = np.array([0.485, 0.456, 0.406])
-im_std = np.array([0.229, 0.224, 0.225]) 
+# def get_smaller_balanced_dataset(dataset, subset_factor=10, seed=42):
+#     """
+#     Create a smaller, balanced subset of the dataset.
 
-def get_smaller_balanced_dataset(dataset, subset_factor=10, seed=42):
-    """
-    Create a smaller, balanced subset of the dataset.
+#     Args:
+#         dataset: The full ImageFolder dataset.
+#         fraction: Fraction of the dataset to use (default: 0.1).
+#         seed: Random seed for reproducibility.
 
-    Args:
-        dataset: The full ImageFolder dataset.
-        fraction: Fraction of the dataset to use (default: 0.1).
-        seed: Random seed for reproducibility.
+#     Returns:
+#         Subset of the dataset with balanced classes.
+#     """
+#     np.random.seed(seed)
 
-    Returns:
-        Subset of the dataset with balanced classes.
-    """
-    np.random.seed(seed)
+#     # Get all targets
+#     targets = np.array(dataset.targets)
 
-    # Get all targets
-    targets = np.array(dataset.targets)
+#     # Get unique classes and their indices
+#     classes, counts = np.unique(targets, return_counts=True)
 
-    # Get unique classes and their indices
-    classes, counts = np.unique(targets, return_counts=True)
+#     # Calculate the number of samples per class in the subset
+#     n_per_class = min(counts) // subset_factor
 
-    # Calculate the number of samples per class in the subset
-    n_per_class = min(counts) // subset_factor
+#     # Sample indices for each class
+#     subset_indices = []
+#     for cls in classes:
+#         cls_indices = np.where(targets == cls)[0]
+#         np.random.shuffle(cls_indices)
+#         subset_indices.extend(cls_indices[:n_per_class])
 
-    # Sample indices for each class
-    subset_indices = []
-    for cls in classes:
-        cls_indices = np.where(targets == cls)[0]
-        np.random.shuffle(cls_indices)
-        subset_indices.extend(cls_indices[:n_per_class])
+#     # Shuffle the subset indices
+#     np.random.shuffle(subset_indices)
+#     subset_indices = [int(idx) for idx in subset_indices]
 
-    # Shuffle the subset indices
-    np.random.shuffle(subset_indices)
-    subset_indices = [int(idx) for idx in subset_indices]
+#     assert len(subset_indices) > 0, "Subset is empty!"
+#     assert max(subset_indices) < len(dataset), "Index out of bounds"
 
-    assert len(subset_indices) > 0, "Subset is empty!"
-    assert max(subset_indices) < len(dataset), "Index out of bounds"
+#     return subset_indices
 
-    return subset_indices
+is_valid_file = lambda p: p.lower().endswith(('.png', '.jpg', '.jpeg'))
 
 class InMemoryImageDataset(Dataset):
     """Load entire ImageFolder dataset into memory"""
-    def __init__(self, dataset,  seed=None):
+    def __init__(self, dataset):
+        self.dataset = dataset
+
         self.images = []
         self.labels = []
 
-        np.random.seed(seed)
         n_total = len(dataset)
         for idx in tqdm(range(n_total), desc='Putting images in memory', total=n_total, leave=False):
             self.images.append(dataset[idx][0])
             self.labels.append(dataset[idx][1])
-
-        # print(f"Loaded {len(self.images)} images into memory")
         
     def __len__(self):
         return len(self.images)
@@ -433,39 +433,63 @@ def get_preprocess(args, do_full_preprocess=True, angle_min=None, angle_max=None
     preprocess = transforms.Compose(transform_list)
     return preprocess
 
+def _core_dataset(ds):
+    """Retourne le dataset le plus interne qui possède les attributs classiques."""
+    while isinstance(ds, (torch.utils.data.Subset,
+                         torch.utils.data.ConcatDataset,
+                         torch.utils.data.WeightedRandomSampler)):
+        # Subset possède l’attribut .dataset ; les autres variantes sont gérées de façon similaire
+        ds = ds.dataset
+    return ds
+
 def get_dataset(args, DATA_DIR, do_full_preprocess=True, angle_min=None, angle_max=None, 
                 in_memory=None, do_augment=None):
+    
+    # defines preprocessing from the raw image to the input to the network
     preprocess = get_preprocess(args, do_full_preprocess=do_full_preprocess, angle_min=angle_min, angle_max=angle_max, do_augment=do_augment)
     
-    is_valid_file = lambda p: p.lower().endswith(('.png', '.jpg', '.jpeg'))
     # --- 2. Create Dataset and DataLoader using ImageFolder ---
     # ImageFolder automatically infers class names from directory names
     # and maps them to integer indices.
     dataset = datasets.ImageFolder(root=DATA_DIR, transform=preprocess, is_valid_file=is_valid_file)
-    if args.subset_factor > 1:
-        subset_indices = get_smaller_balanced_dataset(dataset, subset_factor=args.subset_factor, seed=args.seed)
-        dataset = Subset(dataset, subset_indices)
 
-    if in_memory is None: in_memory = args.in_memory
-    if in_memory:
-        dataset = InMemoryImageDataset(dataset, is_valid_file=is_valid_file, seed=args.seed)
-
+    # -----------------------------------------------------------------
+    # Sous‑échantillonnage (debug) – on crée un Subset
+    # -----------------------------------------------------------------
     if args.subset_factor > 1:
-        dataset.class_to_idx = dataset.dataset.class_to_idx
-        dataset.classes = dataset.dataset.classes
-        dataset.targets = [dataset.dataset.targets[i] for i in subset_indices]
+        # choisir aléatoirement les indices à garder
+        subset_indices = np.random.choice(len(dataset), size=len(dataset)//args.subset_factor,
+                                         replace=False)
+        dataset = torch.utils.data.Subset(dataset, subset_indices)
+
+    # -----------------------------------------------------------------
+    # Récupération robuste des métadonnées (class_to_idx, classes, targets)
+    # -----------------------------------------------------------------
+    core = _core_dataset(dataset)   # le dataset réel derrière le Subset éventuel
+
+    # Copie des dictionnaires de classe → indice
+    dataset.class_to_idx = getattr(core, "class_to_idx", {})
+    dataset.classes      = getattr(core, "classes", [])
+
+    # Si le dataset possède .targets (ImageFolder) on les reconstruit pour le Subset
+    if hasattr(core, "targets"):
+        if isinstance(dataset, torch.utils.data.Subset):
+            dataset.targets = [core.targets[i] for i in subset_indices]
+        else:
+            dataset.targets = core.targets
 
     dataset.idx_to_class = {v: k for k, v in dataset.class_to_idx.items()}
-    dataset.idx2label = get_idx_to_label(args)
-    dataset.label2idx = get_label_to_idx(args)
+    dataset.idx2label   = get_idx_to_label(args)
+    dataset.label2idx   = get_label_to_idx(args)
+
+    if in_memory is None: in_memory = args.in_memory
+    if in_memory: dataset = InMemoryImageDataset(dataset)
 
     return dataset
 
-
 def get_loader(args, dataset, drop_last=True, seed=None):
 
-    if seed is None:
-        seed = getattr(args, "seed", 0)
+    if seed is None: seed = args.seed
         
     loader = DataLoader(
         dataset,
@@ -473,11 +497,10 @@ def get_loader(args, dataset, drop_last=True, seed=None):
         shuffle=args.shuffle,
         drop_last=drop_last,
         num_workers=args.num_workers,
-        # worker_init_fn=worker_init,
         generator=torch.Generator().manual_seed(seed),  # deterministic shuffling
-        # pin_memory=False,               # unified memory → no need for pinned host memory
-        # persistent_workers=False,       # workers are spawned each epoch (safer for transform changes)
-        # prefetch_factor=2,              # a small pre‑fetch queue is enough on M‑series
+        pin_memory=False, # unified memory → no need for pinned host memory
+        persistent_workers=False, # workers are spawned each epoch (safer for transform changes)
+        prefetch_factor= None if args.prefetch_factor==0 else args.prefetch_factor,  # a small pre‑fetch queue is enough on M‑series
     )
     return loader
 
@@ -529,7 +552,8 @@ def apply_weights(model, model_filename, device, verbose=True):
         model: torch model, the model with the weights applied
         """
     if verbose: print(f'loading .... {model_filename}')
-    model.load_state_dict(torch.load(model_filename, map_location=torch.device(device)), strict=True)
+    model.load_state_dict(torch.load(model_filename, map_location=torch.device(device), 
+                                     strict=True))
     return model
 
 

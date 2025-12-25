@@ -28,7 +28,8 @@ class Params:
 
     seed: int = 1998 # Set the seed for reproducibility 
     batch_size: int = 32 # Set number of images per input batch
-    num_workers: int = 0
+    num_workers: int = 8
+    prefetch_factor: int = 2
     do_augment: bool = True
     in_memory: bool = False
 
@@ -62,7 +63,7 @@ class Params:
 all_model_names = ['resnet18', 'resnet50', 'resnet101'] 
 all_model_names_ls = [':', '-.', '-'] 
 all_model_names_color = ['blue', 'blue', 'blue']
-all_cn_model_names = ['convnext_tiny', 'convnext_base', 'convnext_large'] #'convnext_small', 
+all_cn_model_names = ['convnext_tiny', 'convnext_small', 'convnext_base', 'convnext_large']
 all_cn_model_names_color = ['blue', 'blue', 'blue']
 all_cn_model_names_ls = [':', '-.', '-'] 
 all_datasets = ['full', 'bbox']
