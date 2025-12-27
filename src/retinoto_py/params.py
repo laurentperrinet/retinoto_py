@@ -31,7 +31,6 @@ class Params:
     num_workers: int = 8
     prefetch_factor: int = 2
     do_augment: bool = True
-    in_memory: bool = False
 
     # model_name: str = 'resnet50' # Name of the model to use
     model_name: str = 'convnext_base' # Name of the model to use

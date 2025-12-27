@@ -17,6 +17,7 @@
 * TODO : do visual search with a prompt
 * TODO : regénérer bbox avec `fovea.fixate` = nouveau dataset `focus`
 * TODO : use ecoset
+* TODO : clean for `in_memory` code
 * DONE : pretrain FC pour 20 epochs
 * DONE : use Subset instead of n_val_stop
 

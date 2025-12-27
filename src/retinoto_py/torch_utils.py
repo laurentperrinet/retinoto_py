@@ -80,78 +80,6 @@ def get_label_to_idx(args):
     label2idx = {label: idx for idx, label in enumerate(idx2label)}
     return label2idx
 
-# def get_smaller_balanced_dataset(dataset, subset_factor=10, seed=42):
-#     """
-#     Create a smaller, balanced subset of the dataset.
-
-#     Args:
-#         dataset: The full ImageFolder dataset.
-#         fraction: Fraction of the dataset to use (default: 0.1).
-#         seed: Random seed for reproducibility.
-
-#     Returns:
-#         Subset of the dataset with balanced classes.
-#     """
-#     np.random.seed(seed)
-
-#     # Get all targets
-#     targets = np.array(dataset.targets)
-
-#     # Get unique classes and their indices
-#     classes, counts = np.unique(targets, return_counts=True)
-
-#     # Calculate the number of samples per class in the subset
-#     n_per_class = min(counts) // subset_factor
-
-#     # Sample indices for each class
-#     subset_indices = []
-#     for cls in classes:
-#         cls_indices = np.where(targets == cls)[0]
-#         np.random.shuffle(cls_indices)
-#         subset_indices.extend(cls_indices[:n_per_class])
-
-#     # Shuffle the subset indices
-#     np.random.shuffle(subset_indices)
-#     subset_indices = [int(idx) for idx in subset_indices]
-
-#     assert len(subset_indices) > 0, "Subset is empty!"
-#     assert max(subset_indices) < len(dataset), "Index out of bounds"
-
-#     return subset_indices
-
-
-class InMemoryImageDataset(Dataset):
-    """Load entire ImageFolder dataset into memory"""
-    def __init__(self, dataset, num_workers=8):
-        self.dataset = dataset
-
-        self.images = []
-        self.labels = []
-
-
-        n_total = len(dataset)
-        if num_workers==1:
-            for idx in tqdm(range(n_total), desc='Putting images in memory', total=n_total, leave=False):
-                self.images.append(dataset[idx][0])
-                self.labels.append(dataset[idx][1])
-        else:
-            def _load_one(idx):
-                return dataset[idx]          # already returns (tensor, label)
-            with torch.multiprocessing.Pool(num_workers) as pool:
-                for img, lbl in tqdm(pool.imap_unordered(_load_one,
-                                                        range(n_total)),
-                                                        total=n_total):
-                    self.images.append(img)
-                    self.labels.append(lbl)
-        
-    def __len__(self):
-        return len(self.images)
-    
-    def __getitem__(self, idx):
-        img = self.images[idx]
-        label = self.labels[idx]
-        
-        return img, label
 
 # https://github.com/laurentperrinet/2024-12-09-normalizing-images-in-convolutional-neural-networks
 im_mean = np.array([0.485, 0.456, 0.406])
@@ -453,8 +381,7 @@ def _core_dataset(ds):
 
 is_valid_file = lambda p: p.lower().endswith(('.png', '.jpg', '.jpeg'))
 
-def get_dataset(args, DATA_DIR, do_full_preprocess=True, angle_min=None, angle_max=None, 
-                in_memory=None, do_augment=None):
+def get_dataset(args, DATA_DIR, do_full_preprocess=True, angle_min=None, angle_max=None, do_augment=None):
     
     # defines preprocessing from the raw image to the input to the network
     preprocess = get_preprocess(args, do_full_preprocess=do_full_preprocess, angle_min=angle_min, angle_max=angle_max, do_augment=do_augment)
@@ -492,9 +419,6 @@ def get_dataset(args, DATA_DIR, do_full_preprocess=True, angle_min=None, angle_m
     dataset.idx_to_class = {v: k for k, v in dataset.class_to_idx.items()}
     dataset.idx2label   = get_idx_to_label(args)
     dataset.label2idx   = get_label_to_idx(args)
-
-    if in_memory is None: in_memory = args.in_memory
-    if in_memory: dataset = InMemoryImageDataset(dataset)
 
     return dataset
 
