@@ -28,7 +28,7 @@ class Params:
 
     seed: int = 1998 # Set the seed for reproducibility 
     batch_size: int = 128 # Set number of images per input batch
-    num_workers: int = 0
+    num_workers: int = 4
     prefetch_factor: int = 0
     do_augment: bool = True
 

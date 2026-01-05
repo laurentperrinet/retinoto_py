@@ -20,8 +20,6 @@ def get_validation_accuracy(args, model, val_loader, desc=None, leave=True):
 
         correct_predictions = 0
         total_predictions = 0
-        # running_loss_val = 0.0
-
         outer_progress = tqdm(val_loader, desc=desc, total=len(val_loader.dataset)//args.batch_size, leave=leave)
 
         for images, true_idxs in outer_progress:
@@ -31,9 +29,6 @@ def get_validation_accuracy(args, model, val_loader, desc=None, leave=True):
             # Get predictions (no need for gradients)
             outputs = model(images)
             _, predicted_labels = torch.max(outputs, dim=1)
-
-            # loss = criterion(outputs, true_idxs)
-            # running_loss_val += loss.item() * images.size(0)
 
             # Check if the prediction was correct for the entire batch
             # The comparison produces a tensor of booleans (True/False)
@@ -46,26 +41,10 @@ def get_validation_accuracy(args, model, val_loader, desc=None, leave=True):
             # The total number of predictions is the batch size
             total_predictions += true_idxs.size(0)
 
-
         acc_val = correct_predictions / total_predictions
-        # loss_val = running_loss_val / total_predictions
         outer_progress.set_postfix_str(f"accuracy={acc_val:.3f}")
 
-    return acc_val #, loss_val
-
-class StochasticDepth(nn.Module):
-    def __init__(self, survival_prob=1.0):
-        super().__init__()
-        self.survival_prob = survival_prob
-
-    def forward(self, x, residual):
-        if self.training:
-            if torch.rand(1).item() < self.survival_prob:
-                return x + residual
-            else:
-                return x
-        else:
-            return x + self.survival_prob * residual
+    return acc_val
 
 def train_model(args, model, train_loader, val_loader, df_train=None, 
                 model_filename=None, json_filename=None):
