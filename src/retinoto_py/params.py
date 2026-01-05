@@ -27,9 +27,9 @@ class Params:
     # padding_mode: str = "border"
 
     seed: int = 1998 # Set the seed for reproducibility 
-    batch_size: int = 32 # Set number of images per input batch
+    batch_size: int = 512 # Set number of images per input batch
     num_workers: int = 2
-    prefetch_factor: int = 1
+    prefetch_factor: int = 4
     do_augment: bool = True
 
     # model_name: str = 'resnet50' # Name of the model to use
