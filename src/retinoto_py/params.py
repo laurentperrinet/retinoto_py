@@ -27,9 +27,9 @@ class Params:
     # padding_mode: str = "border"
 
     seed: int = 1998 # Set the seed for reproducibility 
-    batch_size: int = 256 # Set number of images per input batch
-    num_workers: int = 8
-    prefetch_factor: int = 2
+    batch_size: int = 128 # Set number of images per input batch
+    num_workers: int = 0
+    prefetch_factor: int = 0
     do_augment: bool = True
 
     # model_name: str = 'resnet50' # Name of the model to use
@@ -37,10 +37,10 @@ class Params:
 
     # https://github.com/pytorch/vision/tree/main/references/classification#convnext
     # num_epochs: int = 1
-    num_epochs: int = 41
+    num_epochs: int = 200
     subset_factor: int = 1 # set for DEBUGging
     lr: float = 3.e-6
-    delta1: float = 0.005
+    delta1: float = 0.02
     delta2: float = 20e-6
     weight_decay: float = 800e-6
     label_smoothing: float = 0. # See https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html
