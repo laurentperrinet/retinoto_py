@@ -215,18 +215,17 @@ def get_grid_hexagonal(args):
     # Create staggered angular coordinates
     grid_xs_list = []
     grid_ys_list = []
-
     for i, r in enumerate(rs_):
         # Calculate phase shift: alternate between 0 and half angular resolution
         phase_shift = 0 if i % 2 == 0 else angular_resolution / 2
 
         # Create angular coordinates for this radial ring
         ts_i = torch.linspace(args.angle_start + phase_shift,
-                             args.angle_start + 2*torch.pi + args.angle_margin + phase_shift,
-                             args.grid_size + 1)[:-1]
+                              args.angle_start + 2*torch.pi + args.angle_margin + phase_shift,
+                              args.grid_size + 1)[:-1]
 
         # Convert to Cartesian coordinates
-        grid_xs_i = r * (-torch.cos(ts_i))
+        grid_xs_i = r * torch.cos(ts_i)
         grid_ys_i = r * torch.sin(ts_i)
 
         grid_xs_list.append(grid_xs_i)
@@ -258,7 +257,7 @@ def get_preprocess(args, do_full_preprocess=True, angle_min=None, angle_max=None
     """
     Defines get_preprocess for the preprocessing 
     
-    :param args: A containaer for all images
+    :param args: A containaer for all parameters
     :param do_full_preprocess: set to FAlse to bypass the full preprocessing and use that for getting a dataloader providing raw images
     :param angle_min: Description
     :param angle_max: Description
@@ -345,8 +344,7 @@ def get_preprocess(args, do_full_preprocess=True, angle_min=None, angle_max=None
         if args.do_fovea: # apply log-polar mapping to the image
             # Choose between regular or hexagonal grid
             # Priority: explicit parameter > args setting > default (False)
-            hexagonal_grid = False # use_hexagonal_grid if use_hexagonal_grid is not None else getattr(args, 'use_hexagonal_grid', False)
-            if hexagonal_grid:
+            if args.use_hexagonal_grid:
                 grid_polar = get_grid_hexagonal(args)
             else:
                 grid_polar = get_grid(args)
