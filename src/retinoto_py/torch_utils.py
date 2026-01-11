@@ -145,10 +145,10 @@ def fixate(image, h, w, box_size, padding_mode='reflect'):
     # assert box_size <= H
     # assert box_size <= W
 
-    b_minus, b_plus = box_size//2, box_size-box_size//2
+    radius_minus, radius_plus = box_size//2, box_size-box_size//2
 
-    h_min, h_max = max((0, h-b_minus)), min((h+b_plus, H))
-    w_min, w_max = max((0, w-b_minus)), min((w+b_plus, W))
+    h_min, h_max = max((0, h-radius_minus)), min((h+radius_plus, H))
+    w_min, w_max = max((0, w-radius_minus)), min((w+radius_plus, W))
     box = image[:, h_min:h_max, w_min:w_max]
 
     # Calcul du padding nécessaire pour atteindre (box_size, box_size)
@@ -156,10 +156,10 @@ def fixate(image, h, w, box_size, padding_mode='reflect'):
     current_width = w_max - w_min
 
     # Padding à gauche/droite et haut/bas
-    pad_left = max(b_minus - (w - w_min), 0)
-    pad_right = max(b_plus - (w_max - w), 0)
-    pad_top = max(b_minus - (h - h_min), 0)
-    pad_bottom = max(b_plus - (h_max - h), 0)
+    pad_left = max(radius_minus - (w - w_min), 0)
+    pad_right = max(radius_plus - (w_max - w), 0)
+    pad_top = max(radius_minus - (h - h_min), 0)
+    pad_bottom = max(radius_plus - (h_max - h), 0)
 
     # Correction pour garantir box_size x box_size
     total_pad_width = box_size - current_width

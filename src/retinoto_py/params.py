@@ -44,6 +44,7 @@ class Params:
     weight_decay: float = 800e-6
     label_smoothing: float = 0. # See https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html
     do_full_training: bool = True
+    magnitude: int = 3
 
     shuffle: bool = True # Whether to shuffle the data during training
     data_cache = Path('cached_data')
