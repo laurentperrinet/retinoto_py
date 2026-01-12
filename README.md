@@ -11,12 +11,11 @@
 * TODO : regarder https://docs.pytorch.org/vision/main/generated/torchvision.transforms.v2.RandomIoUCrop.html#torchvision.transforms.v2.RandomIoUCrop
 * TODO : do visual search with a prompt
 * TODO : use ecoset
-* TODO : regénérer bbox avec `fovea.fixate` = nouveau dataset `focus`
-* TODO : hexagonal tiling for log-polar grid / mettre test_hexagonal_grid dans une notebook / test circular padding
-* DONE : pretrain FC pour 20
-* DONE : clean for `in_memory` code
-* DONE : pretrain FC pour 20 epochs
-* DONE : use Subset instead of n_val_stop
+* TODO : regénérer bbox avec `fovea.fixate` = nouveau dataset `focus` / 
+* DONE  : hexagonal tiling for log-polar grid / mettre test_hexagonal_grid dans une notebook / test circular padding - validé, ça marche effectivement mieux
+* DONE : pretrain FC pour 20 - pas conclusif
+* DONE : clean for `in_memory` code. fait, bon débarras !
+* DONE : use Subset instead of n_val_stop. fait.
 
 ## Credits
 
