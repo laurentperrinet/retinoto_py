@@ -6,11 +6,13 @@
 * Free software: MIT License
 * Documentation: https://retinoto_py.readthedocs.io.
 
-## Features
+## TODO list
 
 * TODO : regarder https://docs.pytorch.org/vision/main/generated/torchvision.transforms.v2.RandomIoUCrop.html#torchvision.transforms.v2.RandomIoUCrop
 * TODO : do visual search with a prompt
 * TODO : use ecoset
+* TODO : test different costs
+ * 
 * TODO : regénérer bbox avec `fovea.fixate` = nouveau dataset `focus` / 
 * DONE  : hexagonal tiling for log-polar grid / mettre test_hexagonal_grid dans une notebook / test circular padding - validé, ça marche effectivement mieux
 * DONE : pretrain FC pour 20 - pas conclusif
