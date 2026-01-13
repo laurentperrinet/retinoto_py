@@ -8,9 +8,27 @@ import numpy as np
 from dataclasses import dataclass
 verbose = False
 
+import os
+USER = os.environ['USER']  # username
+import platform
+HOST = platform.uname()[1]
+
 @dataclass
 class Params:
-    DATAROOT = Path.home() / 'data' / 'Imagenet'
+
+    # platform-dependent variables
+    if USER=='uvb28bo': # Jean Zay
+        DATAROOT = Path('/lustre/fsn1/projects/rech/fsx/uvb28bo/data')
+    # elif '.cluster' in HOST: # mesocentre
+    #     DATAROOT = '/scratch/lperrinet/science/Deep_learning/data'
+    #     num_workers = 8
+    elif 'm-gpu' in HOST: # MESONET
+        DATAROOT = Path.home() / 'data' / 'Imagenet'
+        # num_workers = 16
+    elif 'gaia' in HOST: # MAC STUDIO
+        # batch_size = 512 # Set the batch size for training and validation
+        # num_workers = 2    
+        DATAROOT = Path.home() / 'data' / 'Imagenet'
 
     image_size: int = 224 # base resolution of the image (224, 224)
     grid_size: int = 224 # base resolution of the image (224, 224)
