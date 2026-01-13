@@ -67,6 +67,42 @@ def get_optimizer(args, model):
 
     return optimizer
 
+class NegLogitLoss(nn.Module):
+    """
+    loss = - 1/B * Σ  output[batch_i, true_idx_i]
+
+    *output*  : (B, C) raw logits from the model (no soft‑max)
+    *true_idx*: (B,) integer class indices 0 … C‑1
+
+    """
+    def __init__(self, reduction: str = "mean"):
+        """
+        reduction  – "mean" (default) returns the average over the batch,
+                     "sum"  returns the sum,
+                     "none" returns a vector of shape (B,).
+        """
+        super().__init__()
+        self.reduction = reduction
+
+    def forward(self, outputs: torch.Tensor, true_idxs: torch.Tensor) -> torch.Tensor:
+        # `true_idxs` is shape (B,); we need it as column vector for gather
+        true_idxs = true_idxs.view(-1, 1)               # (B,1)
+
+        # Gather the logits that belong to the true class:
+        #   torch.gather returns a tensor of shape (B,1) with the selected values
+        true_logits = torch.gather(outputs, dim=1, index=true_idxs)  # (B,1)
+
+        # Negate them
+        loss = -true_logits.squeeze(1)                  # (B,)
+
+        # Apply the requested reduction
+        if self.reduction == "mean":
+            return loss.mean()
+        elif self.reduction == "sum":
+            return loss.sum()
+        else:   # "none"
+            return loss
+
 def train_model(args, model, train_loader, val_loader, df_train=None, 
                 model_filename=None, json_filename=None):
     
@@ -91,9 +127,13 @@ def train_model(args, model, train_loader, val_loader, df_train=None,
     if args.loss_name=='CrossEntropyLoss':
         # https://pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html 
         criterion = torch.nn.CrossEntropyLoss(label_smoothing=args.label_smoothing)
+    elif args.loss_name=='NegLogitLoss':
+        # https://pytorch.org/docs/stable/generated/torch.nn.BCEWithLogitsLoss.html 
+        criterion = NegLogitLoss()
     elif args.loss_name=='BCEWithLogitsLoss':
         # https://pytorch.org/docs/stable/generated/torch.nn.BCEWithLogitsLoss.html 
         criterion = nn.BCEWithLogitsLoss()
+        
     num_classes = len(train_loader.dataset.classes)
 
     # the DataFrame to record from
@@ -127,12 +167,12 @@ def train_model(args, model, train_loader, val_loader, df_train=None,
             _, predicted_labels = torch.max(outputs, dim=1)
             running_corrects += (predicted_labels == true_idxs).sum().item()
 
-            if args.loss_name=='CrossEntropyLoss':
-                loss = criterion(outputs, true_idxs)
-            elif args.loss_name=='BCEWithLogitsLoss':
+            if args.loss_name=='BCEWithLogitsLoss':
                 true_idxs_onehot = nnf.one_hot(true_idxs, num_classes=num_classes).float()
                 true_idxs_onehot = args.label_smoothing/num_classes + (1-args.label_smoothing)*true_idxs_onehot
                 loss = criterion(outputs, true_idxs_onehot)
+            else:
+                loss = criterion(outputs, true_idxs)
             running_loss += loss.item() * images.size(0)
             loss.backward()
             optimizer.step()
