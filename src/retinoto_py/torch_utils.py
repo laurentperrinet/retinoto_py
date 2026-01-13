@@ -302,27 +302,15 @@ def get_preprocess(args, do_full_preprocess=True, angle_min=None, angle_max=None
             transform_list.append(
                 transforms.RandAugment(
                     num_ops=2,
-                    magnitude=9,
+                    magnitude=args.augment_magnitude,
                     interpolation=interpolation
-                )
-            )
-
-            # 2️⃣ Color jitter appliqué *aléatoirement* (probabilité p=0.8)
-            #    - brightness 0.4, contrast 0.4, saturation 0.4, hue 0.1
-            #    - RandomApply encapsule le jitter pour que 20 % des images
-            #      ne subissent aucune modification de couleur, ce qui diversifie
-            #      le signal d’entraînement sans épuiser le modèle.
-            transform_list.append(
-                transforms.RandomApply(
-                    [transforms.ColorJitter(0.4, 0.4, 0.4, 0.1)],
-                    p=0.8
                 )
             )
 
             # 3️⃣ RandomGrayscale – avec probabilité 0.2
             #    - transforme l’image en niveaux de gris (R=G=B) pour forcer le
             #      réseau à ne pas dépendre uniquement de la chrominance.
-            transform_list.append(transforms.RandomGrayscale(p=0.2))
+            transform_list.append(transforms.RandomGrayscale(p=args.augment_proba))
 
             # 4️⃣ RandomErasing – efface un petit patch aléatoire
             #    - p=0.25   →  25 % des mini‑batches subiront une opération d’effacement
@@ -332,11 +320,12 @@ def get_preprocess(args, do_full_preprocess=True, angle_min=None, angle_max=None
             #    plutôt qu’à se focaliser sur de petites régions très discriminantes.
             transform_list.append(
                 transforms.RandomErasing(
-                    p=0.25,
+                    p=args.augment_proba,
                     scale=(0.02, 0.33),
                     ratio=(0.3, 3.3)
                 )
             )
+
         # Si les deux angles ne sont pas None, on applique la rotation
         if angle_min is not None and angle_max is not None:
             transform_list.append(transforms.RandomRotation(degrees=(angle_min, angle_max), interpolation=interpolation))
