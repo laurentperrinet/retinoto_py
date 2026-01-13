@@ -3,10 +3,14 @@
 __author__ = """Laurent U Perrinet"""
 __email__ = 'laurent.perrinet@cnrs.fr'
 
+import platform
+HOST = platform.uname()[1]
 
 import multiprocessing
-# multiprocessing.set_start_method('fork', force=True)
-multiprocessing.set_start_method('spawn', force=True)   # <‑‑ préférer sur M‑series
+if 'gaia' in HOST: # MAC STUDIO
+    multiprocessing.set_start_method('spawn', force=True)   # <‑‑ préférer sur M‑series
+else:
+    multiprocessing.set_start_method('fork', force=True)
 
 #####################################################
 #####################################################
