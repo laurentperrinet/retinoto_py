@@ -126,13 +126,13 @@ def train_model(args, model, train_loader, val_loader, df_train=None,
  
     if args.loss_name=='CrossEntropyLoss':
         # https://pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html 
-        criterion = torch.nn.CrossEntropyLoss(label_smoothing=args.label_smoothing)
+        criterion = torch.nn.CrossEntropyLoss(reduction='mean', label_smoothing=args.label_smoothing)
     elif args.loss_name=='NegLogitLoss':
         # https://pytorch.org/docs/stable/generated/torch.nn.BCEWithLogitsLoss.html 
-        criterion = NegLogitLoss()
+        criterion = NegLogitLoss(reduction='mean')
     elif args.loss_name=='BCEWithLogitsLoss':
         # https://pytorch.org/docs/stable/generated/torch.nn.BCEWithLogitsLoss.html 
-        criterion = nn.BCEWithLogitsLoss()
+        criterion = nn.BCEWithLogitsLoss(reduction='mean')
         
     num_classes = len(train_loader.dataset.classes)
 
