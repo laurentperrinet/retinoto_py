@@ -88,10 +88,12 @@ def train_model(args, model, train_loader, val_loader, df_train=None,
     # sets the optimizer
     optimizer = get_optimizer(args, model)
  
-    # https://pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html 
-    # criterion = torch.nn.CrossEntropyLoss(label_smoothing=args.label_smoothing)
-    # https://pytorch.org/docs/stable/generated/torch.nn.BCEWithLogitsLoss.html 
-    criterion = nn.BCEWithLogitsLoss()
+    if args.loss_name=='CrossEntropyLoss':
+        # https://pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html 
+        # criterion = torch.nn.CrossEntropyLoss(label_smoothing=args.label_smoothing)
+    elif args.loss_name=='BCEWithLogitsLoss':
+        # https://pytorch.org/docs/stable/generated/torch.nn.BCEWithLogitsLoss.html 
+        criterion = nn.BCEWithLogitsLoss()
     num_classes = len(train_loader.dataset.classes)
 
     # the DataFrame to record from
@@ -125,10 +127,12 @@ def train_model(args, model, train_loader, val_loader, df_train=None,
             _, predicted_labels = torch.max(outputs, dim=1)
             running_corrects += (predicted_labels == true_idxs).sum().item()
 
-            # loss = criterion(outputs, true_idxs)             
-            true_idxs_onehot = nnf.one_hot(true_idxs, num_classes=num_classes).float()
-            true_idxs_onehot = args.label_smoothing/num_classes + (1-args.label_smoothing)*true_idxs_onehot
-            loss = criterion(outputs, true_idxs_onehot)
+            if args.loss_name=='CrossEntropyLoss':
+                loss = criterion(outputs, true_idxs)
+            elif args.loss_name=='BCEWithLogitsLoss':
+                true_idxs_onehot = nnf.one_hot(true_idxs, num_classes=num_classes).float()
+                true_idxs_onehot = args.label_smoothing/num_classes + (1-args.label_smoothing)*true_idxs_onehot
+                loss = criterion(outputs, true_idxs_onehot)
             running_loss += loss.item() * images.size(0)
             loss.backward()
             optimizer.step()
