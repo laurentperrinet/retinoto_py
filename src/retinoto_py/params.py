@@ -32,6 +32,9 @@ class Params:
         # num_workers = 2    
         DATAROOT = Path.home() / 'data' / 'Imagenet'
         batch_size: int = 512 # Set number of images per input batch
+    else:
+        DATAROOT = Path.home() / 'data' / 'Imagenet'
+        batch_size: int = 64 # Set number of images per input batch
 
     image_size: int = 224 # base resolution of the image (224, 224)
     grid_size: int = 224 # base resolution of the image (224, 224)
