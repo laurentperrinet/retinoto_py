@@ -46,6 +46,27 @@ def get_validation_accuracy(args, model, val_loader, desc=None, leave=True):
 
     return acc_val
 
+def get_optimizer(args, model):
+    optimizer_dict = dict(lr=args.lr, weight_decay=args.weight_decay)
+    if args.optimizer_name=='adam': 
+        optimizer = torch.optim.Adam(model.parameters(), betas=(1-args.delta1, 1-args.delta2), **optimizer_dict)
+    elif args.optimizer_name=='adamw': 
+        optimizer = torch.optim.AdamW(model.parameters(), betas=(1-args.delta1, 1-args.delta2), **optimizer_dict)
+    elif args.optimizer_name=='sparseadam': 
+        optimizer = torch.optim.AdamW(model.parameters(), betas=(1-args.delta1, 1-args.delta2), **optimizer_dict)
+    elif args.optimizer_name=='sgd': 
+        optimizer = torch.optim.SGD(model.parameters(),  momentum=1-args.delta1, dampening=1-args.delta2, **optimizer_dict)
+    elif args.optimizer_name=='rmsprop': 
+        optimizer = torch.optim.RMSprop(model.parameters(), momentum=1-args.delta1, alpha=1-args.delta2, **optimizer_dict)
+    # elif args.optimizer_name=='adagrad': 
+    #     optimizer = torch.optim.Adagrad(model.parameters(), betas=(1-args.delta1, 1-args.delta2), **optimizer_dict)
+    elif args.optimizer_name=='adadelta': 
+        optimizer = torch.optim.Adadelta(model.parameters(), rho=1-args.delta1, **optimizer_dict)
+    else:
+        raise(ValueError(f'Unknown optimizer {args.optimizer_name}'))    
+
+    return optimizer
+
 def train_model(args, model, train_loader, val_loader, df_train=None, 
                 model_filename=None, json_filename=None):
     
@@ -65,12 +86,7 @@ def train_model(args, model, train_loader, val_loader, df_train=None,
                 param.requires_grad = True
 
     # sets the optimizer
-    if args.delta2 > 0.: 
-        optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, betas=(1-args.delta1, 1-args.delta2), 
-                                    weight_decay=args.weight_decay) 
-    else:
-        optimizer = torch.optim.SGD(model.parameters(), lr=args.lr, momentum=1-args.delta1, 
-                                    weight_decay=args.weight_decay) # to set training variables
+    optimizer = get_optimizer(args, model)
  
     # https://pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html 
     # criterion = torch.nn.CrossEntropyLoss(label_smoothing=args.label_smoothing)

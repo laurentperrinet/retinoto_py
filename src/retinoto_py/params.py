@@ -38,6 +38,7 @@ class Params:
     # num_epochs: int = 1
     num_epochs: int = 200
     subset_factor: int = 1 # set for DEBUGging
+    optimizer_name: str = 'adamw'
     lr: float = 3.e-6
     delta1: float = 0.02
     delta2: float = 20e-6
