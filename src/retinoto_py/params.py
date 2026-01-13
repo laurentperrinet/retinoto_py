@@ -22,13 +22,16 @@ class Params:
     # elif '.cluster' in HOST: # mesocentre
     #     DATAROOT = '/scratch/lperrinet/science/Deep_learning/data'
     #     num_workers = 8
+        batch_size: int = 128 # Set number of images per input batch
     elif 'm-gpu' in HOST: # MESONET
         DATAROOT = Path.home() / 'data' / 'Imagenet'
+        batch_size: int = 128 # Set number of images per input batch
         # num_workers = 16
     elif 'gaia' in HOST: # MAC STUDIO
         # batch_size = 512 # Set the batch size for training and validation
         # num_workers = 2    
         DATAROOT = Path.home() / 'data' / 'Imagenet'
+        batch_size: int = 512 # Set number of images per input batch
 
     image_size: int = 224 # base resolution of the image (224, 224)
     grid_size: int = 224 # base resolution of the image (224, 224)
@@ -44,7 +47,6 @@ class Params:
     # padding_mode: str = "border"
 
     seed: int = 1998 # Set the seed for reproducibility 
-    batch_size: int = 512 # Set number of images per input batch
     num_workers: int = 4
     prefetch_factor: int = 0
     do_augment: bool = True
