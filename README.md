@@ -16,6 +16,7 @@
 * DONE : test different costs: 2026-01-14 'BCEWithLogitsLoss' is worst, 'CrossEntropyLoss' is best but 'NegLogitLoss' is pretty good. 
 * TODO : test different optimizers: 2026-01-14  close tie between adam and adamw
 * TODO : scheduling
+* TODO : work out in `NegLogitLoss` how it really represents a log odd-ratio / do the stats of how labels are likely to appear together / is that an attention map ?
 * TODO : remove all resnet testing / learning and focus on convNext ?
 * TODO : semi-supervised learning: using YOLO / fasterRCNN method to extract images - regarder https://docs.pytorch.org/vision/main/generated/torchvision.transforms.v2.RandomIoUCrop.html#torchvision.transforms.v2.RandomIoUCrop
 * TODO : use ecoset
