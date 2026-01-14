@@ -109,7 +109,9 @@ def get_cosine_schedule_with_warmup(optimizer, num_warmup_epochs, num_epochs):
     def lr_lambda(current_epoch):
         if current_epoch < num_warmup_epochs:
             # Linear warmup from 0 to base_lr
-            return (current_epoch / max(1, num_warmup_epochs))
+            # return (current_epoch + 1) / max(1, num_warmup_epochs)
+            # Constant warmup from 0 to base_lr
+            return 1
         else:
             # Cosine decay from base_lr to final_lr
             progress = (current_epoch - num_warmup_epochs) / max(1, num_epochs - num_warmup_epochs)
