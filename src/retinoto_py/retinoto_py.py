@@ -103,18 +103,18 @@ class NegLogitLoss(nn.Module):
         else:   # "none"
             return loss
 
-from torch.optim.lr_scheduler import CosineAnnealingLR, LambdaLR
+from torch.optim.lr_scheduler import LambdaLR
 
-def get_cosine_schedule_with_warmup(optimizer, num_warmup_epochs, num_epochs, base_lr=5e-4, final_lr=1e-5):
+def get_cosine_schedule_with_warmup(optimizer, num_warmup_epochs, num_epochs):
     def lr_lambda(current_epoch):
         if current_epoch < num_warmup_epochs:
             # Linear warmup from 0 to base_lr
-            return (current_epoch / max(1, num_warmup_epochs)) * base_lr
+            return (current_epoch / max(1, num_warmup_epochs))
         else:
             # Cosine decay from base_lr to final_lr
             progress = (current_epoch - num_warmup_epochs) / max(1, num_epochs - num_warmup_epochs)
             cosine_decay = 0.5 * (1 + np.cos(np.pi * progress))
-            return final_lr + (base_lr - final_lr) * cosine_decay
+            return cosine_decay
 
     scheduler = LambdaLR(optimizer, lr_lambda, last_epoch=-1)
     return scheduler
@@ -139,7 +139,7 @@ def train_model(args, model, train_loader, val_loader, df_train=None,
 
     # sets the optimizer
     optimizer = get_optimizer(args, model)
-    scheduler = get_cosine_schedule_with_warmup(optimizer, args.num_warmup_epochs, args.num_epochs, len(train_loader.dataset)//args.batch_size, base_lr=args.base_lr, final_lr=args.final_lr)
+    scheduler = get_cosine_schedule_with_warmup(optimizer, args.num_warmup_epochs, args.num_epochs)
  
     # Using reduction='mean' to automatically scale the gradient for different batch sizes
     if args.loss_name=='CrossEntropyLoss':
@@ -163,7 +163,13 @@ def train_model(args, model, train_loader, val_loader, df_train=None,
     else:
         i_epoch_start = df_train['epoch'].max() + 1
         if args.verbose: print(f"Starting from epoch {i_epoch_start} with {len(df_train)} records")
+        checkpoint = torch.load(model_filename)
+        model.load_state_dict(checkpoint['model_state_dict'])
+        optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+        scheduler.load_state_dict(checkpoint['scheduler_state_dict'])        
         df_train = df_train.copy()
+        for _ in range(i_epoch_start):
+            scheduler.step()
 
     since = time.time()
     max_acc_train, max_acc_val = 0., 0.
@@ -213,7 +219,11 @@ def train_model(args, model, train_loader, val_loader, df_train=None,
         # save everything at each epoch
         if not(model_filename is None):
             # if args.verbose:  print(f"Saving...{model_filename}")
-            torch.save(model.state_dict(), model_filename)
+            torch.save({
+                'model_state_dict': model.state_dict(),
+                'optimizer_state_dict': optimizer.state_dict(),
+                'scheduler_state_dict': scheduler.state_dict(),
+            }, model_filename)
 
         if df_train is None:
             df_train = pd.DataFrame(result)
