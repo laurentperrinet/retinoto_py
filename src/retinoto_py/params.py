@@ -61,17 +61,18 @@ class Params:
     # num_epochs: int = 1
     num_epochs: int = 200
     subset_factor: int = 1 # set for DEBUGging
-    optimizer_name: str = 'adamw'
+    optimizer_name: str = 'adam'
     # loss_name: str = 'BCEWithLogitsLoss'
-    loss_name: str = 'NegLogitLoss'
-    lr: float = 3.e-6
-    delta1: float = 0.02
-    delta2: float = 20e-6
+    # loss_name: str = 'NegLogitLoss'
+    loss_name: str = 'CrossEntropyLoss'
+    lr: float = 1.e-4
+    delta1: float = 0.05
+    delta2: float = 100e-6
     weight_decay: float = 800e-6
     label_smoothing: float = 0. # See https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html
     do_full_training: bool = True
     augment_magnitude: int = 3
-    augment_proba: int = .2
+    augment_proba: int = .25
 
     shuffle: bool = True # Whether to shuffle the data during training
     data_cache = Path('cached_data')
