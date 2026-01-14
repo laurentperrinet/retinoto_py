@@ -12,7 +12,6 @@
 * TODO : do visual search with a prompt
 * TODO : use ecoset
 * TODO : test different costs
- * 
 * TODO : regénérer bbox avec `fovea.fixate` = nouveau dataset `focus` / 
 * DONE  : hexagonal tiling for log-polar grid / mettre test_hexagonal_grid dans une notebook / test circular padding - validé, ça marche effectivement mieux
 * DONE : pretrain FC pour 20 - pas conclusif
