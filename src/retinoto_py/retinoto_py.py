@@ -105,15 +105,16 @@ class NegLogitLoss(nn.Module):
 
 from torch.optim.lr_scheduler import CosineAnnealingLR, LambdaLR
 
-def get_cosine_schedule_with_warmup(optimizer, num_warmup_epochs, num_training_epochs, num_batches_per_epoch, base_lr=5e-4, final_lr=1e-5):
-    # Warmup phase: linearly increase LR from 0 to base_lr
-    def lr_lambda(current_step):
-        if current_step < num_warmup_epochs * num_batches_per_epoch:
-            # Linear warmup
-            return float(current_step) / float(max(1, num_warmup_epochs * num_batches_per_epoch))
-        # Cosine decay phase
-        progress = float(current_step - num_warmup_epochs * num_batches_per_epoch) / float(max(1, (num_training_epochs - num_warmup_epochs) * num_batches_per_epoch))
-        return max(0.0, 0.5 * (1.0 + np.cos(np.pi * progress)))
+def get_cosine_schedule_with_warmup(optimizer, num_warmup_epochs, num_epochs, base_lr=5e-4, final_lr=1e-5):
+    def lr_lambda(current_epoch):
+        if current_epoch < num_warmup_epochs:
+            # Linear warmup from 0 to base_lr
+            return (current_epoch / max(1, num_warmup_epochs)) * base_lr
+        else:
+            # Cosine decay from base_lr to final_lr
+            progress = (current_epoch - num_warmup_epochs) / max(1, num_epochs - num_warmup_epochs)
+            cosine_decay = 0.5 * (1 + np.cos(np.pi * progress))
+            return final_lr + (base_lr - final_lr) * cosine_decay
 
     scheduler = LambdaLR(optimizer, lr_lambda, last_epoch=-1)
     return scheduler
@@ -166,7 +167,7 @@ def train_model(args, model, train_loader, val_loader, df_train=None,
 
     since = time.time()
     max_acc_train, max_acc_val = 0., 0.
-    total_image, batch_idx = 0, 0
+    total_image = 0
     outer_progress = tqdm(range(i_epoch_start, args.num_epochs), desc="Epochs", leave=True, disable=(args.num_epochs==1))
     for i_epoch in outer_progress:
         running_loss = 0.0
@@ -196,9 +197,8 @@ def train_model(args, model, train_loader, val_loader, df_train=None,
             loss.backward()
 
             optimizer.step()
-            scheduler.step(batch_idx)
-            batch_idx += 1
 
+        scheduler.step()
         loss_train = running_loss / i_image
         acc_train = running_corrects*1. / i_image
 
