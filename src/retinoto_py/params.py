@@ -73,7 +73,7 @@ class Params:
     delta1: float = 0.05
     delta2: float = 100e-6
     weight_decay: float = 800e-6
-    label_smoothing: float = 0. # See https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html
+    label_smoothing: float = 0.05 # See https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html
     do_full_training: bool = True
     do_augment: bool = True
     augment_magnitude: int = 3
