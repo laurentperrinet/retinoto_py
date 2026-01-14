@@ -18,6 +18,7 @@
 * TODO : regarder https://docs.pytorch.org/vision/main/generated/torchvision.transforms.v2.RandomIoUCrop.html#torchvision.transforms.v2.RandomIoUCrop
 * TODO : do visual search with a prompt
 * TODO : scheduling
+* TODO : remove all resnet testing / learning and focus on convNext
 * TODO : use ecoset
 * TODO : test circular padding
 
