@@ -19,8 +19,13 @@
 * TODO : do visual search with a prompt
 * TODO : scheduling
 * TODO : remove all resnet testing / learning and focus on convNext
+* TODO : using YOLO / fasterRCNN method to extract images
 * TODO : use ecoset
 * TODO : test circular padding
+* TODO : make a test that the recognition should work on very large images in a better way than a resizing
+* TODO: theroretical derivation of the joint encoding / decoding ("how is it to look through an eye")
+* TODO: learn the differentiable retinotopic mapping
+* TODO: Event-based retinotopy / optic flow detection
 
 ## Credits
 

@@ -47,7 +47,7 @@ def get_validation_accuracy(args, model, val_loader, desc=None, leave=True):
     return acc_val
 
 def get_optimizer(args, model):
-    optimizer_dict = dict(lr=args.lr, weight_decay=args.weight_decay)
+    optimizer_dict = dict(lr=args.base_lr, weight_decay=args.weight_decay)
     if args.optimizer_name=='adam': 
         optimizer = torch.optim.Adam(model.parameters(), betas=(1-args.delta1, 1-args.delta2), **optimizer_dict)
     elif args.optimizer_name=='adamw': 
