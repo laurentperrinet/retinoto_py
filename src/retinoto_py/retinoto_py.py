@@ -146,6 +146,7 @@ def train_model(args, model, train_loader, val_loader, df_train=None,
         criterion = torch.nn.CrossEntropyLoss(reduction='mean', label_smoothing=args.label_smoothing)
     elif args.loss_name=='NegLogitLoss':
         # https://pytorch.org/docs/stable/generated/torch.nn.BCEWithLogitsLoss.html 
+        # TODO add the logit of the chance level to normalize and form an odd ratio
         criterion = NegLogitLoss(reduction='mean')
     elif args.loss_name=='BCEWithLogitsLoss':
         # https://pytorch.org/docs/stable/generated/torch.nn.BCEWithLogitsLoss.html 
