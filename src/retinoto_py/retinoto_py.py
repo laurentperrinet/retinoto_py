@@ -75,7 +75,7 @@ class NegLogitLoss(nn.Module):
     *true_idx*: (B,) integer class indices 0 … C‑1
 
     """
-    def __init__(self, reduction: str = "mean"):
+    def __init__(self, reduction: str = "sum"):
         """
         reduction  – "mean" (default) returns the average over the batch,
                      "sum"  returns the sum,
@@ -140,15 +140,16 @@ def train_model(args, model, train_loader, val_loader, df_train=None,
     optimizer = get_optimizer(args, model)
     scheduler = get_cosine_schedule_with_warmup(optimizer, args.num_warmup_epochs, args.num_epochs, len(train_loader.dataset)//args.batch_size, base_lr=args.base_lr, final_lr=args.final_lr)
  
+    # Using reduction='sum' to automatically scale the gradient for different batch sizes
     if args.loss_name=='CrossEntropyLoss':
         # https://pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html 
-        criterion = torch.nn.CrossEntropyLoss(reduction='mean', label_smoothing=args.label_smoothing)
+        criterion = torch.nn.CrossEntropyLoss(reduction='sum', label_smoothing=args.label_smoothing)
     elif args.loss_name=='NegLogitLoss':
         # https://pytorch.org/docs/stable/generated/torch.nn.BCEWithLogitsLoss.html 
-        criterion = NegLogitLoss(reduction='mean')
+        criterion = NegLogitLoss(reduction='sum')
     elif args.loss_name=='BCEWithLogitsLoss':
         # https://pytorch.org/docs/stable/generated/torch.nn.BCEWithLogitsLoss.html 
-        criterion = nn.BCEWithLogitsLoss(reduction='mean')
+        criterion = nn.BCEWithLogitsLoss(reduction='sum')
 
         
     num_classes = len(train_loader.dataset.classes)
