@@ -22,19 +22,27 @@ class Params:
     # elif '.cluster' in HOST: # mesocentre
     #     DATAROOT = '/scratch/lperrinet/science/Deep_learning/data'
     #     num_workers = 8
-        batch_size: int = 128 # Set number of images per input batch
+        batch_size: int = 64 # Set number of images per input batch
+        num_workers: int = 4
+        prefetch_factor: int = 4
     elif 'm-gpu' in HOST: # MESONET
         DATAROOT = Path.home() / 'data' / 'Imagenet'
         batch_size: int = 128 # Set number of images per input batch
+        num_workers: int = 4
+        prefetch_factor: int = 0
         # num_workers = 16
     elif 'gaia' in HOST: # MAC STUDIO
         # batch_size = 512 # Set the batch size for training and validation
         # num_workers = 2    
         DATAROOT = Path.home() / 'data' / 'Imagenet'
         batch_size: int = 512 # Set number of images per input batch
+        num_workers: int = 4
+        prefetch_factor: int = 0
     else:
         DATAROOT = Path.home() / 'data' / 'Imagenet'
         batch_size: int = 32 # Set number of images per input batch
+        num_workers: int = 4
+        prefetch_factor: int = 0
 
     image_size: int = 224 # base resolution of the image (224, 224)
     grid_size: int = 224 # base resolution of the image (224, 224)
@@ -49,10 +57,6 @@ class Params:
     padding_mode: str = "zeros"
     # padding_mode: str = "border"
 
-    seed: int = 1998 # Set the seed for reproducibility 
-    num_workers: int = 4
-    prefetch_factor: int = 0
-    do_augment: bool = True
 
     # model_name: str = 'resnet50' # Name of the model to use
     model_name: str = 'convnext_base' # Name of the model to use
@@ -71,9 +75,11 @@ class Params:
     weight_decay: float = 800e-6
     label_smoothing: float = 0. # See https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html
     do_full_training: bool = True
+    do_augment: bool = True
     augment_magnitude: int = 3
     augment_proba: int = .25
 
+    seed: int = 1998 # Set the seed for reproducibility 
     shuffle: bool = True # Whether to shuffle the data during training
     data_cache = Path('cached_data')
     figures_folder = Path('figures')
