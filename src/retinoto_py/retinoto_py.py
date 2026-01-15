@@ -273,7 +273,7 @@ def do_learning(args, dataset, name, model_filename_init=None):
             model_filename_train = model_filename
         else:
             model_filename_train = model_filename_init # we use a stored file for learning or None for default weights
-        print(model_filename_train)
+        # print(model_filename_train)
         model = load_model(args, model_filename=model_filename_train)
 
         start_time = time.time()
