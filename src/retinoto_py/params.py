@@ -72,7 +72,7 @@ class Params:
     base_lr: float = 34.e-6
     final_lr: float = 1.e-6
     num_warmup_epochs: int = 20
-    delta1: float = 0.&
+    delta1: float = 0.1
     delta2: float = 100e-6
     weight_decay: float = 20e-6
     label_smoothing: float = 0.002 # See https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html
