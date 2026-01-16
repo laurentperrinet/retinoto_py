@@ -207,6 +207,7 @@ def train_model(args, model, train_loader, val_loader, df_train=None,
             optimizer.step()
 
         scheduler.step()
+        print(f'DEBUG - lr={optimizer.param_groups[0]["lr"]:.2e} - epo')
         loss_train = running_loss / i_image
         acc_train = running_corrects*1. / i_image
 

@@ -79,7 +79,8 @@ class Params:
     do_full_training: bool = True
     do_augment: bool = True
     augment_magnitude: int = 8
-    augment_proba: int = .10
+    augment_proba: float = .10
+    stochastic_depth_prob: float = .30
 
     seed: int = 1998 # Set the seed for reproducibility 
     shuffle: bool = True # Whether to shuffle the data during training

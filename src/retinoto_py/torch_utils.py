@@ -434,6 +434,8 @@ def load_model(args, model_filename=None):
     import os, torchvision.models as models
     os.environ.setdefault('TORCH_HOME', str(args.data_cache))
 
+    opts_convnext = dict(stochastic_depth_prob=args.stochastic_depth_prob)
+
     if args.model_name=='resnet18':
         model = models.resnet18(weights=models.ResNet18_Weights.DEFAULT)
     elif args.model_name=='resnet50':
@@ -442,13 +444,13 @@ def load_model(args, model_filename=None):
         model = models.resnet101(weights=models.ResNet101_Weights.DEFAULT)
     elif args.model_name=='convnext_tiny':
         # https://github.com/facebookresearch/ConvNeXt/
-        model = models.convnext_tiny(weights=models.ConvNeXt_Tiny_Weights.IMAGENET1K_V1)
+        model = models.convnext_tiny(weights=models.ConvNeXt_Tiny_Weights.IMAGENET1K_V1, **opts_convnext)
     elif args.model_name=='convnext_small':
-        model = models.convnext_small(weights=models.ConvNeXt_Small_Weights.IMAGENET1K_V1)
+        model = models.convnext_small(weights=models.ConvNeXt_Small_Weights.IMAGENET1K_V1, **opts_convnext)
     elif args.model_name=='convnext_base':
-        model = models.convnext_base(weights=models.ConvNeXt_Base_Weights.IMAGENET1K_V1)
+        model = models.convnext_base(weights=models.ConvNeXt_Base_Weights.IMAGENET1K_V1, **opts_convnext)
     elif args.model_name=='convnext_large':
-        model = models.convnext_large(weights=models.ConvNeXt_Large_Weights.IMAGENET1K_V1)
+        model = models.convnext_large(weights=models.ConvNeXt_Large_Weights.IMAGENET1K_V1, **opts_convnext)
     else:
         raise ValueError(f'Unknown model {args.model_name}')
     
