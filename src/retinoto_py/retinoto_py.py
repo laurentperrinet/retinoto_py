@@ -277,7 +277,8 @@ def do_learning(args, dataset, name, model_filename_init=None):
         model = load_model(args, model_filename=model_filename_train)
 
         start_time = time.time()
-        model_retrain, df_train = train_model(args, model=model, train_loader=train_loader, val_loader=val_loader, df_train=df_train, model_filename=model_filename, json_filename=json_filename)
+        model_retrain, df_train = train_model(args, model=model, 
+                                              train_loader=train_loader, val_loader=val_loader, df_train=df_train, model_filename=model_filename, json_filename=json_filename)
         elapsed_time = time.time() - start_time
         print(f"Training of {model_retrain} completed in {elapsed_time // 60:.0f}m {elapsed_time % 60:.0f}s")
 
