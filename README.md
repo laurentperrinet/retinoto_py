@@ -14,6 +14,7 @@
 * DONE : 2026-01-12 hexagonal tiling for log-polar grid / mettre test_hexagonal_grid dans une notebook / 2026-01-12 - validé, ça marche effectivement mieux
 * DONE : regénérer bbox avec `fovea.fixate` = nouveau dataset `focus` / 2026-01-14 test sur Jean-Zay, monte à 75% assez vite puis descencd (mais avec  'NegLogitLoss')
 * DONE : test different costs: 2026-01-14 'BCEWithLogitsLoss' is worst, 'CrossEntropyLoss' is best but 'NegLogitLoss' is pretty good. 
+* DONE : introduced stochastic_depth_prob /  2026-01-18 still big over-fitting  acc_train":0.9716529699, "acc_val":0.7339647971,
 * TODO : test different optimizers: 2026-01-14  close tie between adam and adamw
 * TODO : scheduling
 * TODO : work out in `NegLogitLoss` how it really represents a log odd-ratio / do the stats of how labels are likely to appear together / is that an attention map ?

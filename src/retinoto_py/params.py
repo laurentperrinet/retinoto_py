@@ -69,18 +69,18 @@ class Params:
     # loss_name: str = 'BCEWithLogitsLoss'
     # loss_name: str = 'NegLogitLoss'
     loss_name: str = 'CrossEntropyLoss'
-    base_lr: float = 34.e-6
+    base_lr: float = 30.e-6
     final_lr: float = 1.e-6
     num_warmup_epochs: int = 20
-    delta1: float = 0.1
+    delta1: float = 0.15
     delta2: float = 100e-6
-    weight_decay: float = 20e-6
+    weight_decay: float = 2e-6
     label_smoothing: float = 0.002 # See https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html
     do_full_training: bool = True
     do_augment: bool = True
-    augment_magnitude: int = 8
-    augment_proba: float = .10
-    stochastic_depth_prob: float = .30
+    augment_magnitude: int = 10
+    augment_proba: float = .25
+    stochastic_depth_prob: float = .60
 
     seed: int = 1998 # Set the seed for reproducibility 
     shuffle: bool = True # Whether to shuffle the data during training
