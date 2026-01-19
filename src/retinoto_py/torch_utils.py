@@ -325,19 +325,19 @@ def get_preprocess(args, do_full_preprocess=True, angle_min=None, angle_max=None
             transform_list.append(transforms.Resize(args.image_size, interpolation=interpolation, antialias=True))
             transform_list.append(transforms.CenterCrop((args.image_size, args.image_size)))
 
-            # 3. Add ColorJitter BEFORE RandomGrayscale
-            transform_list.append(
-                transforms.ColorJitter(
-                    brightness=0.4,
-                    contrast=0.4,
-                    saturation=0.4,
-                    hue=0.1
-                )
+        # 3. Add ColorJitter BEFORE RandomGrayscale
+        transform_list.append(
+            transforms.ColorJitter(
+                brightness=0.4,
+                contrast=0.4,
+                saturation=0.4,
+                hue=0.1
             )
-            # 3️⃣ RandomGrayscale – avec probabilité 0.2
-            #    - transforme l’image en niveaux de gris (R=G=B) pour forcer le
-            #      réseau à ne pas dépendre uniquement de la chrominance.
-            transform_list.append(transforms.RandomGrayscale(p=args.augment_proba))
+        )
+        # 3️⃣ RandomGrayscale – avec probabilité 0.2
+        #    - transforme l’image en niveaux de gris (R=G=B) pour forcer le
+        #      réseau à ne pas dépendre uniquement de la chrominance.
+        transform_list.append(transforms.RandomGrayscale(p=args.augment_proba))
 
 
         transform_list.append(transforms.Normalize(mean=im_mean, std=im_std))
