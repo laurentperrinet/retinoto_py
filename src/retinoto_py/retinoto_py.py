@@ -8,8 +8,8 @@ import torch.nn.functional as nnf
 import time
 import pandas as pd
 from tqdm.auto import tqdm
-# from timm.data.mixup import Mixup
-# from timm.loss import SoftTargetCrossEntropy
+from timm.data.mixup import Mixup
+from timm.loss import SoftTargetCrossEntropy
 #############################################################
 
 def get_validation_accuracy(args, model, val_loader, desc=None, leave=True):
@@ -123,19 +123,19 @@ def get_cosine_schedule_with_warmup(optimizer, num_warmup_epochs, num_epochs):
     scheduler = LambdaLR(optimizer, lr_lambda, last_epoch=-1)
     return scheduler
 
-def mixup_data(x, y, alpha=0.8):
-    '''Returns mixed inputs, pairs of targets, and lambda'''
-    if alpha > 0:
-        lam = np.random.beta(alpha, alpha)
-    else:
-        lam = 1
+# def mixup_data(x, y, alpha=0.8):
+#     '''Returns mixed inputs, pairs of targets, and lambda'''
+#     if alpha > 0:
+#         lam = np.random.beta(alpha, alpha)
+#     else:
+#         lam = 1
 
-    batch_size = x.size()[0]
-    index = torch.randperm(batch_size).to(x.device)
+#     batch_size = x.size()[0]
+#     index = torch.randperm(batch_size).to(x.device)
 
-    mixed_x = lam * x + (1 - lam) * x[index, :]
-    y_a, y_b = y, y[index]
-    return mixed_x, y_a, y_b, lam
+#     mixed_x = lam * x + (1 - lam) * x[index, :]
+#     y_a, y_b = y, y[index]
+#     return mixed_x, y_a, y_b, lam
 
 def mixup_criterion(criterion, pred, y_a, y_b, lam):
     return lam * criterion(pred, y_a) + (1 - lam) * criterion(pred, y_b)
@@ -195,14 +195,14 @@ def train_model(args, model, train_loader, val_loader, df_train=None,
             scheduler.step()
 
     
-    # mixup_fn = Mixup(
-    #     mixup_alpha=0.8,      # Mixup strength
-    #     cutmix_alpha=1.0,     # CutMix strength
-    #     prob=0.5,             # 50% chance of applying
-    #     switch_prob=0.5,      # 50/50 between mixup and cutmix
-    #     mode='batch',
-    #     label_smoothing=args.label_smoothing
-    # )
+    mixup_fn = Mixup(
+        mixup_alpha=0.8,      # Mixup strength
+        cutmix_alpha=1.0,     # CutMix strength
+        prob=0.5,             # 50% chance of applying
+        switch_prob=0.5,      # 50/50 between mixup and cutmix
+        mode='batch',
+        label_smoothing=args.label_smoothing
+    )
 
     since = time.time()
     max_acc_train, max_acc_val = 0., 0.
@@ -216,9 +216,9 @@ def train_model(args, model, train_loader, val_loader, df_train=None,
                               total=len(train_loader.dataset)//args.batch_size, leave=False)
         model.train()
         for images, labels in inner_progress:
-            # images, labels = mixup_fn(images, labels)  # Apply mixup/cutmix
             images, labels = images.to(args.device), labels.to(args.device)                
-            images, labels_a, labels_b, lam = mixup_data(images, labels, alpha=0.8)
+            images, labels = mixup_fn(images, labels)  # Apply mixup/cutmix
+            # images, labels_a, labels_b, lam = mixup_data(images, labels, alpha=0.8)
 
             total_image += len(images)
             i_image += len(images)
