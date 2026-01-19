@@ -175,7 +175,7 @@ def train_model(args, model, train_loader, val_loader, df_train=None,
     #     criterion = nn.BCEWithLogitsLoss(reduction='mean')
 
     
-    criterion = SoftTargetCrossEntropy(reduction='mean')
+    criterion = SoftTargetCrossEntropy()
         
     num_classes = len(train_loader.dataset.classes)
 
