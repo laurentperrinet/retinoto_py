@@ -236,12 +236,17 @@ def train_model(args, model, train_loader, val_loader, df_train=None,
             #     loss = criterion(outputs, labels)
             loss = criterion(outputs, labels)
             loss.backward()
-
             optimizer.step()
 
+            # Approximate accuracy: use argmax of soft labels
             _, predicted_labels = torch.max(outputs, dim=1)
-            running_corrects += (predicted_labels == labels).sum().item()
+            _, true_labels = torch.max(labels, dim=1)  # Get the dominant class from soft labels
+            running_corrects += (predicted_labels == true_labels).sum().item()
             running_loss += loss.item() * images.size(0)
+            
+            # _, predicted_labels = torch.max(outputs, dim=1)
+            # running_corrects += (predicted_labels == labels).sum().item()
+            # running_loss += loss.item() * images.size(0)
 
         scheduler.step()
         # print(f'DEBUG - lr={optimizer.param_groups[0]["lr"]:.2e} - epo')
