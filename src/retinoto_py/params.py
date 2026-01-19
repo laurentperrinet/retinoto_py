@@ -47,7 +47,7 @@ class Params:
     image_size: int = 224 # base resolution of the image (224, 224)
     grid_size: int = 224 # base resolution of the image (224, 224)
     do_mask: bool = False # Whether apply a circular mask to the image
-    do_fovea: bool = False # Whether apply a log-polar transform to the image
+    do_fovea: bool = True # Whether apply a log-polar transform to the image
     use_hexagonal_grid: bool = True # Whether to use hexagonal packing for the log-polar grid
     rs_min: float = -0.01 # Set minimum radius of the log-polar grid
     rs_max: float = -6.00 # Set maximum radius of the log-polar grid
@@ -72,15 +72,16 @@ class Params:
     base_lr: float = 30.e-6
     final_lr: float = 1.e-6
     num_warmup_epochs: int = 20
-    delta1: float = 0.15
-    delta2: float = 100e-6
-    weight_decay: float = 2e-6
-    label_smoothing: float = 0.002 # See https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html
+    delta1: float = 0.10
+    delta2: float = 10e-6
+    weight_decay: float = 0.05
+    label_smoothing: float = 0.10 # See https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html
     do_full_training: bool = True
     do_augment: bool = True
-    augment_magnitude: int = 10
+    augment_magnitude: int = 14
     augment_proba: float = .25
-    stochastic_depth_prob: float = .60
+    # https://docs.pytorch.org/vision/main/generated/torchvision.ops.stochastic_depth.html#torchvision.ops.stochastic_depth
+    stochastic_depth_prob: float = .50
 
     seed: int = 1998 # Set the seed for reproducibility 
     shuffle: bool = True # Whether to shuffle the data during training

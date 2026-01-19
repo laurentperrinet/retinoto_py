@@ -307,25 +307,6 @@ def get_preprocess(args, do_full_preprocess=True, angle_min=None, angle_max=None
                 )
             )
 
-            # 3️⃣ RandomGrayscale – avec probabilité 0.2
-            #    - transforme l’image en niveaux de gris (R=G=B) pour forcer le
-            #      réseau à ne pas dépendre uniquement de la chrominance.
-            transform_list.append(transforms.RandomGrayscale(p=args.augment_proba))
-
-            # 4️⃣ RandomErasing – efface un petit patch aléatoire
-            #    - p=0.25   →  25 % des mini‑batches subiront une opération d’effacement
-            #    - scale=(0.02, 0.33) → la surface du patch varie de 2 % à 33 % de l’image
-            #    - ratio=(0.3, 3.3)  → forme du patch (aspect ratio) varie entre 0.3 et 3.3
-            #    Cette technique pousse le modèle à exploiter le contexte global
-            #    plutôt qu’à se focaliser sur de petites régions très discriminantes.
-            transform_list.append(
-                transforms.RandomErasing(
-                    p=args.augment_proba,
-                    scale=(0.02, 0.33),
-                    ratio=(0.3, 3.3)
-                )
-            )
-
         # Si les deux angles ne sont pas None, on applique la rotation
         if angle_min is not None and angle_max is not None:
             transform_list.append(transforms.RandomRotation(degrees=(angle_min, angle_max), interpolation=interpolation))
@@ -344,8 +325,32 @@ def get_preprocess(args, do_full_preprocess=True, angle_min=None, angle_max=None
             transform_list.append(transforms.Resize(args.image_size, interpolation=interpolation, antialias=True))
             transform_list.append(transforms.CenterCrop((args.image_size, args.image_size)))
 
+            # 3. Add ColorJitter BEFORE RandomGrayscale
+            transform_list.append(
+                transforms.ColorJitter(
+                    brightness=0.4,
+                    contrast=0.4,
+                    saturation=0.4,
+                    hue=0.1
+                )
+            )
+            # 3️⃣ RandomGrayscale – avec probabilité 0.2
+            #    - transforme l’image en niveaux de gris (R=G=B) pour forcer le
+            #      réseau à ne pas dépendre uniquement de la chrominance.
+            transform_list.append(transforms.RandomGrayscale(p=args.augment_proba))
+
+
         transform_list.append(transforms.Normalize(mean=im_mean, std=im_std))
 
+        if do_augment:
+            # RandomErasing should be applied AFTER normalization
+            transform_list.append(
+                transforms.RandomErasing(
+                    p=args.augment_proba,
+                    scale=(0.02, 0.33),
+                    ratio=(0.3, 3.3)
+                )
+            )
         if args.do_mask:
             if args.do_fovea: raise(BaseException, 'Something is wrong here')
             # Créer le masque une seule fois avec la taille de l'image

@@ -17,7 +17,7 @@
 * DONE : introduced stochastic_depth_prob /  2026-01-18 still big over-fitting  acc_train":0.9716529699, "acc_val":0.7339647971,
 * TODO : test different optimizers: 2026-01-14  close tie between adam and adamw
 * TODO : scheduling
-* TODO : work out in `NegLogitLoss` how it really represents a log odd-ratio / do the stats of how labels are likely to appear together / is that an attention map ?
+* TODO : work out in `NegLogitLoss` how it really represents a log odd-ratio / do the stats of how labels are likely to appear together / is that an attention map ? / page 35 de 2023-04-19_THC ICANN suggère qu'on utilise une maximisation de (2*d -1) * logit (Pr) - mais a-t'on des exemples où on sait qu'il n'y a pas un chien-tench-... ?
 * TODO : remove all resnet testing / learning and focus on convNext ?
 * TODO : semi-supervised learning: using YOLO / fasterRCNN method to extract images - regarder https://docs.pytorch.org/vision/main/generated/torchvision.transforms.v2.RandomIoUCrop.html#torchvision.transforms.v2.RandomIoUCrop
 * TODO : use ecoset
