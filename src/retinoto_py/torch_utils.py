@@ -247,7 +247,7 @@ class transform_apply_grid(object):
     def __call__(self, images):
         result =  nnf.grid_sample(images.unsqueeze(dim=0), 
                                   self.grid.unsqueeze(dim=0), 
-                                  padding_mode=self.padding_mode, align_corners=False, 
+                                  padding_mode=self.padding_mode, align_corners=True, 
                                   mode=self.mode)
         return result.squeeze(0)
 

@@ -49,13 +49,13 @@ class Params:
     do_mask: bool = False # Whether apply a circular mask to the image
     do_fovea: bool = True # Whether apply a log-polar transform to the image
     use_hexagonal_grid: bool = True # Whether to use hexagonal packing for the log-polar grid
-    rs_min: float = -0.01 # Set minimum radius of the log-polar grid
-    rs_max: float = -6.00 # Set maximum radius of the log-polar grid
+    rs_min: float = -6.00 # Set minimum radius of the log-polar grid
+    rs_max: float = -0.00 # Set maximum radius of the log-polar grid
     angle_start: float = -np.pi/4 # Set the intial angle for the grid
     angle_margin: float = np.pi/16 # Set a margin angle to wrap the circle
     mode: str = "bilinear"
-    padding_mode: str = "zeros"
-    # padding_mode: str = "border"
+    # padding_mode: str = "zeros"
+    padding_mode: str = "border"
 
 
     # model_name: str = 'resnet50' # Name of the model to use
