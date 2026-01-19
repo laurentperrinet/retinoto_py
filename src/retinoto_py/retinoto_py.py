@@ -226,7 +226,7 @@ def train_model(args, model, train_loader, val_loader, df_train=None,
             optimizer.zero_grad(set_to_none=True)
 
             outputs = model(images)
-            loss = mixup_criterion(nn.CrossEntropyLoss(), outputs, labels_a, labels_b, lam)
+            # loss = mixup_criterion(nn.CrossEntropyLoss(), outputs, labels_a, labels_b, lam)
 
             # if args.loss_name=='BCEWithLogitsLoss':
             #     true_idxs_onehot = nnf.one_hot(labels, num_classes=num_classes).float()
@@ -234,6 +234,7 @@ def train_model(args, model, train_loader, val_loader, df_train=None,
             #     loss = criterion(outputs, true_idxs_onehot)
             # else:
             #     loss = criterion(outputs, labels)
+            loss = criterion(outputs, labels)
             loss.backward()
 
             optimizer.step()
