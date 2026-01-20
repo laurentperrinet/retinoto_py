@@ -10,7 +10,7 @@ imageio
 nltk
 torch
 torchvision
-timm
+# timm
 ipykernel
 ipywidgets
 jupyter
