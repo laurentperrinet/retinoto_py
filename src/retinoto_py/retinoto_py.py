@@ -30,11 +30,11 @@ def get_validation_accuracy(args, model, val_loader, desc=None, leave=True):
 
             # Get predictions (no need for gradients)
             outputs = model(images)
-            _, predicted_labels = torch.max(outputs, dim=1)
+            _, predicted_true_idxs = torch.max(outputs, dim=1)
 
             # Check if the prediction was correct for the entire batch
             # The comparison produces a tensor of booleans (True/False)
-            correct_predictions_in_batch = (predicted_labels == true_idxs)
+            correct_predictions_in_batch = (predicted_true_idxs == true_idxs)
 
             # Sum the boolean tensor to get the number of correct predictions in the batch
             # .item() extracts the number from the tensor
@@ -215,10 +215,10 @@ def train_model(args, model, train_loader, val_loader, df_train=None,
         inner_progress = tqdm(train_loader, desc=f'Epoch={i_epoch+1}/{args.num_epochs}', 
                               total=len(train_loader.dataset)//args.batch_size, leave=False)
         model.train()
-        for images, labels in inner_progress:
-            images, labels = images.to(args.device), labels.to(args.device)                
-            # images, labels = mixup_fn(images, labels)  # Apply mixup/cutmix
-            # images, labels_a, labels_b, lam = mixup_data(images, labels, alpha=0.8)
+        for images, true_idxs in inner_progress:
+            images, true_idxs = images.to(args.device), true_idxs.to(args.device)                
+            # images, true_idxs = mixup_fn(images, true_idxs)  # Apply mixup/cutmix
+            # images, true_idxs_a, true_idxs_b, lam = mixup_data(images, true_idxs, alpha=0.8)
 
             total_image += len(images)
             i_image += len(images)
@@ -226,25 +226,25 @@ def train_model(args, model, train_loader, val_loader, df_train=None,
             optimizer.zero_grad(set_to_none=True)
 
             outputs = model(images)
-            # loss = mixup_criterion(nn.CrossEntropyLoss(), outputs, labels_a, labels_b, lam)
+            # loss = mixup_criterion(nn.CrossEntropyLoss(), outputs, true_idxs_a, true_idxs_b, lam)
 
             if args.loss_name=='BCEWithLogitsLoss':
-                true_idxs_onehot = nnf.one_hot(labels, num_classes=num_classes).float()
-                true_idxs_onehot = args.label_smoothing/num_classes + (1-args.label_smoothing)*true_idxs_onehot
+                true_idxs_onehot = nnf.one_hot(true_idxs, num_classes=num_classes).float()
+                true_idxs_onehot = args.true_idx_smoothing/num_classes + (1-args.label_smoothing)*true_idxs_onehot
                 loss = criterion(outputs, true_idxs_onehot)
             else:
-                loss = criterion(outputs, labels)
+                loss = criterion(outputs, true_idxs)
             loss.backward()
             optimizer.step()
 
             # # Approximate accuracy: use argmax of soft labels
-            # _, predicted_labels = torch.max(outputs, dim=1)
-            # _, true_labels = torch.max(labels, dim=1)  # Get the dominant class from soft labels
-            # running_corrects += (predicted_labels == true_labels).sum().item()
+            # _, predicted_true_idxs = torch.max(outputs, dim=1)
+            # _, true_true_idxs = torch.max(true_idxs, dim=1)  # Get the dominant class from soft true_idxs
+            # running_corrects += (predicted_true_idxs == true_true_idxs).sum().item()
             # running_loss += loss.item() * images.size(0)
             
-            _, predicted_labels = torch.max(outputs, dim=1)
-            running_corrects += (predicted_labels == labels).sum().item()
+            _, predicted_true_idxs = torch.max(outputs, dim=1)
+            running_corrects += (predicted_true_idxs == true_idxs).sum().item()
             running_loss += loss.item() * images.size(0)
 
         scheduler.step()
