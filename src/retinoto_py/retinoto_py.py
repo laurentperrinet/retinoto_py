@@ -8,8 +8,8 @@ import torch.nn.functional as nnf
 import time
 import pandas as pd
 from tqdm.auto import tqdm
-from timm.data.mixup import Mixup
-from timm.loss import SoftTargetCrossEntropy
+# from timm.data.mixup import Mixup
+# from timm.loss import SoftTargetCrossEntropy
 #############################################################
 
 def get_validation_accuracy(args, model, val_loader, desc=None, leave=True):
@@ -162,20 +162,20 @@ def train_model(args, model, train_loader, val_loader, df_train=None,
     optimizer = get_optimizer(args, model)
     scheduler = get_cosine_schedule_with_warmup(optimizer, args.num_warmup_epochs, args.num_epochs)
  
-    # # Using reduction='mean' to automatically scale the gradient for different batch sizes
-    # if args.loss_name=='CrossEntropyLoss':
-    #     # https://pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html 
-    #     criterion = torch.nn.CrossEntropyLoss(reduction='mean', label_smoothing=args.label_smoothing)
-    # elif args.loss_name=='NegLogitLoss':
-    #     # https://pytorch.org/docs/stable/generated/torch.nn.BCEWithLogitsLoss.html 
-    #     # TODO add the logit of the chance level to normalize and form an odd ratio
-    #     criterion = NegLogitLoss(reduction='mean')
-    # elif args.loss_name=='BCEWithLogitsLoss':
-    #     # https://pytorch.org/docs/stable/generated/torch.nn.BCEWithLogitsLoss.html 
-    #     criterion = nn.BCEWithLogitsLoss(reduction='mean')
+    # Using reduction='mean' to automatically scale the gradient for different batch sizes
+    if args.loss_name=='CrossEntropyLoss':
+        # https://pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html 
+        criterion = torch.nn.CrossEntropyLoss(reduction='mean', label_smoothing=args.label_smoothing)
+    elif args.loss_name=='NegLogitLoss':
+        # https://pytorch.org/docs/stable/generated/torch.nn.BCEWithLogitsLoss.html 
+        # TODO add the logit of the chance level to normalize and form an odd ratio
+        criterion = NegLogitLoss(reduction='mean')
+    elif args.loss_name=='BCEWithLogitsLoss':
+        # https://pytorch.org/docs/stable/generated/torch.nn.BCEWithLogitsLoss.html 
+        criterion = nn.BCEWithLogitsLoss(reduction='mean')
 
     
-    criterion = SoftTargetCrossEntropy()
+    # criterion = SoftTargetCrossEntropy()
         
     num_classes = len(train_loader.dataset.classes)
 
@@ -195,14 +195,14 @@ def train_model(args, model, train_loader, val_loader, df_train=None,
             scheduler.step()
 
     
-    mixup_fn = Mixup(
-        mixup_alpha=0.8,      # Mixup strength
-        cutmix_alpha=1.0,     # CutMix strength
-        prob=0.5,             # 50% chance of applying
-        switch_prob=0.5,      # 50/50 between mixup and cutmix
-        mode='batch',
-        label_smoothing=args.label_smoothing
-    )
+    # mixup_fn = Mixup(
+    #     mixup_alpha=0.8,      # Mixup strength
+    #     cutmix_alpha=1.0,     # CutMix strength
+    #     prob=0.5,             # 50% chance of applying
+    #     switch_prob=0.5,      # 50/50 between mixup and cutmix
+    #     mode='batch',
+    #     label_smoothing=args.label_smoothing
+    # )
 
     since = time.time()
     max_acc_train, max_acc_val = 0., 0.
@@ -217,7 +217,7 @@ def train_model(args, model, train_loader, val_loader, df_train=None,
         model.train()
         for images, labels in inner_progress:
             images, labels = images.to(args.device), labels.to(args.device)                
-            images, labels = mixup_fn(images, labels)  # Apply mixup/cutmix
+            # images, labels = mixup_fn(images, labels)  # Apply mixup/cutmix
             # images, labels_a, labels_b, lam = mixup_data(images, labels, alpha=0.8)
 
             total_image += len(images)
@@ -228,25 +228,24 @@ def train_model(args, model, train_loader, val_loader, df_train=None,
             outputs = model(images)
             # loss = mixup_criterion(nn.CrossEntropyLoss(), outputs, labels_a, labels_b, lam)
 
-            # if args.loss_name=='BCEWithLogitsLoss':
-            #     true_idxs_onehot = nnf.one_hot(labels, num_classes=num_classes).float()
-            #     true_idxs_onehot = args.label_smoothing/num_classes + (1-args.label_smoothing)*true_idxs_onehot
-            #     loss = criterion(outputs, true_idxs_onehot)
-            # else:
-            #     loss = criterion(outputs, labels)
-            loss = criterion(outputs, labels)
+            if args.loss_name=='BCEWithLogitsLoss':
+                true_idxs_onehot = nnf.one_hot(labels, num_classes=num_classes).float()
+                true_idxs_onehot = args.label_smoothing/num_classes + (1-args.label_smoothing)*true_idxs_onehot
+                loss = criterion(outputs, true_idxs_onehot)
+            else:
+                loss = criterion(outputs, labels)
             loss.backward()
             optimizer.step()
 
-            # Approximate accuracy: use argmax of soft labels
-            _, predicted_labels = torch.max(outputs, dim=1)
-            _, true_labels = torch.max(labels, dim=1)  # Get the dominant class from soft labels
-            running_corrects += (predicted_labels == true_labels).sum().item()
-            running_loss += loss.item() * images.size(0)
-            
+            # # Approximate accuracy: use argmax of soft labels
             # _, predicted_labels = torch.max(outputs, dim=1)
-            # running_corrects += (predicted_labels == labels).sum().item()
+            # _, true_labels = torch.max(labels, dim=1)  # Get the dominant class from soft labels
+            # running_corrects += (predicted_labels == true_labels).sum().item()
             # running_loss += loss.item() * images.size(0)
+            
+            _, predicted_labels = torch.max(outputs, dim=1)
+            running_corrects += (predicted_labels == labels).sum().item()
+            running_loss += loss.item() * images.size(0)
 
         scheduler.step()
         # print(f'DEBUG - lr={optimizer.param_groups[0]["lr"]:.2e} - epo')
