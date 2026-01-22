@@ -465,7 +465,7 @@ def load_model(args, model_filename=None):
     #     model_filename_fb = args.data_cache /  'convnext_base_1k_224_ema.pth'  # Remplacez par le chemin réel
     #     model = apply_weights(model, model_filename, args.device, verbose=args.verbose)
 
-    if not model_filename is None:
+    if model_filename is not None:
         model = apply_weights(model, model_filename, args.device, verbose=args.verbose)
 
     return model
@@ -481,7 +481,11 @@ def apply_weights(model, model_filename, device, verbose=True):
         model: torch model, the model with the weights applied
         """
     if verbose: print(f'loading .... {model_filename}')
-    model.load_state_dict(torch.load(model_filename, map_location=torch.device(device)), strict=True, weights_only=False)
+    try:
+        checkpoint = torch.load(model_filename)
+        model.load_state_dict(checkpoint['model_state_dict'])
+    except:
+        model.load_state_dict(torch.load(model_filename, map_location=torch.device(device)), strict=True, weights_only=False)
     return model
 
 
