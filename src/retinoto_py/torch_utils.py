@@ -477,11 +477,11 @@ def apply_weights(model, model_filename, device, verbose=True):
         model: torch model, the model to apply the weights to
         model_filename: str, path to the weights file
         verbose: bool, whether to print the loading message or not
-    Returns:    
+    Returns:
         model: torch model, the model with the weights applied
         """
     if verbose: print(f'loading .... {model_filename}')
-    model.load_state_dict(torch.load(model_filename, map_location=torch.device(device)), strict=True)
+    model.load_state_dict(torch.load(model_filename, map_location=torch.device(device)), strict=True, weights_only=False)
     return model
 
 
