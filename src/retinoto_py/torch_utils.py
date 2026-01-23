@@ -352,7 +352,7 @@ def get_preprocess(args, do_full_preprocess=True, angle_min=None, angle_max=None
                 )
             )
         if args.do_mask:
-            if args.do_fovea: raise(BaseException, 'Something is wrong here')
+            if args.do_fovea: BaseException('Something is wrong here')
             # Créer le masque une seule fois avec la taille de l'image
             mask = make_mask(image_size=args.image_size)#.to(args.device)
             # Ajouter notre transform personnalisée à la liste
@@ -481,11 +481,7 @@ def apply_weights(model, model_filename, device, verbose=True):
         model: torch model, the model with the weights applied
         """
     if verbose: print(f'loading .... {model_filename}')
-    try:
-        checkpoint = torch.load(model_filename)
-        model.load_state_dict(checkpoint['model_state_dict'])
-    except:
-        model.load_state_dict(torch.load(model_filename, map_location=torch.device(device)), strict=True, weights_only=False)
+    model.load_state_dict(torch.load(model_filename, map_location=torch.device(device)), strict=True)
     return model
 
 
