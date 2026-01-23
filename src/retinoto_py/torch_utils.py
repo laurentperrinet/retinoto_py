@@ -186,9 +186,9 @@ def get_grid(args):
     Generate a grid for the log-polar mapping
 
     """
-    rs_ = torch.logspace(args.rs_min, args.rs_max, args.grid_size, base=2) # Radial distances (log scale)
+    rs_ = torch.logspace(args.rs_min, args.rs_max, args.grid_size_ecc, base=2) # Radial distances (log scale)
     # adds a margin in angles in order to get an overrepresentation
-    ts_ = torch.linspace(args.angle_start, args.angle_start+torch.pi*2+args.angle_margin, args.grid_size+1)[:-1] 
+    ts_ = torch.linspace(args.angle_start, args.angle_start+torch.pi*2+args.angle_margin, args.grid_size_ang+1)[:-1] 
     grid_xs = torch.outer(rs_, torch.cos(ts_)) # X-coordinates
     grid_ys = torch.outer(rs_, torch.sin(ts_)) # Y-coordinates	
     
@@ -207,10 +207,10 @@ def get_grid_hexagonal(args):
         args: Parameters object containing grid configuration
         
     Returns:
-        torch.Tensor: Grid tensor of shape (grid_size, grid_size, 2) containing (x,y) coordinates
+        torch.Tensor: Grid tensor of shape (grid_size_ecc, grid_size_ang, 2) containing (x,y) coordinates
     """
-    rs_ = torch.logspace(args.rs_min, args.rs_max, args.grid_size, base=2)  # Radial distances
-    angular_resolution = 2 * torch.pi / args.grid_size  # Base angular step
+    rs_ = torch.logspace(args.rs_min, args.rs_max, args.grid_size_ecc, base=2)  # Radial distances
+    angular_resolution = (2*torch.pi + args.angle_margin) / args.grid_size_ang  # Base angular step
 
     # Create staggered angular coordinates
     grid_xs_list = []
@@ -222,7 +222,7 @@ def get_grid_hexagonal(args):
         # Create angular coordinates for this radial ring
         ts_i = torch.linspace(args.angle_start + phase_shift,
                               args.angle_start + 2*torch.pi + args.angle_margin + phase_shift,
-                              args.grid_size + 1)[:-1]
+                              args.grid_size_ang + 1)[:-1]
 
         # Convert to Cartesian coordinates
         grid_xs_i = r * torch.cos(ts_i)
@@ -235,7 +235,8 @@ def get_grid_hexagonal(args):
     grid_xs = torch.stack(grid_xs_list, dim=0)
     grid_ys = torch.stack(grid_ys_list, dim=0)
 
-    return torch.stack((grid_xs, grid_ys), 2)  # Shape: (grid_size, grid_size, 2)
+    grid = torch.stack((grid_xs, grid_ys), 2)  # Shape: (grid_size_ecc, grid_size_ang, 2)
+    return grid
 
 class transform_apply_grid(object): 
     # https://docs.pytorch.org/docs/stable/generated/torch.nn.functional.grid_sample.html

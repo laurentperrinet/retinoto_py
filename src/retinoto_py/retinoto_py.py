@@ -65,7 +65,7 @@ def get_optimizer(args, model):
     elif args.optimizer_name=='adadelta': 
         optimizer = torch.optim.Adadelta(model.parameters(), rho=1-args.delta1, **optimizer_dict)
     else:
-        raise(ValueError(f'Unknown optimizer {args.optimizer_name}'))    
+        raise(ValueError(f'Unknown optimizer {args.optimizer_name}'))
 
     return optimizer
 
