@@ -1,15 +1,24 @@
 """Main module."""
 
 #############################################################
+from .torch_utils import get_loader, get_dataset, load_model
+
 import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as nnf
+from torch.optim.lr_scheduler import LambdaLR
+
 import time
 import pandas as pd
 from tqdm.auto import tqdm
 # from timm.data.mixup import Mixup
 # from timm.loss import SoftTargetCrossEntropy
+
+# from torchvision.transforms.functional import crop, resize
+from .torch_utils import get_preprocess, fixate
+import torchvision.transforms.functional as TF
+from torchvision.transforms import InterpolationMode
 #############################################################
 
 def get_validation_accuracy(args, model, val_loader, desc=None, leave=True):
@@ -105,8 +114,6 @@ class NegLogitLoss(nn.Module):
         else:   # "none"
             return loss
 
-from torch.optim.lr_scheduler import LambdaLR
-
 def get_cosine_schedule_with_warmup(optimizer, num_warmup_epochs, num_epochs):
     def lr_lambda(current_epoch):
         if current_epoch < num_warmup_epochs:
@@ -140,44 +147,14 @@ def get_cosine_schedule_with_warmup(optimizer, num_warmup_epochs, num_epochs):
 def mixup_criterion(criterion, pred, y_a, y_b, lam):
     return lam * criterion(pred, y_a) + (1 - lam) * criterion(pred, y_b)
 
-def train_model(args, model, train_loader, val_loader, df_train=None, 
+def train_model(args, train_loader, val_loader, df_train=None, 
                 model_filename=None, json_filename=None):
-    
-    model = model.to(args.device)
-
-    if args.do_full_training:
-        # retraining the full model   
-        for param in model.parameters():
-            param.requires_grad = True        
-
-    else:
-        # Freeze everything except FC layer
-        for name, param in model.named_parameters():
-            if not name.startswith('classifier'):
-                param.requires_grad = False
-            else:
-                param.requires_grad = True
 
     # sets the optimizer
+    model = load_model(args)
+    model = model.to(args.device)
     optimizer = get_optimizer(args, model)
     scheduler = get_cosine_schedule_with_warmup(optimizer, args.num_warmup_epochs, args.num_epochs)
- 
-    # Using reduction='mean' to automatically scale the gradient for different batch sizes
-    if args.loss_name=='CrossEntropyLoss':
-        # https://pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html 
-        criterion = torch.nn.CrossEntropyLoss(reduction='mean', label_smoothing=args.label_smoothing)
-    elif args.loss_name=='NegLogitLoss':
-        # https://pytorch.org/docs/stable/generated/torch.nn.BCEWithLogitsLoss.html 
-        # TODO add the logit of the chance level to normalize and form an odd ratio
-        criterion = NegLogitLoss(reduction='mean')
-    elif args.loss_name=='BCEWithLogitsLoss':
-        # https://pytorch.org/docs/stable/generated/torch.nn.BCEWithLogitsLoss.html 
-        criterion = nn.BCEWithLogitsLoss(reduction='mean')
-
-    
-    # criterion = SoftTargetCrossEntropy()
-        
-    num_classes = len(train_loader.dataset.classes)
 
     # the DataFrame to record from
     if df_train is None:
@@ -194,7 +171,33 @@ def train_model(args, model, train_loader, val_loader, df_train=None,
         for _ in range(i_epoch_start):
             scheduler.step()
 
-    
+    if args.do_full_training:
+        # retraining the full model   
+        for param in model.parameters():
+            param.requires_grad = True        
+
+    else:
+        # Freeze everything except FC layer
+        for name, param in model.named_parameters():
+            if not name.startswith('classifier'):
+                param.requires_grad = False
+            else:
+                param.requires_grad = True
+
+ 
+    # Using reduction='mean' to automatically scale the gradient for different batch sizes
+    if args.loss_name=='CrossEntropyLoss':
+        # https://pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html 
+        criterion = torch.nn.CrossEntropyLoss(reduction='mean', label_smoothing=args.label_smoothing)
+    elif args.loss_name=='NegLogitLoss':
+        # https://pytorch.org/docs/stable/generated/torch.nn.BCEWithLogitsLoss.html 
+        # TODO add the logit of the chance level to normalize and form an odd ratio
+        criterion = NegLogitLoss(reduction='mean')
+    elif args.loss_name=='BCEWithLogitsLoss':
+        # https://pytorch.org/docs/stable/generated/torch.nn.BCEWithLogitsLoss.html 
+        criterion = nn.BCEWithLogitsLoss(reduction='mean')
+    # criterion = SoftTargetCrossEntropy()
+
     # mixup_fn = Mixup(
     #     mixup_alpha=0.8,      # Mixup strength
     #     cutmix_alpha=1.0,     # CutMix strength
@@ -207,6 +210,7 @@ def train_model(args, model, train_loader, val_loader, df_train=None,
     since = time.time()
     max_acc_train, max_acc_val = 0., 0.
     total_image = 0
+    num_classes = len(train_loader.dataset.classes)
     outer_progress = tqdm(range(i_epoch_start, args.num_epochs), desc="Epochs", leave=True, disable=(args.num_epochs==1))
     for i_epoch in outer_progress:
         running_loss = 0.0
@@ -279,7 +283,7 @@ def train_model(args, model, train_loader, val_loader, df_train=None,
 
     return model, df_train
 
-def do_learning(args, dataset, name, model_filename_init=None):
+def do_learning(args, dataset, name):
 
     model_filename = args.data_cache / f'{name}.pth'
     json_filename = args.data_cache / model_filename.name.replace('.pth', '.json')
@@ -299,8 +303,7 @@ def do_learning(args, dataset, name, model_filename_init=None):
 
     if should_resume_training:
         lock_filename.touch() # as we do a training, let's lock it
-        from .torch_utils import get_loader, get_dataset, load_model
-
+        
         TRAIN_DATA_DIR = args.DATAROOT / f'Imagenet_{dataset}' / 'train'
         train_dataset = get_dataset(args, TRAIN_DATA_DIR, do_augment=args.do_augment)
         train_loader = get_loader(args, train_dataset)
@@ -311,15 +314,8 @@ def do_learning(args, dataset, name, model_filename_init=None):
         # we need to train the model or finish a training that already started
         print(f"Training model {args.model_name}, file= {model_filename} - image_size={args.image_size}")
 
-        if model_filename.is_file(): 
-            model_filename_train = model_filename
-        else:
-            model_filename_train = model_filename_init # we use a stored file for learning or None for default weights
-        # print(model_filename_train)
-        model = load_model(args, model_filename=model_filename_train)
-
         start_time = time.time()
-        model_retrain, df_train = train_model(args, model=model, 
+        model_retrain, df_train = train_model(args,
                                               train_loader=train_loader, val_loader=val_loader, df_train=df_train, model_filename=model_filename, json_filename=json_filename)
         elapsed_time = time.time() - start_time
         print(f"Training of {model_retrain} completed in {elapsed_time // 60:.0f}m {elapsed_time % 60:.0f}s")
@@ -327,10 +323,6 @@ def do_learning(args, dataset, name, model_filename_init=None):
     if lock_filename.exists(): lock_filename.unlink()
     return model_filename, json_filename
 
-# from torchvision.transforms.functional import crop, resize
-from .torch_utils import get_preprocess, fixate
-import torchvision.transforms.functional as TF
-from torchvision.transforms import InterpolationMode
 
 def get_positions(H, W, resolution=(15, 15), endpoint=False, do_hex=True):
 
