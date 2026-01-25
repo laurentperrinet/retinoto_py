@@ -303,7 +303,7 @@ def do_learning(args, dataset, name):
 
     if should_resume_training:
         lock_filename.touch() # as we do a training, let's lock it
-        
+
         TRAIN_DATA_DIR = args.DATAROOT / f'Imagenet_{dataset}' / 'train'
         train_dataset = get_dataset(args, TRAIN_DATA_DIR, do_augment=args.do_augment)
         train_loader = get_loader(args, train_dataset)
@@ -343,7 +343,7 @@ def get_positions(H, W, resolution=(15, 15), endpoint=False, do_hex=True):
         else:
             delta = (pos_w[1]-pos_w[0])/4
             pos_W[::2] += delta
-            pos_W[1::2] -= delta                
+            pos_W[1::2] -= delta
 
     pos_H, pos_W = pos_H.ravel(), pos_W.ravel()
     return pos_H, pos_W

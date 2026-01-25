@@ -459,13 +459,8 @@ def load_model(args, model_filename=None):
         model = models.convnext_large(weights=models.ConvNeXt_Large_Weights.IMAGENET1K_V1, **opts_convnext)
     else:
         raise ValueError(f'Unknown model {args.model_name}')
-    
+
     model = model.to(args.device)
-
-    # if args.model_name=='convnext_base': # HACK
-    #     model_filename_fb = args.data_cache /  'convnext_base_1k_224_ema.pth'  # Remplacez par le chemin réel
-    #     model = apply_weights(model, model_filename, args.device, verbose=args.verbose)
-
     if model_filename is not None:
         model = apply_weights(model, model_filename, args.device, verbose=args.verbose)
 
