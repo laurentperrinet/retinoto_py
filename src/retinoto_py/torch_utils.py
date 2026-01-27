@@ -460,10 +460,10 @@ def load_model(args, model_filename=None):
     else:
         raise ValueError(f'Unknown model {args.model_name}')
 
-    model = model.to(args.device)
     if model_filename is not None:
         model = apply_weights(model, model_filename, args.device, verbose=args.verbose)
 
+    model = model.to(args.device)
     return model
 
 def apply_weights(model, model_filename, device, verbose=True):
@@ -478,7 +478,7 @@ def apply_weights(model, model_filename, device, verbose=True):
         """
     if verbose: print(f'loading .... {model_filename}')
     # model.load_state_dict(torch.load(model_filename, map_location=torch.device(device)), strict=True)
-    checkpoint = torch.load(model_filename, map_location=torch.device(device))
+    checkpoint = torch.load(model_filename, weights_only=False)
     model.load_state_dict(checkpoint['model_state_dict'])
 
     return model
