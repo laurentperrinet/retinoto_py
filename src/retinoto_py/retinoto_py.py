@@ -163,7 +163,9 @@ def train_model(args, train_loader, val_loader, df_train=None,
     else:
         i_epoch_start = df_train['epoch'].max() + 1
         if args.verbose: print(f"Starting from epoch {i_epoch_start} with {len(df_train)} records")
-        checkpoint = torch.load(model_filename)
+        # checkpoint = torch.load(model_filename)
+        checkpoint = torch.load(model_filename, map_location=torch.device(args.device), weights_only=False)
+
         model.load_state_dict(checkpoint['model_state_dict'])
         optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
         scheduler.load_state_dict(checkpoint['scheduler_state_dict'])        
@@ -246,7 +248,7 @@ def train_model(args, train_loader, val_loader, df_train=None,
             # _, true_true_idxs = torch.max(true_idxs, dim=1)  # Get the dominant class from soft true_idxs
             # running_corrects += (predicted_true_idxs == true_true_idxs).sum().item()
             # running_loss += loss.item() * images.size(0)
-            
+
             _, predicted_true_idxs = torch.max(outputs, dim=1)
             running_corrects += (predicted_true_idxs == true_idxs).sum().item()
             running_loss += loss.item() * images.size(0)
