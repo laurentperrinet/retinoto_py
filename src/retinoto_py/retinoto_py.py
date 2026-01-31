@@ -288,8 +288,8 @@ def train_model(args, train_loader, val_loader, df_train=None,
 def do_learning(args, dataset, name):
 
     model_filename = args.data_cache / f'{name}.pth'
-    json_filename = args.data_cache / model_filename.name.replace('.pth', '.json')
-    lock_filename = args.data_cache / model_filename.name.replace('.pth', '.lock')
+    json_filename = args.data_cache / f'{name}.json'
+    lock_filename = args.data_cache / f'{name}.lock'
 
     # %rm {lock_filename}  # FORCING RECOMPUTE
 
