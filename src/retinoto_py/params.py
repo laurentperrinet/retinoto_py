@@ -68,8 +68,8 @@ class Params:
     subset_factor: int = 1 # set for DEBUGging
     optimizer_name: str = 'adamw'
     # loss_name: str = 'BCEWithLogitsLoss'
-    loss_name: str = 'NegLogitLoss'
-    # loss_name: str = 'CrossEntropyLoss'
+    # loss_name: str = 'NegLogitLoss'
+    loss_name: str = 'CrossEntropyLoss'
     base_lr: float = 10.e-6
     final_lr: float = 1.e-7
     num_warmup_epochs: int = 20
