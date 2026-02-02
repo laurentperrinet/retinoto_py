@@ -73,16 +73,16 @@ class Params:
     base_lr: float = 10.e-6
     final_lr: float = 1.e-7
     num_warmup_epochs: int = 20
-    delta1: float = 0.02
-    delta2: float = 1e-3
+    delta1: float = 0.05
+    delta2: float = 1e-2
     weight_decay: float = 0.03
     label_smoothing: float = 0.05 # See https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html
     do_full_training: bool = True
     do_augment: bool = True
-    augment_magnitude: int = 9
-    augment_proba: float = .20
+    augment_magnitude: int = 15
+    augment_proba: float = .10
     # https://docs.pytorch.org/vision/main/generated/torchvision.ops.stochastic_depth.html#torchvision.ops.stochastic_depth
-    stochastic_depth_prob: float = .20
+    stochastic_depth_prob: float = .50
 
     seed: int = 1998 # Set the seed for reproducibility 
     shuffle: bool = True # Whether to shuffle the data during training
