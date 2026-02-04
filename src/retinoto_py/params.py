@@ -1,93 +1,96 @@
-from pathlib import Path
-from .utils import get_device, set_seed
 #############################################################
 #############################################################
 import platform
-import numpy as np
+
 # https://docs.python.org/3/library/dataclasses.html?highlight=dataclass#module-dataclasses
 from dataclasses import dataclass
+from pathlib import Path
+
+import numpy as np
+
+from .utils import get_device, set_seed
+
 verbose = False
 
 import os
-USER = os.environ['USER']  # username
-import platform
+
+USER = os.environ["USER"]  # username
+
 HOST = platform.uname()[1]
 
 @dataclass
 class Params:
-
     # platform-dependent variables
-    if USER=='uvb28bo': # Jean Zay
-        DATAROOT = Path('/lustre/fsn1/projects/rech/fsx/uvb28bo/data')
-    # elif '.cluster' in HOST: # mesocentre
-    #     DATAROOT = '/scratch/lperrinet/science/Deep_learning/data'
-    #     num_workers = 8
-        batch_size: int = 64 # Set number of images per input batch
+    if USER == "uvb28bo":  # Jean Zay
+        DATAROOT = Path("/lustre/fsn1/projects/rech/fsx/uvb28bo/data")
+        # elif '.cluster' in HOST: # mesocentre
+        #     DATAROOT = '/scratch/lperrinet/science/Deep_learning/data'
+        #     num_workers = 8
+        batch_size: int = 64  # Set number of images per input batch
         num_workers: int = 4
         prefetch_factor: int = 4
-    elif 'm-gpu' in HOST: # MESONET
-        DATAROOT = Path.home() / 'data' / 'Imagenet'
-        batch_size: int = 128 # Set number of images per input batch
+    elif "m-gpu" in HOST:  # MESONET
+        DATAROOT = Path.home() / "data" / "Imagenet"
+        batch_size: int = 128  # Set number of images per input batch
         num_workers: int = 4
         prefetch_factor: int = 0
         # num_workers = 16
-    elif 'gaia' in HOST: # MAC STUDIO
+    elif "gaia" in HOST:  # MAC STUDIO
         # batch_size = 512 # Set the batch size for training and validation
-        # num_workers = 2    
-        DATAROOT = Path.home() / 'data' / 'Imagenet'
-        batch_size: int = 512 # Set number of images per input batch
+        # num_workers = 2
+        DATAROOT = Path.home() / "data" / "Imagenet"
+        batch_size: int = 512  # Set number of images per input batch
         num_workers: int = 4
         prefetch_factor: int = 0
     else:
-        DATAROOT = Path.home() / 'data' / 'Imagenet'
-        batch_size: int = 32 # Set number of images per input batch
+        DATAROOT = Path.home() / "data" / "Imagenet"
+        batch_size: int = 32  # Set number of images per input batch
         num_workers: int = 4
         prefetch_factor: int = 0
 
-    image_size: int = 224 # base resolution of the image (224, 224)
-    grid_size_ecc: int = 224 # grid size in the eccentricity dimension
-    grid_size_ang: int = 224 # grid size in the angular dimension
-    do_mask: bool = False # Whether apply a circular mask to the image
-    do_fovea: bool = True # Whether apply a log-polar transform to the image
-    use_hexagonal_grid: bool = True # Whether to use hexagonal packing for the log-polar grid
-    rs_min: float = -5.00 # Set minimum radius of the log-polar grid
-    rs_max: float = 0.00 # Set maximum radius of the log-polar grid
-    angle_start: float = -np.pi/4 # Set the intial angle for the grid
-    angle_margin: float = np.pi/16 # Set a margin angle to wrap the circle
+    image_size: int = 224  # base resolution of the image (224, 224)
+    grid_size_ecc: int = 224  # grid size in the eccentricity dimension
+    grid_size_ang: int = 224  # grid size in the angular dimension
+    do_mask: bool = False  # Whether apply a circular mask to the image
+    do_fovea: bool = True  # Whether apply a log-polar transform to the image
+    use_hexagonal_grid: bool = True  # Whether to use hexagonal packing for the log-polar grid
+    rs_min: float = -5.00  # Set minimum radius of the log-polar grid
+    rs_max: float = 0.00  # Set maximum radius of the log-polar grid
+    angle_start: float = -np.pi / 4  # Set the intial angle for the grid
+    angle_margin: float = np.pi / 16  # Set a margin angle to wrap the circle
     mode: str = "bilinear"
     # padding_mode: str = "zeros"
     padding_mode: str = "border"
 
-
     # model_name: str = 'resnet50' # Name of the model to use
-    model_name: str = 'convnext_base' # Name of the model to use
+    model_name: str = "convnext_base"  # Name of the model to use
 
     # https://github.com/pytorch/vision/tree/main/references/classification#convnext
     # num_epochs: int = 1
     num_epochs: int = 200
-    subset_factor: int = 1 # set for DEBUGging
-    optimizer_name: str = 'adamw'
+    subset_factor: int = 1  # set for DEBUGging
+    optimizer_name: str = "adamw"
     # loss_name: str = 'BCEWithLogitsLoss'
     # loss_name: str = 'NegLogitLoss'
-    loss_name: str = 'CrossEntropyLoss'
-    base_lr: float = 10.e-6
-    final_lr: float = 1.e-7
+    loss_name: str = "CrossEntropyLoss"
+    base_lr: float = 10.0e-6
+    final_lr: float = 1.0e-7
     num_warmup_epochs: int = 20
     delta1: float = 0.05
     delta2: float = 1e-2
     weight_decay: float = 0.03
-    label_smoothing: float = 0.05 # See https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html
+    label_smoothing: float = 0.05  # See https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html
     do_full_training: bool = True
     do_augment: bool = True
     augment_magnitude: int = 20
-    augment_proba: float = .10
+    augment_proba: float = 0.10
     # https://docs.pytorch.org/vision/main/generated/torchvision.ops.stochastic_depth.html#torchvision.ops.stochastic_depth
-    stochastic_depth_prob: float = .50
+    stochastic_depth_prob: float = 0.50
 
-    seed: int = 1998 # Set the seed for reproducibility 
-    shuffle: bool = True # Whether to shuffle the data during training
-    data_cache = Path('cached_data')
-    figures_folder = Path('figures')
+    seed: int = 1998  # Set the seed for reproducibility
+    shuffle: bool = True  # Whether to shuffle the data during training
+    data_cache = Path("cached_data")
+    figures_folder = Path("figures")
     verbose: bool = verbose
 
     def __post_init__(self):
@@ -99,14 +102,14 @@ class Params:
 
 #############################################################
 #############################################################
-all_model_names = ['resnet18', 'resnet50', 'resnet101'] 
-all_model_names_ls = [':', '-.', '-'] 
-all_model_names_color = ['blue', 'blue', 'blue']
-all_cn_model_names = ['convnext_tiny', 'convnext_small', 'convnext_base', 'convnext_large']
-all_cn_model_names_color = ['blue', 'blue', 'blue']
-all_cn_model_names_ls = [':', '-.', '-'] 
-all_datasets = ['full', 'bbox']
-all_datasets_color = ['blue', 'orange']
-all_datasets_ls = ['-', '-']
+all_model_names = ["resnet18", "resnet50", "resnet101"]
+all_model_names_ls = [":", "-.", "-"]
+all_model_names_color = ["blue", "blue", "blue"]
+all_cn_model_names = ["convnext_tiny", "convnext_small", "convnext_base", "convnext_large"]
+all_cn_model_names_color = ["blue", "blue", "blue"]
+all_cn_model_names_ls = [":", "-.", "-"]
+all_datasets = ["full", "bbox"]
+all_datasets_color = ["blue", "orange"]
+all_datasets_ls = ["-", "-"]
 #############################################################
 #############################################################
