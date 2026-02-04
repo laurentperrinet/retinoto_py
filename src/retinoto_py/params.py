@@ -85,7 +85,7 @@ class Params:
     augment_magnitude: int = 15
     augment_proba: float = 0.10
     # https://docs.pytorch.org/vision/main/generated/torchvision.ops.stochastic_depth.html#torchvision.ops.stochastic_depth
-    stochastic_depth_prob: float = 0.50
+    stochastic_depth_prob: float = 0.40
 
     seed: int = 1998  # Set the seed for reproducibility
     shuffle: bool = True  # Whether to shuffle the data during training
