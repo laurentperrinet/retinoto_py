@@ -210,7 +210,7 @@ def train_model(args, train_loader, val_loader, df_train=None,
     # )
 
     since = time.time()
-    max_acc_train, max_acc_val = 0., 0.
+    # max_acc_train, max_acc_val = 0., 0.
     total_image = 0
     num_classes = len(train_loader.dataset.classes)
     outer_progress = tqdm(range(i_epoch_start, args.num_epochs), desc="Epochs", leave=True, disable=(args.num_epochs==1))
@@ -262,10 +262,6 @@ def train_model(args, train_loader, val_loader, df_train=None,
         model.eval()
         acc_val = get_validation_accuracy(args, model, val_loader, leave=False)
 
-        max_acc_train, max_acc_val = max((max_acc_train, acc_train)), max((max_acc_val, acc_val))
-        outer_progress.set_postfix_str(f"Acc: train={acc_train:.3f} - val={acc_val:.3f} - (Max:train={max_acc_train:.3f} - val={max_acc_val:.3f})")    
-        result = [{'epoch': i_epoch, 'i_image':i_image, 'total_image':total_image, 'loss_train':loss_train, 'acc_train':acc_train, 'acc_val':acc_val, 'time':time.time() - since}] # 'loss_val':loss_val, 
-        
         # save everything at each epoch
         if not(model_filename is None):
             # if args.verbose:  print(f"Saving...{model_filename}")
@@ -275,6 +271,7 @@ def train_model(args, train_loader, val_loader, df_train=None,
                 'scheduler_state_dict': scheduler.state_dict(),
             }, model_filename)
 
+        result = [{'epoch': i_epoch, 'i_image':i_image, 'total_image':total_image, 'loss_train':loss_train, 'acc_train':acc_train, 'acc_val':acc_val, 'time':time.time() - since}] # 'loss_val':loss_val, 
         if df_train is None:
             df_train = pd.DataFrame(result)
         else:
@@ -282,6 +279,11 @@ def train_model(args, train_loader, val_loader, df_train=None,
             df_train = pd.concat([df_train, df_new_row], ignore_index=True)
         if not(json_filename is None):
             df_train.to_json(json_filename, orient='records', indent=2)
+
+        # max_acc_train, max_acc_val = max((max_acc_train, acc_train)), max((max_acc_val, acc_val))
+        max_acc_train, max_acc_val = df_train['acc_train'].max(), df_train['acc_val'].max()
+
+        outer_progress.set_postfix_str(f"Acc: train={acc_train:.3f} - val={acc_val:.3f} - (Max:train={max_acc_train:.3f} - val={max_acc_val:.3f})")    
 
     return model, df_train
 
@@ -294,14 +296,14 @@ def do_learning(args, dataset, name):
     # %rm {lock_filename}  # FORCING RECOMPUTE
 
     df_train = None
-    should_resume_training = not lock_filename.exists() # sets this to True if there is no lock file
+    should_resume_training = not lock_filename.exists() # sets first this to True if there is no lock file
 
     if json_filename.exists():
         print(f"Load JSON from pre-trained resnet {json_filename}")
         df_train = pd.read_json(json_filename, orient='records')
         print(f"{model_filename}: latest accuracy = {df_train.tail(1)['acc_val'].item():.3f}")
         # resume learning if we still have some epochs to run
-        should_resume_training = (df_train['epoch'].max() + 1 < args.num_epochs) and (not lock_filename.exists())
+        should_resume_training = (df_train['epoch'].max() + 1 < args.num_epochs)
 
     if should_resume_training:
         lock_filename.touch() # as we do a training, let's lock it
@@ -318,7 +320,7 @@ def do_learning(args, dataset, name):
 
         start_time = time.time()
         model_retrain, df_train = train_model(args,
-                                              train_loader=train_loader, val_loader=val_loader, df_train=df_train, model_filename=model_filename, json_filename=json_filename)
+                                              train_loader, val_loader, df_train, model_filename, json_filename)
         elapsed_time = time.time() - start_time
         print(f"Training of {model_retrain} completed in {elapsed_time // 60:.0f}m {elapsed_time % 60:.0f}s")
 
