@@ -58,21 +58,21 @@ def get_validation_accuracy(args, model, val_loader, desc=None, leave=True):
     return acc_val
 
 def get_optimizer(args, model):
-    optimizer_dict = dict(lr=args.base_lr, weight_decay=args.weight_decay)
+    optim_dict = dict(lr=args.base_lr, weight_decay=args.weight_decay)
     if args.optimizer_name=='adam': 
-        optimizer = torch.optim.Adam(model.parameters(), betas=(1-args.delta1, 1-args.delta2), **optimizer_dict)
+        optimizer = torch.optim.Adam(model.parameters(), betas=(1-args.delta1, 1-args.delta2), **optim_dict)
     elif args.optimizer_name=='adamw': 
-        optimizer = torch.optim.AdamW(model.parameters(), betas=(1-args.delta1, 1-args.delta2), **optimizer_dict)
+        optimizer = torch.optim.AdamW(model.parameters(), betas=(1-args.delta1, 1-args.delta2), **optim_dict)
     elif args.optimizer_name=='sparseadam': 
-        optimizer = torch.optim.AdamW(model.parameters(), betas=(1-args.delta1, 1-args.delta2), **optimizer_dict)
+        optimizer = torch.optim.AdamW(model.parameters(), betas=(1-args.delta1, 1-args.delta2), **optim_dict)
     elif args.optimizer_name=='sgd': 
-        optimizer = torch.optim.SGD(model.parameters(),  momentum=1-args.delta1, dampening=1-args.delta2, **optimizer_dict)
+        optimizer = torch.optim.SGD(model.parameters(),  momentum=1-args.delta1, dampening=1-args.delta2, **optim_dict)
     elif args.optimizer_name=='rmsprop': 
-        optimizer = torch.optim.RMSprop(model.parameters(), momentum=1-args.delta1, alpha=1-args.delta2, **optimizer_dict)
+        optimizer = torch.optim.RMSprop(model.parameters(), momentum=1-args.delta1, alpha=1-args.delta2, **optim_dict)
     # elif args.optimizer_name=='adagrad': 
-    #     optimizer = torch.optim.Adagrad(model.parameters(), betas=(1-args.delta1, 1-args.delta2), **optimizer_dict)
+    #     optimizer = torch.optim.Adagrad(model.parameters(), betas=(1-args.delta1, 1-args.delta2), **optim_dict)
     elif args.optimizer_name=='adadelta': 
-        optimizer = torch.optim.Adadelta(model.parameters(), rho=1-args.delta1, **optimizer_dict)
+        optimizer = torch.optim.Adadelta(model.parameters(), rho=1-args.delta1, **optim_dict)
     else:
         raise(ValueError(f'Unknown optimizer {args.optimizer_name}'))
 
@@ -114,38 +114,20 @@ class NegLogitLoss(nn.Module):
         else:   # "none"
             return loss
 
-def get_cosine_schedule_with_warmup(optimizer, num_warmup_epochs, num_epochs):
+def get_cosine_schedule_with_warmup(optimizer, num_warmup_epochs, num_epochs, rel_final_lr):
     def lr_lambda(current_epoch):
         if current_epoch < num_warmup_epochs:
-            # Linear warmup from 0 to base_lr
-            # return (current_epoch + 1) / max(1, num_warmup_epochs)
-            # Constant warmup from 0 to base_lr
+            # Constant warmup of 1
             return 1
         else:
             # Cosine decay from base_lr to final_lr
             progress = (current_epoch - num_warmup_epochs) / max(1, num_epochs - num_warmup_epochs)
-            cosine_decay = 0.5 * (1 + np.cos(np.pi * progress))
-            return cosine_decay
+            cosine_decay = 0.5 * (1 + np.cos(np.pi * progress)) # from 1 to zero
+            return (cosine_decay + rel_final_lr) / (1 + rel_final_lr) # between 1 and down to rel_final_lr
 
     scheduler = LambdaLR(optimizer, lr_lambda, last_epoch=-1)
     return scheduler
 
-# def mixup_data(x, y, alpha=0.8):
-#     '''Returns mixed inputs, pairs of targets, and lambda'''
-#     if alpha > 0:
-#         lam = np.random.beta(alpha, alpha)
-#     else:
-#         lam = 1
-
-#     batch_size = x.size()[0]
-#     index = torch.randperm(batch_size).to(x.device)
-
-#     mixed_x = lam * x + (1 - lam) * x[index, :]
-#     y_a, y_b = y, y[index]
-#     return mixed_x, y_a, y_b, lam
-
-def mixup_criterion(criterion, pred, y_a, y_b, lam):
-    return lam * criterion(pred, y_a) + (1 - lam) * criterion(pred, y_b)
 
 def train_model(args, train_loader, val_loader, df_train=None, 
                 model_filename=None, json_filename=None):
@@ -154,7 +136,7 @@ def train_model(args, train_loader, val_loader, df_train=None,
     model = load_model(args)
     model = model.to(args.device)
     optimizer = get_optimizer(args, model)
-    scheduler = get_cosine_schedule_with_warmup(optimizer, args.num_warmup_epochs, args.num_epochs)
+    scheduler = get_cosine_schedule_with_warmup(optimizer, args.num_warmup_epochs, args.num_epochs, args.final_lr/args.base_lr)
 
     # the DataFrame to record from
     if df_train is None:
@@ -168,15 +150,15 @@ def train_model(args, train_loader, val_loader, df_train=None,
 
         model.load_state_dict(checkpoint['model_state_dict'])
         optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
-        scheduler.load_state_dict(checkpoint['scheduler_state_dict'])        
+        scheduler.load_state_dict(checkpoint['scheduler_state_dict'])
         df_train = df_train.copy()
         for _ in range(i_epoch_start):
             scheduler.step()
 
     if args.do_full_training:
-        # retraining the full model   
+        # retraining the full model
         for param in model.parameters():
-            param.requires_grad = True        
+            param.requires_grad = True
 
     else:
         # Freeze everything except FC layer
@@ -198,19 +180,8 @@ def train_model(args, train_loader, val_loader, df_train=None,
     elif args.loss_name=='BCEWithLogitsLoss':
         # https://pytorch.org/docs/stable/generated/torch.nn.BCEWithLogitsLoss.html 
         criterion = nn.BCEWithLogitsLoss(reduction='mean')
-    # criterion = SoftTargetCrossEntropy()
-
-    # mixup_fn = Mixup(
-    #     mixup_alpha=0.8,      # Mixup strength
-    #     cutmix_alpha=1.0,     # CutMix strength
-    #     prob=0.5,             # 50% chance of applying
-    #     switch_prob=0.5,      # 50/50 between mixup and cutmix
-    #     mode='batch',
-    #     label_smoothing=args.label_smoothing
-    # )
 
     since = time.time()
-    # max_acc_train, max_acc_val = 0., 0.
     total_image = 0
     num_classes = len(train_loader.dataset.classes)
     outer_progress = tqdm(range(i_epoch_start, args.num_epochs), desc="Epochs", leave=True, disable=(args.num_epochs==1))
@@ -222,9 +193,7 @@ def train_model(args, train_loader, val_loader, df_train=None,
                               total=len(train_loader.dataset)//args.batch_size, leave=False)
         model.train()
         for images, true_idxs in inner_progress:
-            images, true_idxs = images.to(args.device), true_idxs.to(args.device)                
-            # images, true_idxs = mixup_fn(images, true_idxs)  # Apply mixup/cutmix
-            # images, true_idxs_a, true_idxs_b, lam = mixup_data(images, true_idxs, alpha=0.8)
+            images, true_idxs = images.to(args.device), true_idxs.to(args.device)
 
             total_image += len(images)
             i_image += len(images)
@@ -232,7 +201,6 @@ def train_model(args, train_loader, val_loader, df_train=None,
             optimizer.zero_grad(set_to_none=True)
 
             outputs = model(images)
-            # loss = mixup_criterion(nn.CrossEntropyLoss(), outputs, true_idxs_a, true_idxs_b, lam)
 
             if args.loss_name=='BCEWithLogitsLoss':
                 true_idxs_onehot = nnf.one_hot(true_idxs, num_classes=num_classes).float()
@@ -242,12 +210,6 @@ def train_model(args, train_loader, val_loader, df_train=None,
                 loss = criterion(outputs, true_idxs)
             loss.backward()
             optimizer.step()
-
-            # # Approximate accuracy: use argmax of soft labels
-            # _, predicted_true_idxs = torch.max(outputs, dim=1)
-            # _, true_true_idxs = torch.max(true_idxs, dim=1)  # Get the dominant class from soft true_idxs
-            # running_corrects += (predicted_true_idxs == true_true_idxs).sum().item()
-            # running_loss += loss.item() * images.size(0)
 
             _, predicted_true_idxs = torch.max(outputs, dim=1)
             running_corrects += (predicted_true_idxs == true_idxs).sum().item()
@@ -259,19 +221,19 @@ def train_model(args, train_loader, val_loader, df_train=None,
         acc_train = running_corrects*1. / i_image
 
         # validation on the ohter set
-        model.eval()
         acc_val = get_validation_accuracy(args, model, val_loader, leave=False)
 
         # save everything at each epoch
         if not(model_filename is None):
-            # if args.verbose:  print(f"Saving...{model_filename}")
             torch.save({
                 'model_state_dict': model.state_dict(),
                 'optimizer_state_dict': optimizer.state_dict(),
                 'scheduler_state_dict': scheduler.state_dict(),
             }, model_filename)
 
-        result = [{'epoch': i_epoch, 'i_image':i_image, 'total_image':total_image, 'loss_train':loss_train, 'acc_train':acc_train, 'acc_val':acc_val, 'time':time.time() - since}] # 'loss_val':loss_val, 
+        result = [{'epoch': i_epoch, 'i_image':i_image, 'total_image':total_image, 
+                   'loss_train':loss_train, 'acc_train':acc_train, 'acc_val':acc_val, 
+                   'time':time.time() - since}] # 'loss_val':loss_val, 
         if df_train is None:
             df_train = pd.DataFrame(result)
         else:
@@ -280,10 +242,9 @@ def train_model(args, train_loader, val_loader, df_train=None,
         if not(json_filename is None):
             df_train.to_json(json_filename, orient='records', indent=2)
 
-        # max_acc_train, max_acc_val = max((max_acc_train, acc_train)), max((max_acc_val, acc_val))
-        max_acc_train, max_acc_val = df_train['acc_train'].max(), df_train['acc_val'].max()
-
-        outer_progress.set_postfix_str(f"Acc: train={acc_train:.3f} - val={acc_val:.3f} - (Max:train={max_acc_train:.3f} - val={max_acc_val:.3f})")    
+        postfix_str = f"Acc: train={acc_train:.3f} - val={acc_val:.3f} - "
+        postfix_str += f"(Max:train={df_train['acc_train'].max():.3f} - val={df_train['acc_val'].max():.3f})"
+        outer_progress.set_postfix_str(postfix_str)
 
     return model, df_train
 
