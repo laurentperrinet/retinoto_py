@@ -59,12 +59,14 @@ def get_validation_accuracy(args, model, val_loader, desc=None, leave=True):
 
 def get_optimizer(args, model):
     optim_dict = dict(lr=args.base_lr, weight_decay=args.weight_decay)
+    assert(0 <= args.delta1 <= 1)
+    assert(0 <= args.delta2 <= 1)
     if args.optimizer_name=='adam': 
         optimizer = torch.optim.Adam(model.parameters(), betas=(1-args.delta1, 1-args.delta2), **optim_dict)
     elif args.optimizer_name=='adamw': 
         optimizer = torch.optim.AdamW(model.parameters(), betas=(1-args.delta1, 1-args.delta2), **optim_dict)
     elif args.optimizer_name=='sparseadam': 
-        optimizer = torch.optim.AdamW(model.parameters(), betas=(1-args.delta1, 1-args.delta2), **optim_dict)
+        optimizer = torch.optim.SparseAdam(model.parameters(), betas=(1-args.delta1, 1-args.delta2), **optim_dict)
     elif args.optimizer_name=='sgd': 
         optimizer = torch.optim.SGD(model.parameters(),  momentum=1-args.delta1, dampening=1-args.delta2, **optim_dict)
     elif args.optimizer_name=='rmsprop': 
@@ -132,21 +134,22 @@ def get_cosine_schedule_with_warmup(optimizer, num_warmup_epochs, num_epochs, re
 def train_model(args, train_loader, val_loader, df_train=None, 
                 model_filename=None, json_filename=None):
 
-    # sets the optimizer
+    # sets the model and optimizer
     model = load_model(args)
     model = model.to(args.device)
     optimizer = get_optimizer(args, model)
-    scheduler = get_cosine_schedule_with_warmup(optimizer, args.num_warmup_epochs, args.num_epochs, args.final_lr/args.base_lr)
+    scheduler = get_cosine_schedule_with_warmup(optimizer,
+                                                args.num_warmup_epochs, args.num_epochs, args.final_lr/args.base_lr)
 
     # the DataFrame to record from
     if df_train is None:
         i_epoch_start = 0
-        if args.verbose: print(f"Starting learning...")
+        if args.verbose: print("Starting learning...")
     else:
         i_epoch_start = df_train['epoch'].max() + 1
         if args.verbose: print(f"Starting from epoch {i_epoch_start} with {len(df_train)} records")
         # checkpoint = torch.load(model_filename)
-        checkpoint = torch.load(model_filename, map_location=torch.device(args.device), weights_only=False)
+        checkpoint = torch.load(model_filename, map_location=torch.device(args.device))#, weights_only=False)
 
         model.load_state_dict(checkpoint['model_state_dict'])
         optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
@@ -184,12 +187,13 @@ def train_model(args, train_loader, val_loader, df_train=None,
     since = time.time()
     total_image = 0
     num_classes = len(train_loader.dataset.classes)
-    outer_progress = tqdm(range(i_epoch_start, args.num_epochs), desc="Epochs", leave=True, disable=(args.num_epochs==1))
+    outer_progress = tqdm(range(i_epoch_start, args.num_epochs), desc="Epochs",
+                          leave=True, disable=((args.num_epochs-i_epoch_start)==1))
     for i_epoch in outer_progress:
         running_loss = 0.0
         running_corrects = 0
         i_image = 0
-        inner_progress = tqdm(train_loader, desc=f'Epoch={i_epoch+1}/{args.num_epochs}', 
+        inner_progress = tqdm(train_loader, desc=f'Epoch={i_epoch+1}/{args.num_epochs}',
                               total=len(train_loader.dataset)//args.batch_size, leave=False)
         model.train()
         for images, true_idxs in inner_progress:
@@ -224,7 +228,7 @@ def train_model(args, train_loader, val_loader, df_train=None,
         acc_val = get_validation_accuracy(args, model, val_loader, leave=False)
 
         # save everything at each epoch
-        if not(model_filename is None):
+        if model_filename is not None:
             torch.save({
                 'model_state_dict': model.state_dict(),
                 'optimizer_state_dict': optimizer.state_dict(),
@@ -239,7 +243,7 @@ def train_model(args, train_loader, val_loader, df_train=None,
         else:
             df_new_row = pd.DataFrame(result)
             df_train = pd.concat([df_train, df_new_row], ignore_index=True)
-        if not(json_filename is None):
+        if json_filename is not None:
             df_train.to_json(json_filename, orient='records', indent=2)
 
         postfix_str = f"Acc: train={acc_train:.3f} - val={acc_val:.3f} - "
