@@ -149,7 +149,7 @@ def train_model(args, train_loader, val_loader, df_train=None,
         i_epoch_start = df_train['epoch'].max() + 1
         if args.verbose: print(f"Starting from epoch {i_epoch_start} with {len(df_train)} records")
         # checkpoint = torch.load(model_filename)
-        checkpoint = torch.load(model_filename, map_location=torch.device(args.device))#, weights_only=False)
+        checkpoint = torch.load(model_filename, map_location=torch.device(args.device), weights_only=False)
 
         model.load_state_dict(checkpoint['model_state_dict'])
         optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
