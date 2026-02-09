@@ -39,6 +39,7 @@
 * TODO: Event-based retinotopy / optic flow detection
 * TODO: where network : teacher student / get symmetries to find the best topology 
 * TODO : do visual search with a prompt
+* TODO : what about sigmoid, softmax or log-softmax ??
 
 ## Credits
 
