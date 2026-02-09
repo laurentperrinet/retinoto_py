@@ -8,7 +8,7 @@ Useful torch snippets to use in the main module.
 import numpy as np
 # https://github.com/laurentperrinet/2024-12-09-normalizing-images-in-convolutional-neural-networks
 im_mean = np.array([0.485, 0.456, 0.406])
-im_std = np.array([0.229, 0.224, 0.225]) 
+im_std = np.array([0.229, 0.224, 0.225])
 #############################################################
 import matplotlib.pyplot as plt
 import matplotlib
@@ -57,9 +57,9 @@ def get_idx_to_label(args, verbose=False):
                 json.dump(response.json(), f)
         else:
             if verbose: print(f"Loading labels from local cache {LABELS_FILE}...")
-            
+
         # In both cases, load from the local file
-        with open(LABELS_FILE, 'r') as f:
+        with open(LABELS_FILE) as f:
             class_idx = json.load(f)
 
         # Create a simple mapping from index to class name for easy lookup
@@ -238,7 +238,7 @@ def get_grid_hexagonal(args):
     grid = torch.stack((grid_xs, grid_ys), 2)  # Shape: (grid_size_ecc, grid_size_ang, 2)
     return grid
 
-class transform_apply_grid(object): 
+class transform_apply_grid:
     # https://docs.pytorch.org/docs/stable/generated/torch.nn.functional.grid_sample.html
     def __init__(self, logPolar_grid, padding_mode, mode):
         self.grid = logPolar_grid
@@ -246,9 +246,9 @@ class transform_apply_grid(object):
         self.mode = mode
 
     def __call__(self, images):
-        result =  nnf.grid_sample(images.unsqueeze(dim=0), 
-                                  self.grid.unsqueeze(dim=0), 
-                                  padding_mode=self.padding_mode, align_corners=True, 
+        result =  nnf.grid_sample(images.unsqueeze(dim=0),
+                                  self.grid.unsqueeze(dim=0),
+                                  padding_mode=self.padding_mode, align_corners=True,
                                   mode=self.mode)
         return result.squeeze(0)
 
@@ -273,8 +273,8 @@ def get_preprocess(args, do_full_preprocess=True, angle_min=None, angle_max=None
     # The images must be pre-processed in the exact same way the model was trained on.
     # This includes resizing, cropping, and normalizing.
     transform_list = []
- 
-    transform_list.append(transforms.ToImage())  
+
+    transform_list.append(transforms.ToImage())
     transform_list.append(transforms.ToDtype(torch.float32, scale=True)) 
 
 
@@ -327,14 +327,14 @@ def get_preprocess(args, do_full_preprocess=True, angle_min=None, angle_max=None
             transform_list.append(transforms.CenterCrop((args.image_size, args.image_size)))
 
         # 3. Add ColorJitter BEFORE RandomGrayscale
-        transform_list.append(
-            transforms.ColorJitter(
-                brightness=0.4,
-                contrast=0.4,
-                saturation=0.4,
-                hue=0.1
-            )
-        )
+        # transform_list.append(
+        #     transforms.ColorJitter(
+        #         brightness=0.4,
+        #         contrast=0.4,
+        #         saturation=0.4,
+        #         hue=0.1
+        #     )
+        # )
         # 3️⃣ RandomGrayscale – avec probabilité 0.2
         #    - transforme l’image en niveaux de gris (R=G=B) pour forcer le
         #      réseau à ne pas dépendre uniquement de la chrominance.
@@ -353,7 +353,7 @@ def get_preprocess(args, do_full_preprocess=True, angle_min=None, angle_max=None
                 )
             )
         if args.do_mask:
-            if args.do_fovea: BaseException('Something is wrong here')
+            if args.do_fovea : BaseException('Something is wrong here')  # noqa: E701
             # Créer le masque une seule fois avec la taille de l'image
             mask = make_mask(image_size=args.image_size)#.to(args.device)
             # Ajouter notre transform personnalisée à la liste
