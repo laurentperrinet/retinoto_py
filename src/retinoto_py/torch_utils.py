@@ -259,7 +259,7 @@ def get_preprocess(args, do_full_preprocess=True, angle_min=None, angle_max=None
     Defines get_preprocess for the preprocessing 
 
     :param args: A containaer for all parameters
-    :param do_full_preprocess: set to FAlse to bypass the full preprocessing and use that for getting a dataloader providing raw images
+    :param do_full_preprocess: set to False to bypass the full preprocessing and use that for getting a dataloader providing raw unprocessed images
     :param angle_min: Description
     :param angle_max: Description
     :param interpolation: Description
@@ -275,7 +275,7 @@ def get_preprocess(args, do_full_preprocess=True, angle_min=None, angle_max=None
     transform_list = []
 
     transform_list.append(transforms.ToImage())
-    transform_list.append(transforms.ToDtype(torch.float32, scale=True)) 
+    transform_list.append(transforms.ToDtype(torch.float32, scale=True))
 
 
     if do_full_preprocess:
@@ -314,6 +314,9 @@ def get_preprocess(args, do_full_preprocess=True, angle_min=None, angle_max=None
 
         # 3. Add ColorJitter BEFORE RandomGrayscale
         if do_augment:
+
+            # TODO: try transform_list.append(transforms.RandomRotation(degrees=(angle_min, angle_max), interpolation=interpolation))
+
             transform_list.append(
                 transforms.RandomApply([
                     transforms.ColorJitter(
