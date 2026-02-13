@@ -67,17 +67,17 @@ class Params:
 
     # https://github.com/pytorch/vision/tree/main/references/classification#convnext
     # num_epochs: int = 1
-    num_epochs: int = 200
+    num_epochs: int = 300
     subset_factor: int = 1  # set for DEBUGging
     optimizer_name: str = "adamw"
     # loss_name: str = 'BCEWithLogitsLoss'
     # loss_name: str = 'NegLogitLoss'
     loss_name: str = "CrossEntropyLoss"
     base_lr: float = 10.0e-6
-    final_lr: float = 5.0e-7
+    final_lr: float = 3.0e-7
     num_warmup_epochs: int = 20
-    delta1: float = 0.05
-    delta2: float = 1e-2
+    delta1: float = 0.12
+    delta2: float = 0.06
     weight_decay: float = 0.02
     label_smoothing: float = 0.01  # See https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html
     do_full_training: bool = True
