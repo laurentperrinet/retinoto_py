@@ -59,8 +59,8 @@ class Params:
     angle_start: float = -np.pi / 4  # Set the intial angle for the grid
     angle_margin: float = np.pi / 16  # Set a margin angle to wrap the circle
     mode: str = "bilinear"
-    # padding_mode: str = "zeros"
-    padding_mode: str = "border"
+    padding_mode: str = "zeros"
+    # padding_mode: str = "border"
 
     # model_name: str = 'resnet50' # Name of the model to use
     model_name: str = "convnext_base"  # Name of the model to use
