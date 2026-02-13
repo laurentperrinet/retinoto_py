@@ -65,8 +65,6 @@ def get_optimizer(args, model):
         optimizer = torch.optim.Adam(model.parameters(), betas=(1-args.delta1, 1-args.delta2), **optim_dict)
     elif args.optimizer_name=='adamw': 
         optimizer = torch.optim.AdamW(model.parameters(), betas=(1-args.delta1, 1-args.delta2), **optim_dict)
-    elif args.optimizer_name=='sparseadam': 
-        optimizer = torch.optim.SparseAdam(model.parameters(), betas=(1-args.delta1, 1-args.delta2), **optim_dict)
     elif args.optimizer_name=='sgd': 
         optimizer = torch.optim.SGD(model.parameters(),  momentum=1-args.delta1, dampening=1-args.delta2, **optim_dict)
     elif args.optimizer_name=='rmsprop': 

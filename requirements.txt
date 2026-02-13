@@ -32,3 +32,4 @@ imageio-ffmpeg
 tqdm
 pytest
 ruff
+statsmodels
