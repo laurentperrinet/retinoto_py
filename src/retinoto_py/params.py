@@ -74,18 +74,18 @@ class Params:
     # loss_name: str = 'NegLogitLoss'
     loss_name: str = "CrossEntropyLoss"
     base_lr: float = 10.0e-6
-    final_lr: float = 3.0e-7
+    final_lr: float = 3.0e-8
     num_warmup_epochs: int = 20
-    delta1: float = 0.12
-    delta2: float = 0.06
+    delta1: float = 0.15
+    delta2: float = 0.15
     weight_decay: float = 0.02
     label_smoothing: float = 0.01  # See https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html
     do_full_training: bool = True
     do_augment: bool = True
     augment_magnitude: int = 21
-    augment_proba: float = 0.15
+    augment_proba: float = 0.30
     # https://docs.pytorch.org/vision/main/generated/torchvision.ops.stochastic_depth.html#torchvision.ops.stochastic_depth
-    stochastic_depth_prob: float = 0.7
+    stochastic_depth_prob: float = 0.8
 
     seed: int = 1998  # Set the seed for reproducibility
     shuffle: bool = True  # Whether to shuffle the data during training
