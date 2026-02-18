@@ -347,7 +347,7 @@ def compute_gaussian_params(likelihood_maps, sigma=.5):
         # Fit the Gaussian
         results.append(fit_gaussian_lmfit(likelihood_map))
 
-
+    # print(results)
     # Convert the dictionary to a pandas DataFrame
     gaussian_df = pd.DataFrame(results)
     gaussian_df["theta_deg"] = np.rad2deg(gaussian_df["theta"])
