@@ -99,7 +99,7 @@ def make_mask(image_size: int, radius: float = 1.0):
     mask = (R <= radius).astype(np.float32) # 1.0 pour un cercle complet
     return torch.from_numpy(mask).unsqueeze(0) # Ajoute la dimension du canal
 
-class ApplyMask(object):
+class ApplyMask:
     """Applique un masque circulaire à un tenseur d'image."""
     def __init__(self, mask: torch.Tensor):
         # On stocke le masque. Le .clone() est une bonne pratique pour éviter
