@@ -82,8 +82,8 @@ class Params:
     label_smoothing: float = 0.01  # See https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html
     do_full_training: bool = True
     do_augment: bool = True
-    augment_magnitude: int = 21
-    augment_proba: float = 0.20
+    augment_magnitude: int = 17
+    augment_proba: float = 0.25
     # https://docs.pytorch.org/vision/main/generated/torchvision.ops.stochastic_depth.html#torchvision.ops.stochastic_depth
     stochastic_depth_prob: float = 0.6
 
