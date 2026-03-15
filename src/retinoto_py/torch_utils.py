@@ -186,7 +186,7 @@ def get_grid(args):
     Generate a grid for the log-polar mapping
 
     """
-    rs_ = torch.logspace(args.rs_min, args.rs_max, args.grid_size_ecc, base=2) # Radial distances (log scale)
+    rs_ = torch.logspace(args.rs_min, args.rs_max, args.grid_size_ecc, base=2) # Radial distances (log2 scale)
     # adds a margin in angles in order to get an overrepresentation
     ts_ = torch.linspace(args.angle_start, args.angle_start+torch.pi*2+args.angle_margin, args.grid_size_ang+1)[:-1] 
     grid_xs = torch.outer(rs_, torch.cos(ts_)) # X-coordinates
