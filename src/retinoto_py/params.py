@@ -15,7 +15,6 @@ verbose = False
 import os
 
 USER = os.environ["USER"]  # username
-
 HOST = platform.uname()[1]
 
 @dataclass
@@ -67,13 +66,13 @@ class Params:
 
     # https://github.com/pytorch/vision/tree/main/references/classification#convnext
     # num_epochs: int = 1
-    num_epochs: int = 300
+    num_epochs: int = 100
     subset_factor: int = 1  # set for DEBUGging
     optimizer_name: str = "adamw"
     # loss_name: str = 'BCEWithLogitsLoss'
     # loss_name: str = 'NegLogitLoss'
     loss_name: str = "CrossEntropyLoss"
-    base_lr: float = 10.0e-6
+    base_lr: float = 1.0e-6
     final_lr: float = 3.0e-9
     num_warmup_epochs: int = 20
     delta1: float = 0.1
