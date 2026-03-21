@@ -48,8 +48,8 @@ class Params:
         prefetch_factor: int = 0
 
     image_size: int = 224  # base resolution of the image (224, 224)
-    grid_size_ecc: int = 224  # grid size in the eccentricity dimension
-    grid_size_ang: int = 224  # grid size in the angular dimension
+    grid_size_ecc: int = 160  # grid size in the eccentricity dimension
+    grid_size_ang: int = 313  # grid size in the angular dimension
     do_mask: bool = False  # Whether apply a circular mask to the image
     do_fovea: bool = True  # Whether apply a log-polar transform to the image
     use_hexagonal_grid: bool = True  # Whether to use hexagonal packing for the log-polar grid
