@@ -48,13 +48,13 @@ class Params:
         prefetch_factor: int = 0
 
     image_size: int = 224  # base resolution of the image (224, 224)
-    grid_size_ecc: int = 196  # grid size in the eccentricity dimension
-    grid_size_ang: int = 256  # grid size in the angular dimension
+    grid_size_ecc: int = 161  # grid size in the eccentricity dimension
+    grid_size_ang: int = 309  # grid size in the angular dimension
     do_mask: bool = False  # Whether apply a circular mask to the image
     do_fovea: bool = True  # Whether apply a log-polar transform to the image
     use_hexagonal_grid: bool = True  # Whether to use hexagonal packing for the log-polar grid
-    rs_min: float = -4.50  # Set minimum radius of the log-polar grid
-    rs_max: float = 0.30  # Set maximum radius of the log-polar grid
+    rs_min: float = -3.50  # Set minimum radius of the log-polar grid
+    rs_max: float = 0.70  # Set maximum radius of the log-polar grid
     angle_start: float = - 5 / 3 * np.pi  # Set the intial angle for the grid
     angle_margin: float =  1 / grid_size_ang * np.pi  # Set a margin angle to wrap the circle
     mode: str = "bilinear"
@@ -72,7 +72,7 @@ class Params:
     # loss_name: str = 'BCEWithLogitsLoss'
     # loss_name: str = 'NegLogitLoss'
     loss_name: str = "CrossEntropyLoss"
-    base_lr: float = 10.0e-6
+    base_lr: float = 1.0e-6
     final_lr: float = 3.0e-9
     num_warmup_epochs: int = 20
     delta1: float = 0.1
