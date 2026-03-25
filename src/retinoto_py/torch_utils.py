@@ -21,7 +21,8 @@ from torchvision.io import read_image
 import torch.nn.functional as nnf
 # https://pytorch.org/vision/main/generated/torchvision.transforms.functional.crop.html
 # from torchvision.transforms.functional import crop
-from torchvision.transforms import v2 as transforms
+# from torchvision.transforms import v2 as transforms
+import torchvision.transforms as transforms
 import torchvision.transforms.functional as TF
 # from torchvision import datasets, models, transforms
 # from torchvision.datasets import ImageFolder
@@ -274,9 +275,9 @@ def get_preprocess(args, do_full_preprocess=True, angle_min=None, angle_max=None
     # This includes resizing, cropping, and normalizing.
     transform_list = []
 
-    transform_list.append(transforms.ToImage())
-    transform_list.append(transforms.ToDtype(torch.float32, scale=True))
-
+    # transform_list.append(transforms.ToImage())
+    transform_list.append(transforms.ToTensor())
+    # transform_list.append(transforms.ToDtype(torch.float32, scale=True))
 
     if do_full_preprocess:
 
@@ -340,12 +341,12 @@ def get_preprocess(args, do_full_preprocess=True, angle_min=None, angle_max=None
                 )
             )
 
-        transform_list.append(transforms.Normalize(mean=im_mean, std=im_std))
-
         # Si les deux angles ne sont pas None, on applique la rotation
         # c'est utilisé pour justement tourner l'image
         if angle_min is not None and angle_max is not None:
             transform_list.append(transforms.RandomRotation(degrees=(angle_min, angle_max), interpolation=interpolation))
+
+        transform_list.append(transforms.Normalize(mean=im_mean, std=im_std))
 
         if args.do_fovea: # apply log-polar mapping to the image
             # Choose between regular or hexagonal grid
