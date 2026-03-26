@@ -39,7 +39,7 @@ class Params:
         # num_workers = 2
         DATAROOT = Path.home() / "data" / "Imagenet"
         batch_size: int = 512  # Set number of images per input batch
-        num_workers: int = 4
+        num_workers: int = 0
         prefetch_factor: int = 0
     else:
         DATAROOT = Path.home() / "data" / "Imagenet"
@@ -81,8 +81,8 @@ class Params:
     label_smoothing: float = 0.01  # See https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html
     do_full_training: bool = True
     do_augment: bool = True
-    augment_magnitude: int = 17
-    augment_proba: float = 0.25
+    # augment_magnitude: int = 17
+    augment_proba: float = 0.15
     # https://docs.pytorch.org/vision/main/generated/torchvision.ops.stochastic_depth.html#torchvision.ops.stochastic_depth
     stochastic_depth_prob: float = 0.8
 

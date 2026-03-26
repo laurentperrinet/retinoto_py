@@ -8,7 +8,8 @@ HOST = platform.uname()[1]
 
 import multiprocessing
 if 'gaia' in HOST: # MAC STUDIO
-    multiprocessing.set_start_method('spawn', force=True)   # <‑‑ préférer sur M‑series
+    # multiprocessing.set_start_method('spawn', force=True)   # <‑‑ préférer sur M‑series
+    multiprocessing.set_start_method('fork', force=True)   # <‑‑ préférer sur M‑series
 else:
     multiprocessing.set_start_method('fork', force=True)
 

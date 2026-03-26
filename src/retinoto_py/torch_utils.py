@@ -21,8 +21,8 @@ from torchvision.io import read_image
 import torch.nn.functional as nnf
 # https://pytorch.org/vision/main/generated/torchvision.transforms.functional.crop.html
 # from torchvision.transforms.functional import crop
-# from torchvision.transforms import v2 as transforms
-import torchvision.transforms as transforms
+from torchvision.transforms import v2 as transforms
+# import torchvision.transforms as transforms
 import torchvision.transforms.functional as TF
 # from torchvision import datasets, models, transforms
 # from torchvision.datasets import ImageFolder
@@ -275,9 +275,12 @@ def get_preprocess(args, do_full_preprocess=True, angle_min=None, angle_max=None
     # This includes resizing, cropping, and normalizing.
     transform_list = []
 
-    # transform_list.append(transforms.ToImage())
-    transform_list.append(transforms.ToTensor())
-    # transform_list.append(transforms.ToDtype(torch.float32, scale=True))
+    # transform_list.append(transforms.Resize(args.image_size, interpolation=interpolation, antialias=True))
+    # transform_list.append(transforms.CenterCrop((args.image_size, args.image_size)))
+
+    # transform_list.append(transforms.ToTensor())
+    transform_list.append(transforms.ToImage())
+    transform_list.append(transforms.ToDtype(torch.float32, scale=True))
 
     if do_full_preprocess:
 
@@ -310,7 +313,8 @@ def get_preprocess(args, do_full_preprocess=True, angle_min=None, angle_max=None
             # )
             # FIX RandAugment contains translations, while there are none with AutoAugment with the IMAGENET policy 
             transform_list.append(
-                transforms.AutoAugment(transforms.autoaugment.AutoAugmentPolicy.IMAGENET, interpolation=interpolation)
+                # transforms.AutoAugment(transforms.autoaugment.AutoAugmentPolicy.IMAGENET, interpolation=interpolation)
+                transforms.AutoAugment(transforms.AutoAugmentPolicy.IMAGENET, interpolation=interpolation)
             )
 
         # # 3. Add ColorJitter BEFORE RandomGrayscale
@@ -365,7 +369,7 @@ def get_preprocess(args, do_full_preprocess=True, angle_min=None, angle_max=None
         if args.do_mask:
             if args.do_fovea : BaseException('Something is wrong here')  # noqa: E701
             # Créer le masque une seule fois avec la taille de l'image
-            mask = make_mask(image_size=args.image_size).to(args.device)
+            mask = make_mask(image_size=args.image_size)#.to(args.device)
             # Ajouter notre transform personnalisée à la liste
             transform_list.append(ApplyMask(mask))
 
