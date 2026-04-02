@@ -313,8 +313,9 @@ def get_preprocess(args, do_full_preprocess=True, angle_min=None, angle_max=None
             # )
             # FIX RandAugment contains translations, while there are none with AutoAugment with the IMAGENET policy 
             transform_list.append(
-                # transforms.AutoAugment(transforms.autoaugment.AutoAugmentPolicy.IMAGENET, interpolation=interpolation)
-                transforms.AutoAugment(transforms.AutoAugmentPolicy.IMAGENET, interpolation=interpolation)
+                transforms.RandomApply([
+                    transforms.AutoAugment(transforms.AutoAugmentPolicy.IMAGENET, interpolation=interpolation)
+                                       ], p=args.augment_proba))
             )
 
         # # 3. Add ColorJitter BEFORE RandomGrayscale
