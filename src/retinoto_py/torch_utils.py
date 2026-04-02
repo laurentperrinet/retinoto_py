@@ -315,8 +315,8 @@ def get_preprocess(args, do_full_preprocess=True, angle_min=None, angle_max=None
             transform_list.append(
                 transforms.RandomApply([
                     transforms.AutoAugment(transforms.AutoAugmentPolicy.IMAGENET, interpolation=interpolation)
-                                       ], p=args.augment_proba))
-            )
+                                       ], p=args.augment_proba)
+                                )
 
         # # 3. Add ColorJitter BEFORE RandomGrayscale
         # if do_augment:
