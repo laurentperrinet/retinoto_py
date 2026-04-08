@@ -69,8 +69,6 @@ def get_optimizer(args, model):
         optimizer = torch.optim.SGD(model.parameters(),  momentum=1-args.delta1, dampening=1-args.delta2, **optim_dict)
     elif args.optimizer_name=='rmsprop': 
         optimizer = torch.optim.RMSprop(model.parameters(), momentum=1-args.delta1, alpha=1-args.delta2, **optim_dict)
-    elif args.optimizer_name=='adagrad': 
-        optimizer = torch.optim.Adagrad(model.parameters(), betas=(1-args.delta1, 1-args.delta2), **optim_dict)
     elif args.optimizer_name=='adadelta': 
         optimizer = torch.optim.Adadelta(model.parameters(), rho=1-args.delta1, **optim_dict)
     else:
