@@ -59,8 +59,8 @@ def get_validation_accuracy(args, model, val_loader, desc=None, leave=True):
 
 def get_optimizer(args, model):
     optim_dict = dict(lr=args.base_lr, weight_decay=args.weight_decay)
-    assert(0 <= args.delta1 <= 1)
-    assert(0 <= args.delta2 <= 1)
+    assert 0 <= args.delta1 < 1, "delta1 must be in [0,1)"
+    assert 0 <= args.delta2 < 1, "delta2 must be in [0,1)"
     if args.optimizer_name=='adam': 
         optimizer = torch.optim.Adam(model.parameters(), betas=(1-args.delta1, 1-args.delta2), **optim_dict)
     elif args.optimizer_name=='adamw': 
@@ -69,8 +69,8 @@ def get_optimizer(args, model):
         optimizer = torch.optim.SGD(model.parameters(),  momentum=1-args.delta1, dampening=1-args.delta2, **optim_dict)
     elif args.optimizer_name=='rmsprop': 
         optimizer = torch.optim.RMSprop(model.parameters(), momentum=1-args.delta1, alpha=1-args.delta2, **optim_dict)
-    # elif args.optimizer_name=='adagrad': 
-    #     optimizer = torch.optim.Adagrad(model.parameters(), betas=(1-args.delta1, 1-args.delta2), **optim_dict)
+    elif args.optimizer_name=='adagrad': 
+        optimizer = torch.optim.Adagrad(model.parameters(), betas=(1-args.delta1, 1-args.delta2), **optim_dict)
     elif args.optimizer_name=='adadelta': 
         optimizer = torch.optim.Adadelta(model.parameters(), rho=1-args.delta1, **optim_dict)
     else:
