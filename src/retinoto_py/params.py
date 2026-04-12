@@ -82,7 +82,7 @@ class Params:
     do_full_training: bool = True
     do_augment: bool = True
     # augment_magnitude: int = 17
-    augment_proba: float = 0.50
+    augment_proba: float = 0.70
     # https://docs.pytorch.org/vision/main/generated/torchvision.ops.stochastic_depth.html#torchvision.ops.stochastic_depth
     stochastic_depth_prob: float = 0.8
 
