@@ -73,7 +73,7 @@ class Params:
     # loss_name: str = 'NegLogitLoss'
     loss_name: str = "CrossEntropyLoss"
     base_lr: float = 3.0e-6
-    final_lr: float = 10.0e-9
+    final_lr: float = 100.0e-9
     num_warmup_epochs: int = 20
     delta1: float = 0.02
     delta2: float = 0.02
