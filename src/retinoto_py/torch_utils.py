@@ -336,8 +336,9 @@ def get_preprocess(args, do_full_preprocess=True, angle_min=None, angle_max=None
             transform_list.append(
                 transforms.RandomErasing(
                     p=args.augment_proba,
-                    scale=(0.02, 0.33),
-                    ratio=(0.3, 3.3)
+                    scale=(0.05, 0.5),
+                    ratio=(0.2, 5.0),
+                    value=[0.485, 0.456, 0.406]  # ImageNet mean values
                 )
             )
 
