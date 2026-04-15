@@ -64,6 +64,10 @@ class Params:
     # model_name: str = 'resnet50' # Name of the model to use
     model_name: str = "convnext_base"  # Name of the model to use
 
+
+Best Trial params:  {'base_lr': 1.0255556172066356e-06, 'final_lr': 2.9324972626414617e-08, 'weight_decay': 0.0010486971598234454, 'label_smoothing': 0.0004133120278275439, 'stochastic_depth_prob': 0.3900700943390403, 'delta1': 0.09935173430440898, 'delta2': 0.03372837136438468}
+
+
     # https://github.com/pytorch/vision/tree/main/references/classification#convnext
     # num_epochs: int = 1
     num_epochs: int = 200
@@ -72,19 +76,19 @@ class Params:
     # loss_name: str = 'BCEWithLogitsLoss'
     # loss_name: str = 'NegLogitLoss'
     loss_name: str = "CrossEntropyLoss"
-    base_lr: float = 3.0e-6
-    final_lr: float = 100.0e-9
+    base_lr: float = 1.0e-6
+    final_lr: float = 30.0e-9
     num_warmup_epochs: int = 20
-    delta1: float = 0.02
+    delta1: float = 0.1
     delta2: float = 0.02
     weight_decay: float = 0.001
-    label_smoothing: float = 0.003  # See https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html
+    label_smoothing: float = 0.0003  # See https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html
     do_full_training: bool = True
     do_augment: bool = True
     # augment_magnitude: int = 17
     augment_proba: float = 0.70
     # https://docs.pytorch.org/vision/main/generated/torchvision.ops.stochastic_depth.html#torchvision.ops.stochastic_depth
-    stochastic_depth_prob: float = 0.8
+    stochastic_depth_prob: float = 0.4
 
     seed: int = 1998  # Set the seed for reproducibility
     shuffle: bool = True  # Whether to shuffle the data during training
