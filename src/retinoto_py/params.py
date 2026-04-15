@@ -64,10 +64,6 @@ class Params:
     # model_name: str = 'resnet50' # Name of the model to use
     model_name: str = "convnext_base"  # Name of the model to use
 
-
-Best Trial params:  {'base_lr': 1.0255556172066356e-06, 'final_lr': 2.9324972626414617e-08, 'weight_decay': 0.0010486971598234454, 'label_smoothing': 0.0004133120278275439, 'stochastic_depth_prob': 0.3900700943390403, 'delta1': 0.09935173430440898, 'delta2': 0.03372837136438468}
-
-
     # https://github.com/pytorch/vision/tree/main/references/classification#convnext
     # num_epochs: int = 1
     num_epochs: int = 200
