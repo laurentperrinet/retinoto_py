@@ -66,7 +66,7 @@ class Params:
 
     # https://github.com/pytorch/vision/tree/main/references/classification#convnext
     # num_epochs: int = 1
-    num_epochs: int = 200
+    num_epochs: int = 250
     subset_factor: int = 1  # set for DEBUGging
     optimizer_name: str = "adamw"
     # loss_name: str = 'BCEWithLogitsLoss'
@@ -84,7 +84,7 @@ class Params:
     # augment_magnitude: int = 17
     augment_proba: float = 0.70
     # https://docs.pytorch.org/vision/main/generated/torchvision.ops.stochastic_depth.html#torchvision.ops.stochastic_depth
-    stochastic_depth_prob: float = 0.4
+    stochastic_depth_prob: float = 0.6
 
     seed: int = 1998  # Set the seed for reproducibility
     shuffle: bool = True  # Whether to shuffle the data during training
