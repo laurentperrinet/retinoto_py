@@ -22,9 +22,6 @@ class Params:
     # platform-dependent variables
     if USER == "uvb28bo":  # Jean Zay
         DATAROOT = Path("/lustre/fsn1/projects/rech/fsx/uvb28bo/data")
-        # elif '.cluster' in HOST: # mesocentre
-        #     DATAROOT = '/scratch/lperrinet/science/Deep_learning/data'
-        #     num_workers = 8
         batch_size: int = 64  # Set number of images per input batch
         num_workers: int = 4
         prefetch_factor: int = 4
@@ -33,13 +30,10 @@ class Params:
         batch_size: int = 128  # Set number of images per input batch
         num_workers: int = 4
         prefetch_factor: int = 0
-        # num_workers = 16
     elif "gaia" in HOST:  # MAC STUDIO
-        # batch_size = 512 # Set the batch size for training and validation
-        # num_workers = 2
         DATAROOT = Path.home() / "data" / "Imagenet"
-        batch_size: int = 512  # Set number of images per input batch
-        num_workers: int = 0
+        batch_size: int = 128  # Set number of images per input batch
+        num_workers: int = 4
         prefetch_factor: int = 0
     else:
         DATAROOT = Path.home() / "data" / "Imagenet"
@@ -73,7 +67,7 @@ class Params:
     # loss_name: str = 'NegLogitLoss'
     loss_name: str = "CrossEntropyLoss"
     base_lr: float = 1.0e-6
-    final_lr: float = 20.0e-9
+    final_lr: float = 10.0e-9
     num_warmup_epochs: int = 20
     delta1: float = 0.1
     delta2: float = 0.01
