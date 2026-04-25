@@ -66,7 +66,7 @@ class Params:
 
     # https://github.com/pytorch/vision/tree/main/references/classification#convnext
     # num_epochs: int = 1
-    num_epochs: int = 270
+    num_epochs: int = 290
     subset_factor: int = 1  # set for DEBUGging
     optimizer_name: str = "adamw"
     # loss_name: str = 'BCEWithLogitsLoss'
@@ -76,13 +76,12 @@ class Params:
     final_lr: float = 20.0e-9
     num_warmup_epochs: int = 20
     delta1: float = 0.1
-    delta2: float = 0.02
+    delta2: float = 0.01
     weight_decay: float = 0.001
     label_smoothing: float = 0.0003  # See https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html
     do_full_training: bool = True
     do_augment: bool = True
-    # augment_magnitude: int = 17
-    augment_proba: float = 0.80
+    augment_proba: float = 0.85
     # https://docs.pytorch.org/vision/main/generated/torchvision.ops.stochastic_depth.html#torchvision.ops.stochastic_depth
     stochastic_depth_prob: float = 0.6
 
