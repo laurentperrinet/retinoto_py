@@ -60,24 +60,24 @@ class Params:
 
     # https://github.com/pytorch/vision/tree/main/references/classification#convnext
     # num_epochs: int = 1
-    num_epochs: int = 290
+    num_epochs: int = 300
     subset_factor: int = 1  # set for DEBUGging
     optimizer_name: str = "adamw"
     # loss_name: str = 'BCEWithLogitsLoss'
     # loss_name: str = 'NegLogitLoss'
     loss_name: str = "CrossEntropyLoss"
     base_lr: float = 1.0e-6
-    final_lr: float = 10.0e-9
+    final_lr: float = 1.0e-9
     num_warmup_epochs: int = 20
-    delta1: float = 0.1
-    delta2: float = 0.01
-    weight_decay: float = 0.001
-    label_smoothing: float = 0.0003  # See https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html
+    delta1: float = 0.3
+    delta2: float = 0.002
+    weight_decay: float = 1.0e-4
+    label_smoothing: float = 5.0e-4  # See https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html
     do_full_training: bool = True
     do_augment: bool = True
     augment_proba: float = 0.85
     # https://docs.pytorch.org/vision/main/generated/torchvision.ops.stochastic_depth.html#torchvision.ops.stochastic_depth
-    stochastic_depth_prob: float = 0.6
+    stochastic_depth_prob: float = 0.45
 
     seed: int = 1998  # Set the seed for reproducibility
     shuffle: bool = True  # Whether to shuffle the data during training
