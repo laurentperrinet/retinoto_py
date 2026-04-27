@@ -33,7 +33,7 @@ class Params:
     elif "gaia" in HOST:  # MAC STUDIO
         DATAROOT = Path.home() / "data" / "Imagenet"
         batch_size: int = 128  # Set number of images per input batch
-        num_workers: int = 1
+        num_workers: int = 4
         prefetch_factor: int = 0
     else:
         DATAROOT = Path.home() / "data" / "Imagenet"
