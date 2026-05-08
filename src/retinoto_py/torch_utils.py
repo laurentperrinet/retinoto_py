@@ -356,7 +356,7 @@ def get_preprocess(args, do_full_preprocess=True, angle_min=None, angle_max=None
                 grid_polar = get_grid_hexagonal(args)
             else:
                 grid_polar = get_grid(args)
-            # grid_polar = grid_polar.to(device)
+            grid_polar = grid_polar.to(args.device)
             transform_list.append(transform_apply_grid(grid_polar, padding_mode=args.padding_mode, mode=mode))
         else:
             # transform_list.append(PadAndResize(args.image_size, interpolation=interpolation))

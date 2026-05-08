@@ -23,6 +23,7 @@ from .torch_utils import imshow, get_idx_to_label, get_label_to_idx
 from .torch_utils import get_loader, get_dataset, imgs_to_np, get_grid, transform_apply_grid
 from .torch_utils import load_model, count_parameters, count_layers, apply_weights
 from .torch_utils import make_mask, get_preprocess, TF, squarify, fixate
+from .retinoto_py import get_val_loader, get_train_loader
 from .retinoto_py import get_validation_accuracy, train_model, do_learning
 from .retinoto_py import get_positions, compute_likelihood_map
 #############################################################

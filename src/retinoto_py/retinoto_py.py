@@ -220,7 +220,7 @@ def train_model(args, train_loader, val_loader, df_train=None,
         loss_train = running_loss / i_image
         acc_train = running_corrects*1. / i_image
 
-        # validation on the ohter set
+        # validation on the other set
         acc_val = get_validation_accuracy(args, model, val_loader, leave=False)
 
         # save everything at each epoch
@@ -248,6 +248,18 @@ def train_model(args, train_loader, val_loader, df_train=None,
 
     return model, df_train
 
+def get_train_loader(args, dataset):
+    TRAIN_DATA_DIR = args.DATAROOT / f'Imagenet_{dataset}' / 'train'
+    train_dataset = get_dataset(args, TRAIN_DATA_DIR, do_augment=args.do_augment)
+    train_loader = get_loader(args, train_dataset)
+    return train_loader
+
+def get_val_loader(args, dataset):
+    VAL_DATA_DIR = args.DATAROOT / f'Imagenet_{dataset}' / 'val'
+    val_dataset = get_dataset(args, VAL_DATA_DIR, do_augment=False)
+    val_loader = get_loader(args, val_dataset)
+    return val_loader
+
 def do_learning(args, dataset, name):
 
     model_filename = args.data_cache / f'{name}.pth'
@@ -269,12 +281,8 @@ def do_learning(args, dataset, name):
     if should_resume_training:
         lock_filename.touch() # as we do a training, let's lock it
 
-        TRAIN_DATA_DIR = args.DATAROOT / f'Imagenet_{dataset}' / 'train'
-        train_dataset = get_dataset(args, TRAIN_DATA_DIR, do_augment=args.do_augment)
-        train_loader = get_loader(args, train_dataset)
-        VAL_DATA_DIR = args.DATAROOT / f'Imagenet_{dataset}' / 'val'
-        val_dataset = get_dataset(args, VAL_DATA_DIR, do_augment=False)
-        val_loader = get_loader(args, val_dataset)
+        train_loader = get_train_loader(args, dataset)
+        val_loader = get_val_loader(args, dataset)
 
         # we need to train the model or finish a training that already started
         print(f"Training model {args.model_name}, file= {model_filename} - image_size={args.image_size}")
@@ -318,6 +326,7 @@ def compute_likelihood_map(args, model, full_image,
                            size_ratio = 0.618, # how much of the image to use relative to radius
                            do_min_boxsize = False
                            ):
+    full_image = full_image.to(args.device)
 
     three, H, W = full_image.shape
     assert three == 3
@@ -332,7 +341,7 @@ def compute_likelihood_map(args, model, full_image,
     # box_size = min(())
     # args.image_size = box_size
     preprocess = get_preprocess(args, do_augment=False)
-    preprocess = preprocess.to(full_image.device)
+    preprocess = preprocess.to(args.device)
     # pil_image = TF.to_pil_image(full_image)
 
     N_fixations = len(pos_H)
@@ -341,7 +350,7 @@ def compute_likelihood_map(args, model, full_image,
     gaze_images = torch.empty((N_fixations, 3, args.image_size, args.image_size))
     for i_fixation, (h, w) in enumerate(zip(pos_H, pos_W)):
         h, w = int(h), int(w) 
-        image_fix = fixate(full_image, h, w, box_size)#.to(args.device)
+        image_fix = fixate(full_image, h, w, box_size).to(args.device)
         gaze_images[i_fixation, ...] = preprocess(image_fix)
 
     with torch.no_grad():
