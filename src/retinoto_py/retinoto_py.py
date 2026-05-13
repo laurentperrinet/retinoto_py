@@ -340,23 +340,23 @@ def compute_likelihood_map(args, model, full_image,
     # take a smaller box if the image is small
     # box_size = min(())
     # args.image_size = box_size
-    preprocess = get_preprocess(args, do_augment=False)
+    # preprocess = get_preprocess(args, do_augment=False)
     # preprocess = preprocess.to(args.device)
     # pil_image = TF.to_pil_image(full_image)
 
     N_fixations = len(pos_H)
     assert N_fixations == len(pos_W)
 
-    gaze_images = torch.empty((N_fixations, 3, args.grid_size_ecc, args.grid_size_ang))
+    gaze_images = torch.empty((N_fixations, 3, box_size, box_size))
     for i_fixation, (h, w) in enumerate(zip(pos_H, pos_W)):
         h, w = int(h), int(w) 
         image_fix = fixate(full_image, h, w, box_size)
-        gaze_images[i_fixation, ...] = preprocess(image_fix)
+        gaze_images[i_fixation, ...] = image_fix # preprocess(image_fix)
 
     with torch.no_grad():
         gaze_images = gaze_images.to(args.device)
         # TODO : make a decision on whether to use sigmoid or softmax depending
-        # probas = nnf.sigmoid(model(gaze_images))
-        probas = nnf.softmax(model(gaze_images), dim=1)
+        probas = nnf.sigmoid(model(gaze_images))
+        # probas = nnf.softmax(model(gaze_images), dim=1)
 
     return probas.cpu()
