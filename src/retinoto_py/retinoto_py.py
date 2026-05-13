@@ -128,10 +128,10 @@ def get_cosine_schedule_with_warmup(optimizer, num_warmup_epochs, num_epochs, re
 
 
 def train_model(args, train_loader, val_loader, df_train=None, 
-                model_filename=None, json_filename=None):
+                model_filename=None, json_filename=None, init_model_filename=None):
 
     # sets the model and optimizer
-    model = load_model(args)
+    model = load_model(args, model_filename=init_model_filename)
     model = model.to(args.device)
     optimizer = get_optimizer(args, model)
     scheduler = get_cosine_schedule_with_warmup(optimizer,
@@ -150,6 +150,7 @@ def train_model(args, train_loader, val_loader, df_train=None,
         model.load_state_dict(checkpoint['model_state_dict'])
         optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
         scheduler.load_state_dict(checkpoint['scheduler_state_dict'])
+
         df_train = df_train.copy()
         for _ in range(i_epoch_start):
             scheduler.step()
@@ -260,7 +261,7 @@ def get_val_loader(args, dataset):
     val_loader = get_loader(args, val_dataset)
     return val_loader
 
-def do_learning(args, dataset, name):
+def do_learning(args, dataset, name, init_model_filename=None):
 
     model_filename = args.data_cache / f'{name}.pth'
     json_filename = args.data_cache / f'{name}.json'
@@ -289,7 +290,7 @@ def do_learning(args, dataset, name):
 
         start_time = time.time()
         model_retrain, df_train = train_model(args,
-                                              train_loader, val_loader, df_train, model_filename, json_filename)
+                                              train_loader, val_loader, df_train, model_filename, json_filename, init_model_filename)
         elapsed_time = time.time() - start_time
         print(f"Training of {model_retrain} completed in {elapsed_time // 60:.0f}m {elapsed_time % 60:.0f}s")
 
