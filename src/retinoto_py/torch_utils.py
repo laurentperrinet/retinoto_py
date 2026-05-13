@@ -174,7 +174,7 @@ def fixate(image, h, w, box_size, padding_mode='reflect'):
     # Vérification de la taille
     assert box_padded.shape[1:] == (box_size, box_size), f"Expected {(box_size, box_size)}, got {box_padded.shape[1:]}"
 
-    return box_padded    
+    return box_padded
 
 # Prefer direct module import to avoid static analysis issues in some environments
 def get_grid(args):
@@ -312,24 +312,6 @@ def get_preprocess(args, do_full_preprocess=True, angle_min=None, angle_max=None
                     transforms.AutoAugment(transforms.AutoAugmentPolicy.IMAGENET, interpolation=interpolation)
                                        ], p=args.augment_proba)
                                 )
-
-        # # 3. Add ColorJitter BEFORE RandomGrayscale
-        # if do_augment:
-
-        #     # TODO: try transform_list.append(transforms.RandomRotation(degrees=(angle_min, angle_max), interpolation=interpolation))
-
-        #     transform_list.append(
-        #         transforms.RandomApply([
-        #             transforms.ColorJitter(
-        #                 brightness=(0.4, 1),
-        #                 contrast=(0.4, 1),
-        #                 saturation=0.4,
-        #                 hue=(-0.1, .1)
-        #             )], p=args.augment_proba))
-        #     # 3️⃣ RandomGrayscale – avec probabilité 0.2
-        #     #    - transforme l’image en niveaux de gris (R=G=B) pour forcer le
-        #     #      réseau à ne pas dépendre uniquement de la chrominance.
-        #     transform_list.append(transforms.RandomGrayscale(p=args.augment_proba))
 
         if do_augment:
             # RandomErasing should be applied AFTER normalization

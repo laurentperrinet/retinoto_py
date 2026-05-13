@@ -326,7 +326,7 @@ def compute_likelihood_map(args, model, full_image,
                            size_ratio = 0.618, # how much of the image to use relative to radius
                            do_min_boxsize = False
                            ):
-    full_image = full_image.to(args.device)
+    # full_image = full_image.to(args.device)
 
     three, H, W = full_image.shape
     assert three == 3
@@ -341,20 +341,21 @@ def compute_likelihood_map(args, model, full_image,
     # box_size = min(())
     # args.image_size = box_size
     preprocess = get_preprocess(args, do_augment=False)
-    preprocess = preprocess.to(args.device)
+    # preprocess = preprocess.to(args.device)
     # pil_image = TF.to_pil_image(full_image)
 
     N_fixations = len(pos_H)
     assert N_fixations == len(pos_W)
 
-    gaze_images = torch.empty((N_fixations, 3, args.image_size, args.image_size))
+    gaze_images = torch.empty((N_fixations, 3, args.grid_size_ecc, args.grid_size_ang))
     for i_fixation, (h, w) in enumerate(zip(pos_H, pos_W)):
         h, w = int(h), int(w) 
-        image_fix = fixate(full_image, h, w, box_size).to(args.device)
+        image_fix = fixate(full_image, h, w, box_size)
         gaze_images[i_fixation, ...] = preprocess(image_fix)
 
     with torch.no_grad():
         gaze_images = gaze_images.to(args.device)
+        # TODO : make a decision on whether to use sigmoid or softmax depending
         # probas = nnf.sigmoid(model(gaze_images))
         probas = nnf.softmax(model(gaze_images), dim=1)
 
