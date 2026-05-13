@@ -2,6 +2,7 @@
 # use it to install (and update) dependencies with
 # `pip install -U -r requirements.txt`
 pip
+# multiprocessing
 matplotlib
 opencv-python
 numpy
