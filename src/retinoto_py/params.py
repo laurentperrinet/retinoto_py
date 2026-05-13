@@ -94,9 +94,9 @@ class Params:
 
 #############################################################
 #############################################################
-all_model_names = ["resnet18", "resnet50", "resnet101"]
-all_model_names_ls = [":", "-.", "-"]
-all_model_names_color = ["blue", "blue", "blue"]
+all_rn_model_names = ["resnet18", "resnet50", "resnet101"]
+all_rn_model_names_ls = [":", "-.", "-"]
+all_rn_model_names_color = ["blue", "blue", "blue"]
 all_cn_model_names = ["convnext_tiny", "convnext_small", "convnext_base", "convnext_large"]
 all_cn_model_names_color = ["blue", "blue", "blue"]
 all_cn_model_names_ls = [":", "-.", "-"]
