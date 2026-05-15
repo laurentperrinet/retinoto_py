@@ -325,7 +325,7 @@ def get_positions(H, W, resolution=(15, 15), endpoint=False, do_hex=True):
 def compute_likelihood_map(args, model, full_image,
                            pos_H, pos_W,
                            size_ratio = 0.618, # how much of the image to use relative to radius
-                           do_min_boxsize = False
+                           do_min_boxsize = False, do_softmax=True
                            ):
     # full_image = full_image.to(args.device)
 
@@ -341,23 +341,25 @@ def compute_likelihood_map(args, model, full_image,
     # take a smaller box if the image is small
     # box_size = min(())
     # args.image_size = box_size
-    # preprocess = get_preprocess(args, do_augment=False)
-    # preprocess = preprocess.to(args.device)
-    # pil_image = TF.to_pil_image(full_image)
+    preprocess = get_preprocess(args, do_augment=False)
 
     N_fixations = len(pos_H)
+    # first, collect regular images centered on the fixation points
     assert N_fixations == len(pos_W)
-
     gaze_images = torch.empty((N_fixations, 3, box_size, box_size))
     for i_fixation, (h, w) in enumerate(zip(pos_H, pos_W)):
-        h, w = int(h), int(w) 
+        h, w = int(h), int(w)
         image_fix = fixate(full_image, h, w, box_size)
-        gaze_images[i_fixation, ...] = image_fix # preprocess(image_fix)
+        gaze_images[i_fixation, ...] = image_fix
 
+    # preprocess the gaze images (resizing, cropping, normalizing) and project on the retina
+    gaze_image_preprocessed = preprocess(gaze_images)
+
+    # finally, do the inference on the model to get the likelihood map
     with torch.no_grad():
-        gaze_images = gaze_images.to(args.device)
-        # TODO : make a decision on whether to use sigmoid or softmax depending
-        probas = nnf.sigmoid(model(gaze_images))
-        # probas = nnf.softmax(model(gaze_images), dim=1)
-
+        gaze_image_preprocessed = gaze_image_preprocessed.to(args.device)
+        if do_softmax:
+            probas = nnf.softmax(model(gaze_image_preprocessed), dim=1)
+        else:
+            probas = nnf.sigmoid(model(gaze_image_preprocessed))
     return probas.cpu()

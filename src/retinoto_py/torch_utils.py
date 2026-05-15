@@ -242,12 +242,28 @@ class transform_apply_grid:
         self.mode = mode
 
     def __call__(self, images):
-        result =  nnf.grid_sample(images.unsqueeze(dim=0),
-                                  self.grid.unsqueeze(dim=0),
-                                  padding_mode=self.padding_mode, align_corners=True,
-                                  mode=self.mode)
-        return result.squeeze(0)
-
+        # Handle both single images and batches
+        if len(images.shape) == 3:  # Single image [C, H, W]
+            result = nnf.grid_sample(
+                images.unsqueeze(dim=0),  # [1, C, H, W]
+                self.grid.unsqueeze(dim=0),  # [1, H, W, 2]
+                padding_mode=self.padding_mode,
+                align_corners=True,
+                mode=self.mode
+            )
+            return result.squeeze(0)  # [C, H, W]
+        else:  # Batch of images [N, C, H, W]
+            # Expand grid to match batch size
+            batch_size = images.shape[0]
+            expanded_grid = self.grid.expand(batch_size, *self.grid.shape)
+            result = nnf.grid_sample(
+                images,  # [N, C, H, W]
+                expanded_grid,  # [N, H, W, 2]
+                padding_mode=self.padding_mode,
+                align_corners=True,
+                mode=self.mode
+            )
+            return result  # [N, C, H, W]
 
 def get_preprocess(args, do_full_preprocess=True, angle_min=None, angle_max=None, 
                    interpolation=InterpolationMode.BILINEAR, mode='bilinear', do_augment=None):
@@ -270,10 +286,6 @@ def get_preprocess(args, do_full_preprocess=True, angle_min=None, angle_max=None
     # This includes resizing, cropping, and normalizing.
     transform_list = []
 
-    # transform_list.append(transforms.Resize(args.image_size, interpolation=interpolation, antialias=True))
-    # transform_list.append(transforms.CenterCrop((args.image_size, args.image_size)))
-
-    # transform_list.append(transforms.ToTensor())
     transform_list.append(transforms.ToImage())
     transform_list.append(transforms.ToDtype(torch.float32, scale=True))
 
@@ -333,7 +345,6 @@ def get_preprocess(args, do_full_preprocess=True, angle_min=None, angle_max=None
 
         if args.do_fovea: # apply log-polar mapping to the image
             # Choose between regular or hexagonal grid
-            # Priority: explicit parameter > args setting > default (False)
             if args.use_hexagonal_grid:
                 grid_polar = get_grid_hexagonal(args)
             else:
@@ -365,13 +376,16 @@ def _core_dataset(ds):
         ds = ds.dataset
     return ds
 
-is_valid_file = lambda p: p.lower().endswith(('.png', '.jpg', '.jpeg'))
+def is_valid_file(p):
+    return p.lower().endswith(('.png', '.jpg', '.jpeg'))
 
 def get_dataset(args, DATA_DIR, do_full_preprocess=True, angle_min=None, angle_max=None, do_augment=None):
-    
+
     # defines preprocessing from the raw image to the input to the network
-    preprocess = get_preprocess(args, do_full_preprocess=do_full_preprocess, angle_min=angle_min, angle_max=angle_max, do_augment=do_augment)
-    
+    preprocess = get_preprocess(args, do_full_preprocess=do_full_preprocess,
+                                angle_min=angle_min, angle_max=angle_max,
+                                do_augment=do_augment)
+
     # --- 2. Create Dataset and DataLoader using ImageFolder ---
     # ImageFolder automatically infers class names from directory names
     # and maps them to integer indices.
@@ -506,11 +520,11 @@ def imgs_to_np(img_list, im_mean=im_mean, im_std=im_std, nrow=11):
     inp = np.clip(inp, 0, 1)
     return(inp)
 
-from .utils import savefig
-def imshow(img_list, nrow=11, im_mean=im_mean, im_std=im_std, 
-           title=None, fig_height=7., fig=None, ax=None, 
+# from .utils import savefig
+def imshow(img_list, nrow=11, im_mean=im_mean, im_std=im_std,
+           title=None, fig_height=7., fig=None, ax=None,
            fontsize=14):
-    
+
     if ax is None:
         fig, ax = plt.subplots(figsize=(fig_height*len(img_list), fig_height))
 
