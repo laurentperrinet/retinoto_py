@@ -23,8 +23,8 @@ class Params:
     if USER == "uvb28bo":  # Jean Zay
         DATAROOT = Path("/lustre/fsn1/projects/rech/fsx/uvb28bo/data")
         batch_size: int = 64  # Set number of images per input batch
-        num_workers: int = 4
-        prefetch_factor: int = 4
+        num_workers: int = 8
+        prefetch_factor: int = 1
     elif "m-gpu" in HOST:  # MESONET
         DATAROOT = Path.home() / "data" / "Imagenet"
         batch_size: int = 128  # Set number of images per input batch
