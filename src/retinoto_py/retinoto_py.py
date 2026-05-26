@@ -140,10 +140,12 @@ def train_model(args, train_loader, val_loader, df_train=None,
     # the DataFrame to record from
     if df_train is None:
         i_epoch_start = 0
+        total_image = 0
         if args.verbose: print("Starting learning...")
     else:
         i_epoch_start = df_train['epoch'].max() + 1
-        if args.verbose: print(f"Starting from epoch {i_epoch_start} with {len(df_train)} records")
+        total_image = df_train['total_image'].tail(1).item()
+        if args.verbose: print(f"Starting from epoch {i_epoch_start} with {len(df_train)} records and {total_image} images already seen...")
         # checkpoint = torch.load(model_filename)
         checkpoint = torch.load(model_filename, map_location=torch.device(args.device), weights_only=False)
 
@@ -182,7 +184,6 @@ def train_model(args, train_loader, val_loader, df_train=None,
         criterion = nn.BCEWithLogitsLoss(reduction='mean')
 
     since = time.time()
-    total_image = 0
     num_classes = len(train_loader.dataset.classes)
     outer_progress = tqdm(range(i_epoch_start, args.num_epochs), desc="Epochs",
                           leave=True, disable=((args.num_epochs-i_epoch_start)==1))
