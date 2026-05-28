@@ -196,7 +196,7 @@ def plot_model_comparison(results, model_names, datasets, do_masks=[True, False]
     # plt.show()
     return fig, axes
 
-def savefig(fig, name, exts=['pdf', 'png'], figures_folder=Path('figures'), opts_savefig = dict(bbox_inches='tight', pad_inches=0.1, edgecolor=None)):
+def savefig(fig, name, exts=['pdf', 'png', 'svg'], figures_folder=Path('figures'), opts_savefig = dict(bbox_inches='tight', pad_inches=0.1, edgecolor=None)):
     for ext in exts:
         fig.savefig(figures_folder / f'{name}.{ext}', **opts_savefig)
 
