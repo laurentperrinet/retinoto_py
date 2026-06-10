@@ -133,7 +133,7 @@ def squarify(image):
     image = transform(image.unsqueeze(0))
     return image.squeeze(0)
 
-def fixate(image, h, w, box_size, padding_mode='reflect'):
+def fixate(image, h, w, box_size, angle=0, padding_mode='reflect'):
     three, H, W = image.shape
     assert three == 3
     assert 0 <= h < H
@@ -150,6 +150,12 @@ def fixate(image, h, w, box_size, padding_mode='reflect'):
     # Calcul du padding nécessaire pour atteindre (box_size, box_size)
     current_height = h_max - h_min
     current_width = w_max - w_min
+
+    # Padding à gauche/droite et haut/bas
+    pad_left = max(radius_minus - (w - w_min), 0)
+    # pad_right = max(radius_plus - (w_max - w), 0)
+    pad_top = max(radius_minus - (h - h_min), 0)
+    # pad_bottom = max(radius_plus - (h_max - h), 0)
 
     # Correction pour garantir box_size x box_size
     total_pad_width = box_size - current_width
