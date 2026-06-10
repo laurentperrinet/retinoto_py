@@ -151,12 +151,6 @@ def fixate(image, h, w, box_size, padding_mode='reflect'):
     current_height = h_max - h_min
     current_width = w_max - w_min
 
-    # Padding à gauche/droite et haut/bas
-    pad_left = max(radius_minus - (w - w_min), 0)
-    pad_right = max(radius_plus - (w_max - w), 0)
-    pad_top = max(radius_minus - (h - h_min), 0)
-    pad_bottom = max(radius_plus - (h_max - h), 0)
-
     # Correction pour garantir box_size x box_size
     total_pad_width = box_size - current_width
     total_pad_height = box_size - current_height
