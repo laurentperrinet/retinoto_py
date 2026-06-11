@@ -324,7 +324,7 @@ def get_positions(H, W, resolution=(15, 15), endpoint=False, do_hex=True):
     return pos_H, pos_W
 
 def compute_likelihood_map(args, model, full_image,
-                           pos_H, pos_W,
+                           pos_H, pos_W, angle=0,
                            size_ratio = 0.618, # how much of the image to use relative to radius
                            do_min_boxsize = False, do_softmax=True
                            ):
@@ -350,7 +350,7 @@ def compute_likelihood_map(args, model, full_image,
     gaze_images = torch.empty((N_fixations, 3, box_size, box_size))
     for i_fixation, (h, w) in enumerate(zip(pos_H, pos_W)):
         h, w = int(h), int(w)
-        image_fix = fixate(full_image, h, w, box_size)
+        image_fix = fixate(full_image, h, w, box_size, angle=angle)
         gaze_images[i_fixation, ...] = image_fix
 
     # preprocess the gaze images (resizing, cropping, normalizing) and project on the retina
@@ -360,6 +360,7 @@ def compute_likelihood_map(args, model, full_image,
     with torch.no_grad():
         gaze_image_preprocessed = gaze_image_preprocessed.to(args.device)
         if do_softmax:
+            # as we wish to find the object a softmax will penalize the other classes and make the likelihood map more sparse, while a sigmoid will give more weight to all the classes that are present in the image
             probas = nnf.softmax(model(gaze_image_preprocessed), dim=1)
         else:
             probas = nnf.sigmoid(model(gaze_image_preprocessed))

@@ -133,13 +133,30 @@ def squarify(image):
     image = transform(image.unsqueeze(0))
     return image.squeeze(0)
 
-def fixate(image, h, w, box_size, angle=0, padding_mode='reflect'):
+from torchvision.transforms import ToPILImage, ToTensor
+def fixate(image, h, w, box_size, angle=0., padding_mode='reflect'):
     three, H, W = image.shape
     assert three == 3
     assert 0 <= h < H
     assert 0 <= w < W
     # assert box_size <= H
     # assert box_size <= W
+
+    # Apply rotation around the fixation point (h, w) if angle != 0
+    if angle != 0:
+        # Convert to PIL for rotation (easier to handle)
+        if isinstance(image, torch.Tensor):
+            
+            to_pil = ToPILImage()
+            to_tensor = ToTensor()
+            pil_image = to_pil(image)
+            
+            # Rotate around the center (h, w) - need to translate first
+            # angle: degrees (positive = counter-clockwise, negative = clockwise)
+            pil_image = TF.rotate(pil_image, angle, center=(w, h), fill=0)
+            
+            # Convert back to tensor
+            image = to_tensor(pil_image)
 
     radius_minus, radius_plus = box_size//2, box_size-box_size//2
 
