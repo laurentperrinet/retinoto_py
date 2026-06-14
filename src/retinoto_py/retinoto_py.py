@@ -278,7 +278,7 @@ def do_learning(args, dataset, name, init_model_filename=None):
         df_train = pd.read_json(json_filename, orient='records')
         print(f"{model_filename}: latest accuracy = {df_train.tail(1)['acc_val'].item():.3f}")
         # resume learning if we still have some epochs to run
-        should_resume_training = (df_train['epoch'].max() + 1 < args.num_epochs)
+        # should_resume_training = (df_train['epoch'].max() + 1 < args.num_epochs)
 
     if should_resume_training:
         lock_filename.touch() # as we do a training, let's lock it
