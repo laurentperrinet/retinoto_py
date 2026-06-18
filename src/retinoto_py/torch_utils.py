@@ -124,10 +124,10 @@ def squarify(image):
     pad_height = (square_image_size - H) // 2
     pad_width = (square_image_size - W) // 2
 
-    # If a sequence of length 4 is provided
-    #     this is the padding for the left, top, right and bottom borders respectively.
-    transform = transforms.Pad((pad_width, 
-                                pad_height, 
+    # If a sequence of length 4 is provided this is the padding
+    # for the left, top, right and bottom borders respectively.
+    transform = transforms.Pad((pad_width,
+                                pad_height,
                                 square_image_size - W - pad_width, 
                                 square_image_size - H - pad_height), padding_mode='reflect')
     image = transform(image.unsqueeze(0))
@@ -137,8 +137,8 @@ from torchvision.transforms import ToPILImage, ToTensor
 def fixate(image, h, w, box_size, angle=0., padding_mode='reflect'):
     three, H, W = image.shape
     assert three == 3
-    assert 0 <= h < H
-    assert 0 <= w < W
+    assert 0 <= h <= H
+    assert 0 <= w <= W
     # assert box_size <= H
     # assert box_size <= W
 
@@ -309,33 +309,9 @@ def get_preprocess(args, do_full_preprocess=True, angle_min=None, angle_max=None
     if do_full_preprocess:
 
         if do_augment:
-            # transform_list.append(transforms.RandomHorizontalFlip())
-
-            # ----- Augmentations spécifiques au training -----
-            # 1. RandAugment
-            # https://docs.pytorch.org/vision/main/generated/torchvision.transforms.v2.RandAugment.html#torchvision.transforms.v2.RandAugment
-            # --------------------------------------------------------------
-            #  Bloc d’augmentations « full preprocess » (activé seulement
-            #  pendant l’entraînement).  Toutes les opérations ci‑dessous
-            #  conservent la résolution de l’image (pas de crop ou de zoom)
-            #  puisqu’on a déjà fixé la taille avec `Resize` plus haut.
-            # --------------------------------------------------------------
-
-            # 1️⃣ RandAugment – applique N opérations de façon aléatoire
-            #    parmi le catalogue torchvision (rotation, shear, contrast, …)
-            #    * num_ops=2  →  deux opérations sont composées pour chaque image
-            #    * magnitude=9 → intensité élevée (0‑30 ° de rotation, forte
-            #      contraste, etc.) mais toujours dans les limites du même shape
-            #    * interpolation=interpolation → on passe le même mode d’interpolation
-            #      qui a été utilisé pour les éventuelles rotations précédentes
-            # transform_list.append(
-            #     transforms.RandAugment(
-            #         num_ops=2,
-            #         magnitude=args.augment_magnitude,
-            #         interpolation=interpolation
-            #     )
-            # )
-            # FIX RandAugment contains translations, while there are none with AutoAugment with the IMAGENET policy 
+            transform_list.append(transforms.RandomHorizontalFlip())
+            # AutoAugment
+            # https://docs.pytorch.org/vision/main/generated/torchvision.transforms.v2.AutoAugment.html#torchvision.transforms.v2.AutoAugment
             transform_list.append(
                 transforms.RandomApply([
                     transforms.AutoAugment(transforms.AutoAugmentPolicy.IMAGENET, interpolation=interpolation)

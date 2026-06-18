@@ -299,9 +299,9 @@ def do_learning(args, dataset, name, init_model_filename=None):
     return model_filename, json_filename
 
 
-def get_positions(H, W, resolution=(15, 15), endpoint=False, do_hex=True):
+def get_positions(H, W, resolution=(15, 15), endpoints=False, do_hex=True):
 
-    if endpoint:
+    if endpoints:
         pos_h = np.linspace(0, H, resolution[0], endpoint=True)
         pos_w = np.linspace(0, W, resolution[1], endpoint=True)
     else:
@@ -311,7 +311,7 @@ def get_positions(H, W, resolution=(15, 15), endpoint=False, do_hex=True):
     pos_H, pos_W = np.meshgrid(pos_h, pos_w)
 
     if do_hex:
-        if H<W:
+        if resolution[0]<=resolution[1]:
             delta = (pos_h[1]-pos_h[0])/4
             pos_H[::2] += delta
             pos_H[1::2] -= delta
@@ -325,8 +325,8 @@ def get_positions(H, W, resolution=(15, 15), endpoint=False, do_hex=True):
 
 def compute_likelihood_map(args, model, full_image,
                            pos_H, pos_W, angle=0,
-                           size_ratio = 0.618, # how much of the image to use relative to radius
-                           do_min_boxsize = False, do_softmax=True
+                           size_ratio=0.618, # how much of the image to use relative to radius
+                           do_min_boxsize=False, do_softmax=True
                            ):
     # full_image = full_image.to(args.device)
 
@@ -359,9 +359,11 @@ def compute_likelihood_map(args, model, full_image,
     # finally, do the inference on the model to get the likelihood map
     with torch.no_grad():
         gaze_image_preprocessed = gaze_image_preprocessed.to(args.device)
+        output_logits = model(gaze_image_preprocessed)
         if do_softmax:
-            # as we wish to find the object a softmax will penalize the other classes and make the likelihood map more sparse, while a sigmoid will give more weight to all the classes that are present in the image
-            probas = nnf.softmax(model(gaze_image_preprocessed), dim=1)
+            # as we wish to find the center of the object, a softmax will penalize objects from other classes and make the likelihood map more sparse, ...
+            probas = nnf.softmax(output_logits, dim=1)
         else:
-            probas = nnf.sigmoid(model(gaze_image_preprocessed))
+            # ... while a sigmoid will give more weight to all the classes that are present in the image
+            probas = nnf.sigmoid(output_logits)
     return probas.cpu()
