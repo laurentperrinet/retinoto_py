@@ -142,27 +142,11 @@ def fixate(image, h, w, box_size, angle=0., padding_mode='reflect'):
     # assert box_size <= H
     # assert box_size <= W
 
-    # Apply rotation around the fixation point (h, w) if angle != 0
-    if angle != 0:
-        # Convert to PIL for rotation (easier to handle)
-        if isinstance(image, torch.Tensor):
-            
-            to_pil = ToPILImage()
-            to_tensor = ToTensor()
-            pil_image = to_pil(image)
-            
-            # Rotate around the center (h, w) - need to translate first
-            # angle: degrees (positive = counter-clockwise, negative = clockwise)
-            pil_image = TF.rotate(pil_image, angle, center=(w, h), fill=0)
-            
-            # Convert back to tensor
-            image = to_tensor(pil_image)
-
     radius_minus, radius_plus = box_size//2, box_size-box_size//2
 
     h_min, h_max = max((0, h-radius_minus)), min((h+radius_plus, H))
     w_min, w_max = max((0, w-radius_minus)), min((w+radius_plus, W))
-    box = image[:, h_min:h_max, w_min:w_max]
+    crop = image[:, h_min:h_max, w_min:w_max]
 
     # Calcul du padding nécessaire pour atteindre (box_size, box_size)
     current_height = h_max - h_min
@@ -186,12 +170,35 @@ def fixate(image, h, w, box_size, angle=0., padding_mode='reflect'):
 
     # padding for the left, top, right and bottom borders
     transform = transforms.Pad((pad_left, pad_top, pad_right, pad_bottom), padding_mode=padding_mode)
-    box_padded = transform(box)
+    crop_padded = transform(crop)
 
     # Vérification de la taille
-    assert box_padded.shape[1:] == (box_size, box_size), f"Expected {(box_size, box_size)}, got {box_padded.shape[1:]}"
+    assert crop_padded.shape[1:] == (box_size, box_size), f"Expected {(box_size, box_size)}, got {crop_padded.shape[1:]}"
 
-    return box_padded
+    # Apply rotation around the the middle of the box if angle != 0
+    if angle != 0:
+        if angle == 180:
+            # crop_padded = crop_padded[:, ::-1, ::-1]  # Flip both vertically and horizontally
+            crop_padded = torch.rot90(crop_padded, k=2, dims=(1, 2))
+        elif angle == 90:
+            crop_padded = torch.rot90(crop_padded, k=3, dims=(1, 2))
+        elif angle == 270:
+            crop_padded = torch.rot90(crop_padded, k=1, dims=(1, 2)) 
+        else:
+            if isinstance(image, torch.Tensor):
+                # Convert to PIL for rotation (easier to handle)
+                to_pil = ToPILImage()
+                to_tensor = ToTensor()
+                pil_image = to_pil(crop_padded)
+                
+                # Rotate around the center (h, w) - need to translate first
+                # angle: degrees (positive = counter-clockwise, negative = clockwise)
+                pil_image = TF.rotate(pil_image, angle, center=(box_size/2, box_size/2), fill=0)
+                
+                # Convert back to tensor
+                crop_padded = to_tensor(pil_image)
+
+    return crop_padded
 
 # Prefer direct module import to avoid static analysis issues in some environments
 def get_grid(args):

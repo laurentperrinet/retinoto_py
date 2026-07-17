@@ -324,16 +324,14 @@ def get_positions(H, W, resolution=(15, 15), endpoints=False, do_hex=True):
     return pos_H, pos_W
 
 def compute_likelihood_map(args, model, full_image,
-                           pos_H, pos_W, angle=0,
-                           size_ratio=0.618, # how much of the image to use relative to radius
+                           pos_H, pos_W, padding_mode='reflect', angle=0,
+                           size_ratio=1.,
                            do_min_boxsize=False, do_softmax=True
                            ):
-    # full_image = full_image.to(args.device)
 
     three, H, W = full_image.shape
     assert three == 3
     if do_min_boxsize:
-        # max_size = np.max((H, W))
         min_size = np.min((H, W))
         box_size = int(min_size*size_ratio)
     else:
@@ -350,7 +348,7 @@ def compute_likelihood_map(args, model, full_image,
     gaze_images = torch.empty((N_fixations, 3, box_size, box_size))
     for i_fixation, (h, w) in enumerate(zip(pos_H, pos_W)):
         h, w = int(h), int(w)
-        image_fix = fixate(full_image, h, w, box_size, angle=angle)
+        image_fix = fixate(full_image, h, w, box_size, angle=angle, padding_mode=padding_mode)
         gaze_images[i_fixation, ...] = image_fix
 
     # preprocess the gaze images (resizing, cropping, normalizing) and project on the retina
