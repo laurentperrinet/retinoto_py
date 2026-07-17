@@ -137,8 +137,8 @@ from torchvision.transforms import ToPILImage, ToTensor
 def fixate(image, h, w, box_size, angle=0., padding_mode='reflect'):
     three, H, W = image.shape
     assert three == 3
-    assert 0 <= h <= H
-    assert 0 <= w <= W
+    # assert 0 <= h <= H
+    # assert 0 <= w <= W
     # assert box_size <= H
     # assert box_size <= W
 
