@@ -142,35 +142,52 @@ def fixate(image, h, w, box_size, angle=0., padding_mode='reflect'):
     # assert box_size <= H
     # assert box_size <= W
 
-    radius_minus, radius_plus = box_size//2, box_size-box_size//2
 
-    h_min, h_max = max((0, h-radius_minus)), min((h+radius_plus, H))
-    w_min, w_max = max((0, w-radius_minus)), min((w+radius_plus, W))
-    crop = image[:, h_min:h_max, w_min:w_max]
+    r0, r1 = box_size//2, box_size-box_size//2
 
-    # Calcul du padding nécessaire pour atteindre (box_size, box_size)
-    current_height = h_max - h_min
-    current_width = w_max - w_min
+    if False: # OLD method = crop then pad
+        h_min, h_max = max((0, h-r0)), min((h+r1, H))
+        w_min, w_max = max((0, w-r0)), min((w+r1, W))
+        crop = image[:, h_min:h_max, w_min:w_max]
 
-    # Padding à gauche/droite et haut/bas
-    pad_left = max(radius_minus - (w - w_min), 0)
-    # pad_right = max(radius_plus - (w_max - w), 0)
-    pad_top = max(radius_minus - (h - h_min), 0)
-    # pad_bottom = max(radius_plus - (h_max - h), 0)
+        # Calcul du padding nécessaire pour atteindre (box_size, box_size)
+        current_height = h_max - h_min
+        current_width = w_max - w_min
 
-    # Correction pour garantir box_size x box_size
-    total_pad_width = box_size - current_width
-    total_pad_height = box_size - current_height
+        # Padding à gauche/droite et haut/bas
+        pad_left = max(r0 - (w - w_min), 0)
+        # pad_right = max(r1 - (w_max - w), 0)
+        pad_top = max(r0 - (h - h_min), 0)
+        # pad_bottom = max(r1 - (h_max - h), 0)
 
-    # Répartition du padding
-    pad_left = max(pad_left, 0)
-    pad_right = max(total_pad_width - pad_left, 0)
-    pad_top = max(pad_top, 0)
-    pad_bottom = max(total_pad_height - pad_top, 0)
+        # Correction pour garantir box_size x box_size
+        total_pad_width = box_size - current_width
+        total_pad_height = box_size - current_height
 
-    # padding for the left, top, right and bottom borders
-    transform = transforms.Pad((pad_left, pad_top, pad_right, pad_bottom), padding_mode=padding_mode)
-    crop_padded = transform(crop)
+        # Répartition du padding
+        pad_left = max(pad_left, 0)
+        pad_right = max(total_pad_width - pad_left, 0)
+        pad_top = max(pad_top, 0)
+        pad_bottom = max(total_pad_height - pad_top, 0)
+
+        # padding for the left, top, right and bottom borders
+        transform = transforms.Pad((pad_left, pad_top, pad_right, pad_bottom), padding_mode=padding_mode)
+        crop_padded = transform(crop)
+    else: # NEW method = pad then crop  
+        # Pad once, then crop once
+        pad_left, pad_top, pad_right, pad_bottom = r0, r0, r1, r1
+        # reflect requires each pad < corresponding input dim
+        safe_mode = (padding_mode == 'reflect' and (pad_left >= W or pad_right >= W or pad_top >= H or pad_bottom >= H))
+        image_pad = transforms.Pad(
+            (pad_left, pad_top, pad_right, pad_bottom),
+            padding_mode='replicate' if safe_mode else padding_mode
+        )(image.unsqueeze(0)).squeeze(0)
+
+        # Shift center because of padding
+        hp, wp = h + pad_top, w + pad_left
+
+        # Fixed-size crop: always [box_size, box_size]
+        crop_padded = image_pad[:, (hp - r0):(hp + r1), (wp - r0):(wp + r1)]
 
     # Vérification de la taille
     assert crop_padded.shape[1:] == (box_size, box_size), f"Expected {(box_size, box_size)}, got {crop_padded.shape[1:]}"
