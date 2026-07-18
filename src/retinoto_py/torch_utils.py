@@ -193,7 +193,7 @@ def fixate(image, h, w, box_size, angle=0., padding_mode='reflect'):
         # reflect requires each pad < corresponding input dim
         use_mode = padding_mode
         if padding_mode == 'reflect' and (pad_left >= W or pad_right >= W or pad_top >= H or pad_bottom >= H):
-            use_mode = 'replicate'
+            use_mode = 'constant'
 
         image_pad = transforms.Pad(
             (pad_left, pad_top, pad_right, pad_bottom),
