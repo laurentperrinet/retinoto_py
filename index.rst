@@ -8,13 +8,10 @@ Retinotopy is an open-source Python package for applying spatial transformations
 .. toctree::
    :maxdepth: 2
    :caption: Getting Started
-
-   installation.md
-   usage.md
-   index.ipynb
-
-
-.. _tutorials-section:
+ 
+ 
+ 
+ .. _tutorials-section:
 
 Tutorials & Examples
 --------------------
