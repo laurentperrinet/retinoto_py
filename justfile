@@ -41,6 +41,31 @@ build:
     rm -rf dist
     uv build
 
+# Install dependencies needed locally to reproduce RTD's exact doc build (sphinx + nbsphinx)
+doc-install-deps:
+    @echo "Installing Sphinx + nbsphinx deps..."
+    uv pip install sphinx myst-nb nbsphinx ruff[python]
+
+# Build HTML docs locally (same command RTD would run)
+doc-build-html:
+    @echo "Building documentation to _build/html/ ..."
+    sphinx-build -b html . _build/html
+
+# Clean the doc build outputs
+doc-clean:
+    rm -rf _build
+
+# Run all document commands in sequence - clean, then install deps, then build (same as RTD does)
+doc:
+    @echo "Reproducing RTD's docs build locally..."
+    $(MAKE) doc-clean
+    $(MAKE) doc-install-deps
+    $(MAKE) doc-build-html
+
+# Run HTML linkcheck without rebuilding - useful for verifying internal links
+doc-linkcheck:
+    sphinx-build -b linkcheck . _build/linkcheck
+
 VERSION := `grep -m1 '^version' pyproject.toml | sed -E 's/version = "(.*)"/\1/'`
 
 # Print the current version of the project

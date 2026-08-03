@@ -1,35 +1,21 @@
 # Read the Docs configuration file for Sphinx projects
 # See https://docs.readthedocs.io/en/stable/config-file/v2.html for details
 
-# Required
 version: 2
 
-# Set the OS, Python version and other tools you might need
+# Set the OS and Python version used to build docs on RTD servers.
 build:
   os: ubuntu-24.04
   tools:
     python: "3.12"
-    # You can also specify other tool versions:
-    # nodejs: "20"
-    # rust: "1.70"
-    # golang: "1.20"
 
-# Build documentation in the "docs/" directory with Sphinx
+# Install our doc deps alongside the project so sphinx builds succeed.
+python:
+  install:
+    - method: pip
+      path: .                     # installs retinoto_py itself so autodoc can find it
+    - requirements: docs/requirements.txt   # Sphinx + myst-nb + nbsphinx go here
+
+# Tell RTD where conf.py sits — repo root (no docs/ subdir now).
 sphinx:
-  configuration: docs/pelicanconf.py
-  # You can configure Sphinx to use a different builder, for instance use the dirhtml builder for simpler URLs
-  # builder: "dirhtml"
-  # Fail on all warnings to avoid broken references
-  # fail_on_warning: true
-
-# Optionally build your docs in additional formats such as PDF and ePub
-# formats:
-#   - pdf
-#   - epub
-
-# Optional but recommended, declare the Python requirements required
-# to build your documentation
-# See https://docs.readthedocs.io/en/stable/guides/reproducible-builds.html
-# python:
-#   install:
-#     - requirements: docs/requirements.txt
+  configuration: conf.py          # <-- repo-root Sphinx config replaces pelicanconf
