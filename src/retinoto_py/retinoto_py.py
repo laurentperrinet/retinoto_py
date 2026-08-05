@@ -206,7 +206,7 @@ def train_model(args, train_loader, val_loader, df_train=None,
 
             if args.loss_name=='BCEWithLogitsLoss':
                 true_idxs_onehot = nnf.one_hot(true_idxs, num_classes=num_classes).float()
-                true_idxs_onehot = args.true_idx_smoothing/num_classes + (1-args.label_smoothing)*true_idxs_onehot
+                # true_idxs_onehot = args.true_idx_smoothing/num_classes + (1-args.label_smoothing)*true_idxs_onehot
                 loss = criterion(outputs, true_idxs_onehot)
             else:
                 loss = criterion(outputs, true_idxs)
