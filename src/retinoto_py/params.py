@@ -21,7 +21,7 @@ HOST = platform.uname()[1]
 class Params:
     # platform-dependent variables
     if USER == "uvb28bo":  # Jean Zay
-        DATAROOT = Path("/lustre/fsn1/projects/rech/fsx/uvb28bo/data")
+        DATAROOT = Path("/lustre/fsn1/projects/rech/fsx/uvb28bo") / "data"
         batch_size: int = 64  # Set number of images per input batch
         num_workers: int = 8
         prefetch_factor: int = 1
@@ -31,7 +31,7 @@ class Params:
         num_workers: int = 4
         prefetch_factor: int = 0
     elif "gaia" in HOST:  # MAC STUDIO
-        DATAROOT = Path.home() / "data" / "Imagenet"
+        DATAROOT = Path("/Volumes/SSD1TO") / "data" / "Imagenet"
         batch_size: int = 128  # Set number of images per input batch
         num_workers: int = 0
         prefetch_factor: int = 0
