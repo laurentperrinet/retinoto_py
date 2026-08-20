@@ -50,7 +50,7 @@ class Params:
     rs_min: float = -3.50  # Set minimum radius of the log-polar grid
     rs_max: float = 0.70  # Set maximum radius of the log-polar grid
     angle_start: float = - 5 / 3 * np.pi  # Set the intial angle for the grid
-    angle_margin: float =  3 / grid_size_ang * np.pi  # Set a margin angle to wrap the circle
+    angle_margin: float =  1 / grid_size_ang * np.pi  # Set a margin angle to wrap the circle
     mode: str = "bilinear"
     padding_mode: str = "zeros"
     # padding_mode: str = "border"
@@ -62,22 +62,22 @@ class Params:
     # num_epochs: int = 1
     num_epochs: int = 20
     subset_factor: int = 1  # set for DEBUGging
-    optimizer_name: str = "rmsprop"
+    optimizer_name: str = "adamw"
     # loss_name: str = 'BCEWithLogitsLoss'
     # loss_name: str = 'NegLogitLoss'
     loss_name: str = "CrossEntropyLoss"
     base_lr: float = 1.0e-6
     final_lr: float = 1.0e-9
-    num_warmup_epochs: int = 5
-    delta1: float = 0.1
-    delta2: float = 0.001
-    weight_decay: float = 1.0e-1
-    label_smoothing: float = 5.0e-3  # See https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html
+    num_warmup_epochs: int = 20
+    delta1: float = 0.3
+    delta2: float = 0.002
+    weight_decay: float = 1.0e-4
+    label_smoothing: float = 5.0e-4  # See https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html
     do_full_training: bool = True
     do_augment: bool = True
-    augment_proba: float = 0.45
+    augment_proba: float = 0.85
     # https://docs.pytorch.org/vision/main/generated/torchvision.ops.stochastic_depth.html#torchvision.ops.stochastic_depth
-    stochastic_depth_prob: float = 0.40
+    stochastic_depth_prob: float = 0.60
 
     seed: int = 1998  # Set the seed for reproducibility
     shuffle: bool = True  # Whether to shuffle the data during training
