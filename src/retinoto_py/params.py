@@ -49,8 +49,8 @@ class Params:
     use_hexagonal_grid: bool = True  # Whether to use hexagonal packing for the log-polar grid
     rs_min: float = -3.50  # Set minimum radius of the log-polar grid
     rs_max: float = 0.70  # Set maximum radius of the log-polar grid
-    angle_start: float = - 2 / 3 * np.pi  # Set the intial angle for the grid
-    angle_margin: float =  30 / grid_size_ang * np.pi  # Set a margin angle to wrap the circle
+    angle_start: float = - 5 / 3 * np.pi  # Set the intial angle for the grid
+    angle_margin: float =  3 / grid_size_ang * np.pi  # Set a margin angle to wrap the circle
     mode: str = "bilinear"
     padding_mode: str = "zeros"
     # padding_mode: str = "border"
@@ -68,7 +68,7 @@ class Params:
     loss_name: str = "CrossEntropyLoss"
     base_lr: float = 1.0e-6
     final_lr: float = 1.0e-9
-    num_warmup_epochs: int = 20
+    num_warmup_epochs: int = 5
     delta1: float = 0.1
     delta2: float = 0.001
     weight_decay: float = 1.0e-1
