@@ -62,7 +62,7 @@ class Params:
     # num_epochs: int = 1
     num_epochs: int = 20
     subset_factor: int = 1  # set for DEBUGging
-    optimizer_name: str = "adamw"
+    optimizer_name: str = "rmsprop"
     # loss_name: str = 'BCEWithLogitsLoss'
     # loss_name: str = 'NegLogitLoss'
     loss_name: str = "CrossEntropyLoss"
