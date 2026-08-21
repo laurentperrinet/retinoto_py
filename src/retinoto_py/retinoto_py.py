@@ -121,7 +121,7 @@ def get_cosine_schedule_with_warmup(optimizer, num_warmup_epochs, num_epochs, re
             # Cosine decay from base_lr to final_lr
             progress = (current_epoch - num_warmup_epochs) / max(1, num_epochs - num_warmup_epochs)
             cosine_decay = 0.5 * (1 + np.cos(np.pi * progress)) # from 1 to zero
-            return (cosine_decay + rel_final_lr) / (1 + rel_final_lr) # between 1 and down to rel_final_lr
+            return cosine_decay * (1 - rel_final_lr) + rel_final_lr # between 1 and down to rel_final_lr
 
     scheduler = LambdaLR(optimizer, lr_lambda, last_epoch=-1)
     return scheduler
