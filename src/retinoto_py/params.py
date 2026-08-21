@@ -69,10 +69,10 @@ class Params:
     base_lr: float = 1.0e-6
     final_lr: float = 1.0e-9
     num_warmup_epochs: int = 20
-    delta1: float = 0.3
+    delta1: float = 0.1
     delta2: float = 0.002
     weight_decay: float = 1.0e-4
-    label_smoothing: float = 5.0e-4  # See https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html
+    label_smoothing: float = 1.0e-3  # See https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html
     do_full_training: bool = True
     do_augment: bool = True
     augment_proba: float = 0.85
