@@ -3,7 +3,8 @@
 
 Sources live at the repo root — Markdown files and Jupyter notebooks are all
 built as first-class doc pages in a flat layout, with nothing nested under a
-sub-directory. ReadTheDocs picks up this config via '.readthedocs.yaml'.
+sub-directory. The built HTML is deployed to GitHub Pages by a GitHub Actions
+workflow.
 """
 
 
@@ -19,7 +20,7 @@ try:
 except Exception:
     pass
 
-# RTD passes `_RTD_VERSION` to avoid caching stale values across branches.
+# Pages build passes `_RTD_VERSION` to avoid caching stale values across branches.
 import os
 version = os.environ.get("_RTD_VERSION", version_raw)
 
@@ -31,10 +32,9 @@ extensions = [
 ]
 
 exclude_patterns = [
-    "_build",               # build outputs
-    ".venv/",
-    "cached_data/*",
-    "!docs/**",             # leave any legacy docs/ tree out if it exists
+      "_build",                # build outputs
+      ".venv/",
+      "cached_data/*",
 ]
 
 source_suffix = {".rst": "restructuredtext", ".md": "markdown"}
@@ -64,19 +64,17 @@ html_title = (
 )
 # html_short_title  = 'retinoto_py'
 
-# Add GitHub / RTD links
+# Add link back to the published docs
 html_context = {
-    "docs_readthedocs_url": "https://retinoto-py.readthedocs.io/",
+      "docs_github_url": "https://laurentperrinet.github.io/retinoto_py/",
 }
 # html_favicon = ''            # optional, default Sphinx favicon is fine
 
 
 # -- nbsphinx rendering -------------------------------------------------------
-nbsphinx_execute = 'never'   # only run on RTD / local; skip during CI
-# Set cache dir explicitly so the build isn't sensitive to cwd location (e.g. in GitHub Actions)
-import sys, os  # noqa: E402 — top-level import above can still raise ImportError if Python is too old
+nbsphinx_execute = 'never'     # render without executing; skip during CI
 nbsphinx_execute_arguments = [
-    '--InlineMathPlugin.enable',
+      '--InlineMathPlugin.enable',
 ]
 
 

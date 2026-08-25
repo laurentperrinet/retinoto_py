@@ -41,26 +41,26 @@ build:
     rm -rf dist
     uv build
 
-# Install dependencies needed locally to reproduce RTD's exact doc build (sphinx + nbsphinx)
+# Install dependencies needed locally to reproduce the Pages doc build (sphinx + nbsphinx)
 doc-install-deps:
-    @echo "Installing Sphinx + nbsphinx deps..."
-    uv pip install sphinx myst-nb nbsphinx ruff[python]
+     @echo "Installing Sphinx + nbsphinx deps..."
+   uv pip install -r require-docs.txt
 
-# Build HTML docs locally (same command RTD would run)
+# Build HTML docs locally (same command the Pages workflow runs)
 doc-build-html:
-    @echo "Building documentation to _build/html/ ..."
-    sphinx-build -b html . _build/html
+     @echo "Building documentation to _build/html/ ..."
+   sphinx-build -b html . _build/html
 
 # Clean the doc build outputs
 doc-clean:
     rm -rf _build
 
-# Run all document commands in sequence - clean, then install deps, then build (same as RTD does)
+# Run all document commands in sequence - clean, then install deps, then build (same as the Pages workflow)
 doc:
-    @echo "Reproducing RTD's docs build locally..."
-    $(MAKE) doc-clean
-    $(MAKE) doc-install-deps
-    $(MAKE) doc-build-html
+     @echo "Rebuilding docs locally (same as the Pages workflow)..."
+   just doc-clean
+   just doc-install-deps
+   just doc-build-html
 
 # Run HTML linkcheck without rebuilding - useful for verifying internal links
 doc-linkcheck:
