@@ -3,7 +3,7 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html">
+<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="Installation Guide" href="00_installation.html">
 
     <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
         <title>retinoto_py | Foveated Retinotopy Documentation</title>
@@ -190,7 +190,47 @@
   <input type="hidden" name="area" value="default">
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
-  
+  <p class="caption" role="heading"><span class="caption-text">Setup &amp; Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="00_installation.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04_imagenet-bbox-dataset.html">reading localisation metadata</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04_imagenet-bbox-dataset.html#Building-the-new-dataset">Building the new dataset</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Training &amp; Transfers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="20_transfer-learning-resnet101.html">transfer learning of each network on the masked dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="21_transfer-learning-convnext.html">transfer learning of each network on the masked dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="31_transfer-learning-resnet101-fovea.html">learning the <code class="docutils literal notranslate"><span class="pre">resnet101</span></code> on retinotopic images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="31_transfer-learning-resnet101-fovea.html#Evaluation-on-the-validation-dataset">Evaluation on the validation dataset</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Retinotopic Transforms and Analysis</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="30_retinotopic-mapping.html">Implementing a retinotopic transform using <code class="docutils literal notranslate"><span class="pre">grid_sample</span></code> from <code class="docutils literal notranslate"><span class="pre">pyTorch</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="50_retinotopic-mapping-where.html">Retinotopic Mapping of Fixation Dynamics</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Advanced Topics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="34_optimize-bbox.html">optimize meta-parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="40_compute_likelihood_map.html">Likelihood map on a test image</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Data &amp; Preprocessing Tools</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="08_dataloaders.html">displaying sample images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="08_dataloaders.html#displaying-sample-images-with-a-mask">displaying sample images with a mask</a></li>
+<li class="toctree-l1"><a class="reference internal" href="08_dataloaders.html#displaying-sample-images-with-a-mask-and-a-rotation">displaying sample images with a mask and a rotation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="08_dataloaders.html#displaying-sample-images-with-a-fovea">displaying sample images with a fovea</a></li>
+<li class="toctree-l1"><a class="reference internal" href="08_dataloaders.html#id1">displaying sample images with a mask</a></li>
+<li class="toctree-l1"><a class="reference internal" href="08_dataloaders.html#displaying-sample-images-from-bbox-with-a-fovea">displaying sample images from bbox with a fovea</a></li>
+<li class="toctree-l1"><a class="reference internal" href="41_multiple_likelihood_map.html">testing on some sample images</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Full Stack Workflows</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="99_run-all-the-stack.html">checking vanilla inference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="99_run-all-the-stack.html#introducing-a-fovea">introducing a fovea</a></li>
+<li class="toctree-l1"><a class="reference internal" href="99_run-all-the-stack.html#emerging-localization-properties">emerging localization properties</a></li>
+<li class="toctree-l1"><a class="reference internal" href="99_run-all-the-stack.html#learning-where-things-are">learning where things are</a></li>
+</ul>
+
 </div>
 </div>
 
@@ -230,53 +270,84 @@
           <section id="welcome-to-retinoto-py-s-documentation">
 <span id="retinoto-py-docs-index"></span><h1>Welcome to retinoto_py’s documentation!<a class="headerlink" href="#welcome-to-retinoto-py-s-documentation" title="Link to this heading">¶</a></h1>
 <p>Retinotopy is an open-source Python package for applying spatial transformations based on visual field representations in the human brain. It allows researchers and engineers to analyze and interpret data using different transformation topologies, including log-polar mappings that simulate biological retina structures. The project provides tools for both theoretical modeling and practical application development in computational neuroscience and computer vision research.</p>
-<div class="toctree-wrapper compound">
-</div>
 <section id="tutorials-examples">
-<h2>Tutorials &amp; Examples<a class="headerlink" href="#tutorials-examples" title="Link to this heading">¶</a></h2>
+<span id="tutorials-section"></span><h2>Tutorials &amp; Examples<a class="headerlink" href="#tutorials-examples" title="Link to this heading">¶</a></h2>
 <p>The following notebooks demonstrate the capabilities of retinoto_py, organized by topic for ease of navigation. The first tutorial series shows how to set up and use the package’s core features through interactive examples - explore them in order or jump directly to topics relevant to your current work.</p>
 <section id="setup-installation">
 <span id="setup-and-installation"></span><h3>Setup &amp; Installation<a class="headerlink" href="#setup-installation" title="Link to this heading">¶</a></h3>
 <p>The initial configuration covers installation steps and project setup. The notebooks walk through basic usage patterns for applying log-polar transformations: starting from the fundamental concepts, moving toward real-world applications like medical imaging. Each tutorial builds incrementally so you gain practical experience with the package’s API as we go. All example codes include comments to help you customize them for your own projects - explore how data flows through each module and discover which functions work best for your use case:</p>
-<ul class="simple">
-<li><p><span class="xref std std-doc">00_installation.ipynb</span> - Step-by-step installation guide</p></li>
-<li><p><span class="xref std std-doc">04_imagenet-bbox-dataset.ipynb</span> - Working with ImageNet bounding box datasets</p></li>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Setup &amp; Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="00_installation.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04_imagenet-bbox-dataset.html">reading localisation metadata</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04_imagenet-bbox-dataset.html#Building-the-new-dataset">Building the new dataset</a></li>
 </ul>
-<p id="learning-and-transfer">Training &amp; Transfers
-++++++++++++++++++++|</p>
-<p>The second section demonstrates how trained models can be transferred between architectures using retinoto_py’s built-in transfer learning capabilities. These notebooks show progressive complexity from simple experiments to advanced multi-task learning - perfect for adapting our work on biological-inspired vision systems (such as those studied in [Perrinet 2013](<a class="reference external" href="https://doi.org/10.3389/fnins.2015.00430">https://doi.org/10.3389/fnins.2015.00430</a>)) to your research questions:</p>
-<ul class="simple">
-<li><p><span class="xref std std-doc">20_transfer-learning-resnet101.ipynb</span></p></li>
-<li><p><span class="xref std std-doc">21_transfer-learning-convnext.ipynb</span></p></li>
-<li><p><span class="xref std std-doc">31_transfer-learning-resnet101-fovea.ipynb</span></p></li>
+</div>
+</section>
+<section id="training-transfers">
+<span id="learning-and-transfer"></span><h3>Training &amp; Transfers<a class="headerlink" href="#training-transfers" title="Link to this heading">¶</a></h3>
+<p>The second section demonstrates how trained models can be transferred between architectures using retinoto_py’s built-in transfer learning capabilities. These notebooks show progressive complexity from simple experiments to advanced multi-task learning - perfect for adapting our work on biological-inspired vision systems (such as those studied in <a class="reference external" href="https://doi.org/10.3389/fnins.2015.00430">Perrinet 2013</a>) to your research questions:</p>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Training &amp; Transfers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="20_transfer-learning-resnet101.html">transfer learning of each network on the masked dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="21_transfer-learning-convnext.html">transfer learning of each network on the masked dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="31_transfer-learning-resnet101-fovea.html">learning the <code class="docutils literal notranslate"><span class="pre">resnet101</span></code> on retinotopic images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="31_transfer-learning-resnet101-fovea.html#Evaluation-on-the-validation-dataset">Evaluation on the validation dataset</a></li>
 </ul>
-<p id="retinotopic-transforms">Retinotopic Transforms and Analysis
-++++++++++++++++++++++++++++++++++++|</p>
+</div>
+</section>
+<section id="retinotopic-transforms-and-analysis">
+<span id="retinotopic-transforms"></span><h3>Retinotopic Transforms and Analysis<a class="headerlink" href="#retinotopic-transforms-and-analysis" title="Link to this heading">¶</a></h3>
 <p>These notebooks focus on analyzing how visual information transforms through the brain’s retinotopic mapping - key for understanding neural representations of space. We start with basic log-polar coordinates that represent visual field topology, then move into advanced techniques for measuring likelihood maps from real brain scan data:</p>
-<ul class="simple">
-<li><p><span class="xref std std-doc">30_retinotopic-mapping.ipynb</span></p></li>
-<li><p><span class="xref std std-doc">50_retinotopic-mapping-where.ipynb</span></p></li>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Retinotopic Transforms and Analysis</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="30_retinotopic-mapping.html">Implementing a retinotopic transform using <code class="docutils literal notranslate"><span class="pre">grid_sample</span></code> from <code class="docutils literal notranslate"><span class="pre">pyTorch</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="50_retinotopic-mapping-where.html">Retinotopic Mapping of Fixation Dynamics</a></li>
 </ul>
-<p id="advanced-topics">Advanced Topics
-+++++++++++++++|</p>
+</div>
+</section>
+<section id="advanced-topics">
+<span id="id1"></span><h3>Advanced Topics<a class="headerlink" href="#advanced-topics" title="Link to this heading">¶</a></h3>
 <p>For users working with specialized topics or complex datasets, these notebooks cover edge cases and advanced processing pipelines. Examples include rotation attacks on image recognition systems (important for understanding robustness of biological-inspired architectures), focus-based learning methods for improving accuracy in low-signal regions, and optimization techniques for bounding box estimation:</p>
-<ul class="simple">
-<li><p><span class="xref std std-doc">34_optimize-bbox.ipynb</span></p></li>
-<li><p><span class="xref std std-doc">40_compute_likelihood_map.ipynb</span></p></li>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Advanced Topics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="34_optimize-bbox.html">optimize meta-parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="40_compute_likelihood_map.html">Likelihood map on a test image</a></li>
 </ul>
-<p id="data-and-preprocessing">Data &amp; Preprocessing Tools
-++++++++++++++++++++++++++++|</p>
+</div>
+</section>
+<section id="data-preprocessing-tools">
+<span id="data-and-preprocessing"></span><h3>Data &amp; Preprocessing Tools<a class="headerlink" href="#data-preprocessing-tools" title="Link to this heading">¶</a></h3>
 <p>This section covers supporting utilities - how to work with datasets, apply transformations efficiently, and prepare raw neural recordings. These notebooks help build the infrastructure needed before running experiments described elsewhere in this documentation set, from basic utility methods through full multi-modal pipeline processing scripts for image sequences:</p>
-<ul class="simple">
-<li><p><span class="xref std std-doc">08_dataloaders.ipynb</span></p></li>
-<li><p><span class="xref std std-doc">41_multiple_likelihood_map.ipynb</span></p></li>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Data &amp; Preprocessing Tools</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="08_dataloaders.html">displaying sample images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="08_dataloaders.html#displaying-sample-images-with-a-mask">displaying sample images with a mask</a></li>
+<li class="toctree-l1"><a class="reference internal" href="08_dataloaders.html#displaying-sample-images-with-a-mask-and-a-rotation">displaying sample images with a mask and a rotation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="08_dataloaders.html#displaying-sample-images-with-a-fovea">displaying sample images with a fovea</a></li>
+<li class="toctree-l1"><a class="reference internal" href="08_dataloaders.html#id1">displaying sample images with a mask</a></li>
+<li class="toctree-l1"><a class="reference internal" href="08_dataloaders.html#displaying-sample-images-from-bbox-with-a-fovea">displaying sample images from bbox with a fovea</a></li>
+<li class="toctree-l1"><a class="reference internal" href="41_multiple_likelihood_map.html">testing on some sample images</a></li>
 </ul>
-<p id="full-stack-workflows">Full Stack Workflows
-++++++++++++++++++++|</p>
+</div>
+</section>
+<section id="full-stack-workflows">
+<span id="id2"></span><h3>Full Stack Workflows<a class="headerlink" href="#full-stack-workflows" title="Link to this heading">¶</a></h3>
 <p>The final section brings together everything you’ve learned so long as your system supports all the dependencies we use throughout these notebooks - explore complete end-to-end pipelines that apply retinotopy principles across multiple domains sequentially. These workflows demonstrate production-ready strategies for applying our framework to new problems:</p>
-<ul class="simple">
-<li><p><span class="xref std std-doc">99_run-all-the-stack.ipynb</span></p></li>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Full Stack Workflows</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="99_run-all-the-stack.html">checking vanilla inference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="99_run-all-the-stack.html#introducing-a-fovea">introducing a fovea</a></li>
+<li class="toctree-l1"><a class="reference internal" href="99_run-all-the-stack.html#emerging-localization-properties">emerging localization properties</a></li>
+<li class="toctree-l1"><a class="reference internal" href="99_run-all-the-stack.html#learning-where-things-are">learning where things are</a></li>
 </ul>
+</div>
 </section>
 </section>
 </section>
@@ -294,7 +365,15 @@
       <footer>
         
         <div class="related-pages">
-          
+          <a class="next-page" href="00_installation.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Installation Guide</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
           
         </div>
         <div class="bottom-of-page">
@@ -329,6 +408,11 @@
 <li><a class="reference internal" href="#">Welcome to retinoto_py’s documentation!</a><ul>
 <li><a class="reference internal" href="#tutorials-examples">Tutorials &amp; Examples</a><ul>
 <li><a class="reference internal" href="#setup-installation">Setup &amp; Installation</a></li>
+<li><a class="reference internal" href="#training-transfers">Training &amp; Transfers</a></li>
+<li><a class="reference internal" href="#retinotopic-transforms-and-analysis">Retinotopic Transforms and Analysis</a></li>
+<li><a class="reference internal" href="#advanced-topics">Advanced Topics</a></li>
+<li><a class="reference internal" href="#data-preprocessing-tools">Data &amp; Preprocessing Tools</a></li>
+<li><a class="reference internal" href="#full-stack-workflows">Full Stack Workflows</a></li>
 </ul>
 </li>
 </ul>

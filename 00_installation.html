@@ -3,7 +3,7 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html">
+<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="reading localisation metadata" href="04_imagenet-bbox-dataset.html"><link rel="prev" title="Welcome to retinoto_py’s documentation!" href="index.html">
 
     <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
         <title>Installation Guide - retinoto_py | Foveated Retinotopy Documentation</title>
@@ -191,7 +191,47 @@
   <input type="hidden" name="area" value="default">
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
-  
+  <p class="caption" role="heading"><span class="caption-text">Setup &amp; Installation</span></p>
+<ul class="current">
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04_imagenet-bbox-dataset.html">reading localisation metadata</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04_imagenet-bbox-dataset.html#Building-the-new-dataset">Building the new dataset</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Training &amp; Transfers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="20_transfer-learning-resnet101.html">transfer learning of each network on the masked dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="21_transfer-learning-convnext.html">transfer learning of each network on the masked dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="31_transfer-learning-resnet101-fovea.html">learning the <code class="docutils literal notranslate"><span class="pre">resnet101</span></code> on retinotopic images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="31_transfer-learning-resnet101-fovea.html#Evaluation-on-the-validation-dataset">Evaluation on the validation dataset</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Retinotopic Transforms and Analysis</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="30_retinotopic-mapping.html">Implementing a retinotopic transform using <code class="docutils literal notranslate"><span class="pre">grid_sample</span></code> from <code class="docutils literal notranslate"><span class="pre">pyTorch</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="50_retinotopic-mapping-where.html">Retinotopic Mapping of Fixation Dynamics</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Advanced Topics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="34_optimize-bbox.html">optimize meta-parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="40_compute_likelihood_map.html">Likelihood map on a test image</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Data &amp; Preprocessing Tools</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="08_dataloaders.html">displaying sample images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="08_dataloaders.html#displaying-sample-images-with-a-mask">displaying sample images with a mask</a></li>
+<li class="toctree-l1"><a class="reference internal" href="08_dataloaders.html#displaying-sample-images-with-a-mask-and-a-rotation">displaying sample images with a mask and a rotation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="08_dataloaders.html#displaying-sample-images-with-a-fovea">displaying sample images with a fovea</a></li>
+<li class="toctree-l1"><a class="reference internal" href="08_dataloaders.html#id1">displaying sample images with a mask</a></li>
+<li class="toctree-l1"><a class="reference internal" href="08_dataloaders.html#displaying-sample-images-from-bbox-with-a-fovea">displaying sample images from bbox with a fovea</a></li>
+<li class="toctree-l1"><a class="reference internal" href="41_multiple_likelihood_map.html">testing on some sample images</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Full Stack Workflows</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="99_run-all-the-stack.html">checking vanilla inference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="99_run-all-the-stack.html#introducing-a-fovea">introducing a fovea</a></li>
+<li class="toctree-l1"><a class="reference internal" href="99_run-all-the-stack.html#emerging-localization-properties">emerging localization properties</a></li>
+<li class="toctree-l1"><a class="reference internal" href="99_run-all-the-stack.html#learning-where-things-are">learning where things are</a></li>
+</ul>
+
 </div>
 </div>
 
@@ -721,8 +761,26 @@ Git branch: main
       <footer>
         
         <div class="related-pages">
-          
-          
+          <a class="next-page" href="04_imagenet-bbox-dataset.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">reading localisation metadata</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="index.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Home</div>
+                
+              </div>
+            </a>
         </div>
         <div class="bottom-of-page">
           <div class="left-details">
