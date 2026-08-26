@@ -1,0 +1,2024 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="./">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html">
+
+    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
+        <title>Likelihood map on a test image - retinoto_py | Foveated Retinotopy Documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="_static/nbsphinx-code-cells.css?v=2aa19091" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">retinoto_py | Foveated Retinotopy Documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  
+  <span class="sidebar-brand-text">retinoto_py | Foveated Retinotopy Documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="_sources/40_compute_likelihood_map.ipynb.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <p>Notebook explaining step by step how we build the <code class="docutils literal notranslate"><span class="pre">compute_likelihood_map</span></code> function.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">retinoto_py</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">fovea</span>
+<span class="n">args</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">Params</span><span class="p">(</span><span class="n">do_fovea</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="c1"># args</span>
+</pre></div>
+</div>
+</div>
+<section id="Likelihood-map-on-a-test-image">
+<h1>Likelihood map on a test image<a class="headerlink" href="#Likelihood-map-on-a-test-image" title="Link to this heading">¶</a></h1>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torchvision.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">read_image</span>
+
+<span class="n">true_label</span> <span class="o">=</span> <span class="s1">'leopard'</span>
+<span class="n">image_url</span> <span class="o">=</span> <span class="s1">'./images/leopard.jpg'</span>
+<span class="c1"># image_url = './images/jaguar.jpg'</span>
+
+<span class="c1"># true_label = 'tree_frog'</span>
+<span class="c1"># image_url = './images/frog.jpg'</span>
+
+<span class="n">alpha</span> <span class="o">=</span> <span class="mf">1.</span>
+<span class="n">s_max</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">cmocean</span>
+<span class="n">cmap</span> <span class="o">=</span> <span class="n">cmocean</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">haline</span>
+
+<span class="n">full_image</span> <span class="o">=</span> <span class="n">read_image</span><span class="p">(</span><span class="n">image_url</span><span class="p">)</span><span class="o">/</span><span class="mf">255.</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">full_image</span><span class="p">)</span><span class="w"> </span><span class="si">= }</span><span class="s2">, </span><span class="si">{</span><span class="n">full_image</span><span class="o">.</span><span class="n">dtype</span><span class="w"> </span><span class="si">= }</span><span class="s2">, </span><span class="si">{</span><span class="n">full_image</span><span class="o">.</span><span class="n">shape</span><span class="w"> </span><span class="si">= }</span><span class="s2">, </span><span class="si">{</span><span class="n">full_image</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="si">=}</span><span class="s2">, </span><span class="si">{</span><span class="n">full_image</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="si">=}</span><span class="s2">"</span><span class="p">)</span>
+<br/><br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+type(full_image) = &lt;class &#39;torch.Tensor&#39;&gt;, full_image.dtype = torch.float32, full_image.shape = torch.Size([3, 587, 800]), full_image.min()=tensor(0.), full_image.max()=tensor(1.)
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">image_size_full</span> <span class="o">=</span> <span class="mi">224</span>
+<span class="n">image_size_full</span> <span class="o">=</span> <span class="mi">400</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">torchvision.transforms.functional</span><span class="w"> </span><span class="kn">import</span> <span class="n">InterpolationMode</span><span class="p">,</span> <span class="n">resize</span>
+
+<span class="n">three</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">W</span> <span class="o">=</span> <span class="n">full_image</span><span class="o">.</span><span class="n">shape</span>
+<span class="k">if</span> <span class="nb">max</span><span class="p">((</span><span class="n">H</span><span class="p">,</span> <span class="n">W</span><span class="p">))</span> <span class="o">&gt;</span> <span class="n">image_size_full</span><span class="p">:</span>
+    <span class="n">full_image</span> <span class="o">=</span> <span class="n">resize</span><span class="p">(</span><span class="n">full_image</span><span class="p">,</span> <span class="n">image_size_full</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="n">InterpolationMode</span><span class="o">.</span><span class="n">BILINEAR</span><span class="p">,</span> <span class="n">antialias</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">full_image</span><span class="p">)</span><span class="w"> </span><span class="si">= }</span><span class="s2">, </span><span class="si">{</span><span class="n">full_image</span><span class="o">.</span><span class="n">dtype</span><span class="w"> </span><span class="si">= }</span><span class="s2">, </span><span class="si">{</span><span class="n">full_image</span><span class="o">.</span><span class="n">shape</span><span class="w"> </span><span class="si">= }</span><span class="s2">"</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+type(full_image) = &lt;class &#39;torch.Tensor&#39;&gt;, full_image.dtype = torch.float32, full_image.shape = torch.Size([3, 400, 545])
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+tensor([[[0.218, 0.286, 0.942, 0.515],
+         [0.600, 0.926, 0.553, 0.205],
+         [0.745, 0.547, 0.955, 0.622]],
+
+        [[0.576, 0.447, 0.632, 0.752],
+         [0.646, 0.541, 0.181, 0.367],
+         [0.742, 0.707, 0.810, 0.197]]])
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">full_image</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+tensor([0.418, 0.384, 0.332])
+</pre></div></div>
+</div>
+<p>Loading the test image</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">full_image_np</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">movedim</span><span class="p">(</span><span class="n">full_image</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">full_image_np</span><span class="p">)</span>
+<span class="c1"># ax.set_xticks([])</span>
+<span class="c1"># ax.set_yticks([])</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">set_facecolor</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">'white'</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [0.0..1.0000001].
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/40_compute_likelihood_map_8_1.png" src="_images/40_compute_likelihood_map_8_1.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">preprocess</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">get_preprocess</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">do_augment</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="c1"># pil_image = fovea.TF.to_pil_image(full_image)</span>
+<span class="n">out</span> <span class="o">=</span> <span class="n">preprocess</span><span class="p">(</span><span class="n">full_image</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">out</span><span class="p">)</span><span class="w"> </span><span class="si">= }</span><span class="s2">, </span><span class="si">{</span><span class="n">out</span><span class="o">.</span><span class="n">dtype</span><span class="w"> </span><span class="si">= }</span><span class="s2">, </span><span class="si">{</span><span class="n">out</span><span class="o">.</span><span class="n">shape</span><span class="w"> </span><span class="si">= }</span><span class="s2">"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+type(out) = &lt;class &#39;torch.Tensor&#39;&gt;, out.dtype = torch.float32, out.shape = torch.Size([3, 161, 309])
+</pre></div></div>
+</div>
+<section id="testing-fixate">
+<h2>testing fixate<a class="headerlink" href="#testing-fixate" title="Link to this heading">¶</a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># image = image.squeeze()</span>
+<span class="c1"># fig, ax = fovea.plt.subplots()</span>
+<span class="c1"># image_np = torch.movedim(image, (1, 2, 0), (0, 1, 2)).cpu().numpy()</span>
+<span class="c1"># ax.imshow(image_np)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">image_fix</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">fixate</span><span class="p">(</span><span class="n">full_image</span><span class="p">,</span> <span class="n">h</span><span class="o">=</span><span class="mi">130</span><span class="p">,</span> <span class="n">w</span><span class="o">=</span><span class="mi">325</span><span class="p">,</span> <span class="n">box_size</span><span class="o">=</span><span class="mi">128</span><span class="p">)</span>
+<span class="n">full_image</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">image_fix</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+(torch.Size([3, 400, 545]), torch.Size([3, 128, 128]))
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="mi">0</span> <span class="o">&lt;=</span> <span class="mi">40</span> <span class="o">&lt;</span> <span class="mi">200</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+True
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">image_np</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">movedim</span><span class="p">(</span><span class="n">image_fix</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">image_np</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [0.0..1.0000001].
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;matplotlib.image.AxesImage at 0x130b0ead0&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/40_compute_likelihood_map_14_2.png" src="_images/40_compute_likelihood_map_14_2.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">image_fix</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">fixate</span><span class="p">(</span><span class="n">full_image</span><span class="p">,</span> <span class="n">h</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">w</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">box_size</span><span class="o">=</span><span class="mi">128</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">image_np</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">movedim</span><span class="p">(</span><span class="n">image_fix</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">image_np</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;matplotlib.image.AxesImage at 0x130c45950&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/40_compute_likelihood_map_15_1.png" src="_images/40_compute_likelihood_map_15_1.png" />
+</div>
+</div>
+<section id="making-a-grid">
+<h3>making a grid<a class="headerlink" href="#making-a-grid" title="Link to this heading">¶</a></h3>
+<p>First, we will define a set of fixation points as grids, that is list of horizontal and vertical coordinates. We explore different strategies.</p>
+</section>
+</section>
+<section id="first-strategy:-valid-boxes">
+<h2>first strategy: valid boxes<a class="headerlink" href="#first-strategy:-valid-boxes" title="Link to this heading">¶</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="n">resolution</span> <span class="o">=</span> <span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">23</span><span class="p">)</span> <span class="c1"># size of the fixation grid</span>
+<span class="n">size_ratio</span> <span class="o">=</span> <span class="mf">0.3</span> <span class="c1"># how much of the image to use relative to radius</span>
+
+<span class="n">three</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">W</span> <span class="o">=</span> <span class="n">full_image</span><span class="o">.</span><span class="n">shape</span>
+<span class="k">assert</span> <span class="n">three</span> <span class="o">==</span> <span class="mi">3</span>
+
+<span class="n">max_size</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">((</span><span class="n">H</span><span class="p">,</span> <span class="n">W</span><span class="p">))</span>
+<span class="n">min_size</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">((</span><span class="n">H</span><span class="p">,</span> <span class="n">W</span><span class="p">))</span>
+<span class="n">box_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">min_size</span><span class="o">*</span><span class="n">size_ratio</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">H</span> <span class="o">&lt;</span> <span class="n">W</span><span class="p">:</span>
+    <span class="n">shift</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="n">W</span><span class="o">-</span><span class="n">H</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">shift</span> <span class="o">=</span> <span class="p">((</span><span class="n">H</span><span class="o">-</span><span class="n">W</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">min_size</span><span class="p">,</span> <span class="n">max_size</span><span class="p">,</span> <span class="n">shift</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">shift</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">box_size</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+(np.int64(400), np.int64(545), 0, 72.5, 120)
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pos_h</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">shift</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="n">box_size</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">min_size</span><span class="o">+</span><span class="n">shift</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="n">box_size</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">resolution</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">pos_w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">shift</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="n">box_size</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">min_size</span><span class="o">+</span><span class="n">shift</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">box_size</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">resolution</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">pos_h</span><span class="p">,</span> <span class="n">pos_w</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+(array([ 60.,  80., 100., 120., 140., 160., 180., 200., 220., 240., 260.,
+        280., 300., 320., 340.]),
+ array([132.5       , 145.22727273, 157.95454545, 170.68181818,
+        183.40909091, 196.13636364, 208.86363636, 221.59090909,
+        234.31818182, 247.04545455, 259.77272727, 272.5       ,
+        285.22727273, 297.95454545, 310.68181818, 323.40909091,
+        336.13636364, 348.86363636, 361.59090909, 374.31818182,
+        387.04545455, 399.77272727, 412.5       ]))
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pos_H</span><span class="p">,</span> <span class="n">pos_W</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">pos_h</span><span class="p">,</span> <span class="n">pos_w</span><span class="p">)</span>
+
+<span class="n">pos_H</span><span class="p">,</span> <span class="n">pos_W</span> <span class="o">=</span> <span class="n">pos_H</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">pos_W</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+<span class="n">pos_H</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">pos_W</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+((345,), (345,))
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">full_image_np</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">pos_W</span><span class="p">,</span> <span class="n">pos_H</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">s_max</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([])</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([])</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">set_facecolor</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">'white'</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [0.0..1.0000001].
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/40_compute_likelihood_map_21_1.png" src="_images/40_compute_likelihood_map_21_1.png" />
+</div>
+</div>
+</section>
+<section id="second-strategy:-more-brutal">
+<h2>second strategy: more brutal<a class="headerlink" href="#second-strategy:-more-brutal" title="Link to this heading">¶</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">aspect_ratio</span> <span class="o">=</span> <span class="n">H</span><span class="o">/</span><span class="n">W</span>
+<span class="n">N_fixations</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">resolution</span><span class="p">)</span>
+<span class="n">resolution</span><span class="p">,</span> <span class="n">N_fixations</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+((15, 23), np.int64(345))
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">resolution</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">N_fixations</span><span class="o">*</span><span class="n">aspect_ratio</span><span class="p">)),</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">N_fixations</span><span class="o">/</span><span class="n">aspect_ratio</span><span class="p">)))</span>
+<span class="n">N_fixations</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">resolution</span><span class="p">)</span>
+<span class="n">resolution</span><span class="p">,</span> <span class="n">N_fixations</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+((15, 21), np.int64(315))
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pos_h</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">resolution</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="mi">2</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">pos_w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">resolution</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">2</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">pos_h</span><span class="p">,</span> <span class="n">pos_w</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+(array([ 25.,  50.,  75., 100., 125., 150., 175., 200., 225., 250., 275.,
+        300., 325., 350., 375.]),
+ array([ 24.77272727,  49.54545455,  74.31818182,  99.09090909,
+        123.86363636, 148.63636364, 173.40909091, 198.18181818,
+        222.95454545, 247.72727273, 272.5       , 297.27272727,
+        322.04545455, 346.81818182, 371.59090909, 396.36363636,
+        421.13636364, 445.90909091, 470.68181818, 495.45454545,
+        520.22727273]))
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pos_H</span><span class="p">,</span> <span class="n">pos_W</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">pos_h</span><span class="p">,</span> <span class="n">pos_w</span><span class="p">)</span>
+<span class="n">pos_H</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">pos_W</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+((21, 15), (21, 15))
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pos_H</span><span class="p">,</span> <span class="n">pos_W</span> <span class="o">=</span> <span class="n">pos_H</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">pos_W</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="second-strategy:-a-regular-grid-with-a-hexagonal-twist">
+<h2>second strategy: a regular grid with a hexagonal twist<a class="headerlink" href="#second-strategy:-a-regular-grid-with-a-hexagonal-twist" title="Link to this heading">¶</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">resolution</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+(15, 21)
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pos_h</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">resolution</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="mi">2</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">pos_w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">resolution</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">2</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">pos_h</span><span class="p">,</span> <span class="n">pos_w</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+(array([ 25.,  50.,  75., 100., 125., 150., 175., 200., 225., 250., 275.,
+        300., 325., 350., 375.]),
+ array([ 24.77272727,  49.54545455,  74.31818182,  99.09090909,
+        123.86363636, 148.63636364, 173.40909091, 198.18181818,
+        222.95454545, 247.72727273, 272.5       , 297.27272727,
+        322.04545455, 346.81818182, 371.59090909, 396.36363636,
+        421.13636364, 445.90909091, 470.68181818, 495.45454545,
+        520.22727273]))
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pos_H</span><span class="p">,</span> <span class="n">pos_W</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">pos_h</span><span class="p">,</span> <span class="n">pos_w</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">resolution</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">&lt;=</span><span class="n">resolution</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+    <span class="n">delta</span> <span class="o">=</span> <span class="p">(</span><span class="n">pos_h</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">pos_h</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">/</span><span class="mi">4</span>
+    <span class="n">pos_H</span><span class="p">[::</span><span class="mi">2</span><span class="p">]</span> <span class="o">+=</span> <span class="n">delta</span>
+    <span class="n">pos_H</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span> <span class="o">-=</span> <span class="n">delta</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">delta</span> <span class="o">=</span> <span class="p">(</span><span class="n">pos_w</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">pos_w</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">/</span><span class="mi">4</span>
+    <span class="n">pos_W</span><span class="p">[::</span><span class="mi">2</span><span class="p">]</span> <span class="o">+=</span> <span class="n">delta</span>
+    <span class="n">pos_W</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span> <span class="o">-=</span> <span class="n">delta</span>
+<span class="n">pos_H</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">pos_W</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+((21, 15), (21, 15))
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pos_H</span><span class="p">,</span> <span class="n">pos_W</span> <span class="o">=</span> <span class="n">pos_H</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">pos_W</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+<span class="n">pos_H</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">pos_W</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+((315,), (315,))
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">full_image_np</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">pos_W</span><span class="p">,</span> <span class="n">pos_H</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">s_max</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">)</span>
+<span class="c1"># ax.set_xticks([])</span>
+<span class="c1"># ax.set_yticks([])</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">W</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">set_facecolor</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">'white'</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [0.0..1.0000001].
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/40_compute_likelihood_map_33_1.png" src="_images/40_compute_likelihood_map_33_1.png" />
+</div>
+</div>
+</section>
+<section id="all-in-one-function-def-get_positions">
+<h2>all in one function <code class="docutils literal notranslate"><span class="pre">def</span> <span class="pre">get_positions</span></code><a class="headerlink" href="#all-in-one-function-def-get_positions" title="Link to this heading">¶</a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pos_H</span><span class="p">,</span> <span class="n">pos_W</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">get_positions</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="n">resolution</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">full_image_np</span><span class="p">)</span>
+<span class="c1"># ax.set_xticks([])</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">pos_W</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">pos_H</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">s</span><span class="o">=</span><span class="n">s_max</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">)</span>
+<span class="c1"># ax.set_yticks([])</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">set_facecolor</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">'white'</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [0.0..1.0000001].
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/40_compute_likelihood_map_36_1.png" src="_images/40_compute_likelihood_map_36_1.png" />
+</div>
+</div>
+<section id="making-fixations-on-the-positions-of-the-grid">
+<h3>making fixations on the positions of the grid<a class="headerlink" href="#making-fixations-on-the-positions-of-the-grid" title="Link to this heading">¶</a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">preprocess</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">get_preprocess</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">do_augment</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">out</span> <span class="o">=</span> <span class="n">preprocess</span><span class="p">(</span><span class="n">full_image</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">out</span><span class="p">)</span><span class="w"> </span><span class="si">= }</span><span class="s2">, </span><span class="si">{</span><span class="n">out</span><span class="o">.</span><span class="n">dtype</span><span class="w"> </span><span class="si">= }</span><span class="s2">, </span><span class="si">{</span><span class="n">out</span><span class="o">.</span><span class="n">shape</span><span class="w"> </span><span class="si">= }</span><span class="s2">"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+type(out) = &lt;class &#39;torch.Tensor&#39;&gt;, out.dtype = torch.float32, out.shape = torch.Size([3, 161, 309])
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">box_size</span><span class="p">,</span> <span class="n">full_image</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">out</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+(120, torch.Size([3, 400, 545]), torch.Size([3, 161, 309]))
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">image_size</span> <span class="o">=</span> <span class="nb">max</span><span class="p">((</span><span class="n">box_size</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">image_size</span><span class="p">))</span>
+<span class="n">image_size</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+224
+</pre></div></div>
+</div>
+</section>
+</section>
+<section id="using-the-fovea.fixate-function">
+<h2>using the <code class="docutils literal notranslate"><span class="pre">fovea.fixate</span></code> function<a class="headerlink" href="#using-the-fovea.fixate-function" title="Link to this heading">¶</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[32]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%timeit</span>
+<span class="n">preprocess</span><span class="p">(</span><span class="n">fovea</span><span class="o">.</span><span class="n">fixate</span><span class="p">(</span><span class="n">full_image</span><span class="p">,</span> <span class="n">H</span><span class="o">//</span><span class="mi">2</span><span class="p">,</span> <span class="n">W</span><span class="o">//</span><span class="mi">2</span><span class="p">,</span> <span class="n">box_size</span><span class="p">))</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+639 μs ± 19 μs per loop (mean ± std. dev. of 7 runs, 1,000 loops each)
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[33]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">N_fixations</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">pos_H</span><span class="p">)</span>
+<span class="n">gaze_images</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">N_fixations</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">box_size</span><span class="p">,</span> <span class="n">box_size</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">i_fixation</span><span class="p">,</span> <span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">pos_H</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">pos_W</span><span class="o">.</span><span class="n">ravel</span><span class="p">())):</span>
+    <span class="n">h</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">h</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+    <span class="n">angle</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">()</span><span class="o">*</span><span class="mi">360</span><span class="o">-</span><span class="mi">180</span>
+    <span class="n">gaze_images</span><span class="p">[</span><span class="n">i_fixation</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">fixate</span><span class="p">(</span><span class="n">full_image</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">box_size</span><span class="p">,</span> <span class="n">angle</span><span class="o">=</span><span class="n">angle</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[34]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gaze_images</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">gaze_images</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[34]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+(tensor(0.), tensor(1.))
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[35]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">gaze_images</span><span class="p">[</span><span class="mi">0</span><span class="p">:(</span><span class="n">resolution</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="mi">3</span><span class="p">),</span> <span class="o">...</span><span class="p">],</span> <span class="n">im_mean</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">im_std</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">nrow</span><span class="o">=</span><span class="n">resolution</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/40_compute_likelihood_map_45_0.png" src="_images/40_compute_likelihood_map_45_0.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[36]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">gaze_images</span><span class="p">[(</span><span class="n">resolution</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="mi">6</span><span class="p">):(</span><span class="n">resolution</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="mi">9</span><span class="p">),</span> <span class="o">...</span><span class="p">],</span> <span class="n">im_mean</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">im_std</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">nrow</span><span class="o">=</span><span class="n">resolution</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/40_compute_likelihood_map_46_0.png" src="_images/40_compute_likelihood_map_46_0.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[37]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gaze_images</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">box_size</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[37]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+(torch.Size([315, 3, 120, 120]), 120)
+</pre></div></div>
+</div>
+</section>
+<section id="preprocess-the-batch">
+<h2>preprocess the batch<a class="headerlink" href="#preprocess-the-batch" title="Link to this heading">¶</a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[38]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">preprocess</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">get_preprocess</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">do_augment</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">gaze_image_preprocessed</span> <span class="o">=</span> <span class="n">preprocess</span><span class="p">(</span><span class="n">gaze_images</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[39]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">gaze_image_preprocessed</span><span class="p">[(</span><span class="n">resolution</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="mi">6</span><span class="p">):(</span><span class="n">resolution</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="mi">9</span><span class="p">),</span> <span class="o">...</span><span class="p">],</span> <span class="n">nrow</span><span class="o">=</span><span class="n">resolution</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/40_compute_likelihood_map_50_0.png" src="_images/40_compute_likelihood_map_50_0.png" />
+</div>
+</div>
+</section>
+<section id="process-the-batch">
+<h2>process the batch<a class="headerlink" href="#process-the-batch" title="Link to this heading">¶</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[40]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dataset</span> <span class="o">=</span> <span class="s1">'bbox'</span>
+<span class="n">model_filename</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">data_cache</span> <span class="o">/</span> <span class="sa">f</span><span class="s1">'32_fovea_model_name=</span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">model_name</span><span class="si">}</span><span class="s1">_dataset=</span><span class="si">{</span><span class="n">dataset</span><span class="si">}</span><span class="s1">.pth'</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">model_filename</span><span class="o">=</span><span class="n">model_filename</span><span class="p">)</span>
+<span class="n">model_filename</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[40]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+PosixPath(&#39;cached_data/32_fovea_model_name=convnext_base_dataset=bbox.pth&#39;)
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[41]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn.functional</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nnf</span>
+
+<span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+    <span class="n">gaze_image_preprocessed</span> <span class="o">=</span> <span class="n">gaze_image_preprocessed</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">probas</span> <span class="o">=</span> <span class="n">nnf</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">model</span><span class="p">(</span><span class="n">gaze_image_preprocessed</span><span class="p">),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span>
+    <span class="c1"># probas = nnf.sigmoid(model(gaze_image_preprocessed)).cpu()</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[42]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">probas</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">probas</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">probas</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="n">probas</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[42]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+(torch.Size([315, 1000]), tensor(0.000), tensor(0.998), tensor(0.001))
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[43]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">idx_to_label</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">get_idx_to_label</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[44]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">proba_max</span><span class="p">,</span> <span class="n">preds</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">probas</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="c1"># detect = (preds == labels.data).cpu().numpy()</span>
+<span class="k">for</span> <span class="n">proba</span><span class="p">,</span> <span class="n">pred</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">proba_max</span><span class="p">,</span> <span class="n">preds</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">' </span><span class="si">{</span><span class="n">idx_to_label</span><span class="p">[</span><span class="n">pred</span><span class="p">]</span><span class="si">}</span><span class="s1"> @ Pr=</span><span class="si">{</span><span class="n">proba</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">'</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span><span class="s1">'</span><span class="se">\t</span><span class="s1">'</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+ vault @ Pr=0.444        coucal @ Pr=0.191       green_mamba @ Pr=0.136  king_crab @ Pr=0.149    green_mamba @ Pr=0.148  king_crab @ Pr=0.089    earthstar @ Pr=0.206    nail @ Pr=0.633         nail @ Pr=0.145         earthstar @ Pr=0.398    earthstar @ Pr=0.457    prayer_rug @ Pr=0.341   American_egret @ Pr=0.081       coral_fungus @ Pr=0.250         barn_spider @ Pr=0.420  fire_screen @ Pr=0.432  black_grouse @ Pr=0.129         black_grouse @ Pr=0.383         green_mamba @ Pr=0.118  pot @ Pr=0.543  green_mamba @ Pr=0.203  velvet @ Pr=0.249       nail @ Pr=0.705         earthstar @ Pr=0.355    coral_fungus @ Pr=0.099         earthstar @ Pr=0.175    coral_fungus @ Pr=0.297         earthstar @ Pr=0.159    stinkhorn @ Pr=0.246    sidewinder @ Pr=0.192   pot @ Pr=0.115  pot @ Pr=0.230  pot @ Pr=0.742  green_mamba @ Pr=0.123  ear @ Pr=0.498  earthstar @ Pr=0.142    hen-of-the-woods @ Pr=0.147     coral_fungus @ Pr=0.190         hen-of-the-woods @ Pr=0.182     ear @ Pr=0.221  coral_fungus @ Pr=0.352         stinkhorn @ Pr=0.154    earthstar @ Pr=0.201    coral_fungus @ Pr=0.645         sidewinder @ Pr=0.237   leopard @ Pr=0.104      drumstick @ Pr=0.037    steel_arch_bridge @ Pr=0.257    pot @ Pr=0.313  plastic_bag @ Pr=0.163  spider_web @ Pr=0.123   barn_spider @ Pr=0.285  hen-of-the-woods @ Pr=0.078     cliff @ Pr=0.766        walking_stick @ Pr=0.201        coral_fungus @ Pr=0.092         beaver @ Pr=0.318       earthstar @ Pr=0.070    thatch @ Pr=0.072       earthstar @ Pr=0.253    lakeside @ Pr=0.154     black_grouse @ Pr=0.118         pot @ Pr=0.799  lakeside @ Pr=0.407     earthstar @ Pr=0.482    walking_stick @ Pr=0.153        ear @ Pr=0.237  weasel @ Pr=0.158       cliff @ Pr=0.253        ruffed_grouse @ Pr=0.334        bittern @ Pr=0.162      English_setter @ Pr=0.054       pot @ Pr=0.119  rock_python @ Pr=0.401  pot @ Pr=0.111  leopard @ Pr=0.402      pot @ Pr=0.139  pot @ Pr=0.583  plastic_bag @ Pr=0.138  pot @ Pr=0.122  walking_stick @ Pr=0.539        spider_web @ Pr=0.223   weasel @ Pr=0.275       cliff @ Pr=0.173        European_fire_salamander @ Pr=0.220     stinkhorn @ Pr=0.115    lakeside @ Pr=0.130     beaver @ Pr=0.147       pot @ Pr=0.111  velvet @ Pr=0.270       leopard @ Pr=0.220      langur @ Pr=0.431       brambling @ Pr=0.150    king_crab @ Pr=0.147    langur @ Pr=0.203       walking_stick @ Pr=0.350        barn_spider @ Pr=0.135  spider_web @ Pr=0.768   black_grouse @ Pr=0.123         weasel @ Pr=0.080       barn_spider @ Pr=0.202  barn_spider @ Pr=0.517  pot @ Pr=0.567  velvet @ Pr=0.170       hay @ Pr=0.331  leopard @ Pr=0.200      black_grouse @ Pr=0.198         langur @ Pr=0.342       gar @ Pr=0.278  brambling @ Pr=0.261    pot @ Pr=0.119  walking_stick @ Pr=0.852        velvet @ Pr=0.261       spider_web @ Pr=0.307   cliff @ Pr=0.412        spider_web @ Pr=0.777   spider_web @ Pr=0.538   Irish_setter @ Pr=0.107         lakeside @ Pr=0.191     lakeside @ Pr=0.072     black_grouse @ Pr=0.131         langur @ Pr=0.310       pole @ Pr=0.129         black_grouse @ Pr=0.280         king_crab @ Pr=0.356    langur @ Pr=0.456       lion @ Pr=0.373         lion @ Pr=0.635         gazelle @ Pr=0.190      barn_spider @ Pr=0.126  lion @ Pr=0.097         lion @ Pr=0.092         hartebeest @ Pr=0.135   spider_web @ Pr=0.107   hay @ Pr=0.159  indri @ Pr=0.398        brambling @ Pr=0.087    colobus @ Pr=0.083      black_grouse @ Pr=0.496         langur @ Pr=0.139       cliff @ Pr=0.181        lakeside @ Pr=0.081     gazelle @ Pr=0.071      gazelle @ Pr=0.246      red_wolf @ Pr=0.218     barn_spider @ Pr=0.452  black_grouse @ Pr=0.606         hartebeest @ Pr=0.169   lion @ Pr=0.221         doormat @ Pr=0.114      brambling @ Pr=0.214    leopard @ Pr=0.348      leopard @ Pr=0.825      tiger @ Pr=0.515        leopard @ Pr=0.179      leopard @ Pr=0.586      volcano @ Pr=0.212      cheetah @ Pr=0.306      leopard @ Pr=0.616      leopard @ Pr=0.839      cheetah @ Pr=0.923      red_wolf @ Pr=0.226     black_grouse @ Pr=0.116         Brittany_spaniel @ Pr=0.168     prayer_rug @ Pr=0.624   fire_screen @ Pr=0.239  black_grouse @ Pr=0.328         buckeye @ Pr=0.148      cheetah @ Pr=0.148      leopard @ Pr=0.787      leopard @ Pr=0.911      leopard @ Pr=0.967      leopard @ Pr=0.693      cheetah @ Pr=0.863      cheetah @ Pr=0.941      leopard @ Pr=0.398      cheetah @ Pr=0.847      leopard @ Pr=0.937      leopard @ Pr=0.326      velvet @ Pr=0.852       pot @ Pr=0.081  leopard @ Pr=0.976      leopard @ Pr=0.994      cheetah @ Pr=0.826      cheetah @ Pr=0.864      leopard @ Pr=0.818      leopard @ Pr=0.633      cheetah @ Pr=0.741      cheetah @ Pr=0.477      cheetah @ Pr=0.760      cheetah @ Pr=0.753      leopard @ Pr=0.692      cheetah @ Pr=0.844      velvet @ Pr=0.329       prayer_rug @ Pr=0.743   nematode @ Pr=0.089     pot @ Pr=0.247  leopard @ Pr=0.998      leopard @ Pr=0.853      leopard @ Pr=0.931      leopard @ Pr=0.895      leopard @ Pr=0.939      leopard @ Pr=0.885      cheetah @ Pr=0.879      cheetah @ Pr=0.602      cheetah @ Pr=0.772      cheetah @ Pr=0.341      leopard @ Pr=0.664      hay @ Pr=0.532  lakeside @ Pr=0.327     broom @ Pr=0.251        leopard @ Pr=0.160      leopard @ Pr=0.687      leopard @ Pr=0.989      leopard @ Pr=0.927      leopard @ Pr=0.362      leopard @ Pr=0.884      leopard @ Pr=0.590      cheetah @ Pr=0.485      leopard @ Pr=0.448      cheetah @ Pr=0.449      leopard @ Pr=0.708      coyote @ Pr=0.050       pot @ Pr=0.108  prayer_rug @ Pr=0.769   pot @ Pr=0.768  pot @ Pr=0.149  pot @ Pr=0.791  cheetah @ Pr=0.789      leopard @ Pr=0.729      leopard @ Pr=0.569      leopard @ Pr=0.730      leopard @ Pr=0.497      leopard @ Pr=0.305      leopard @ Pr=0.777      leopard @ Pr=0.451      leopard @ Pr=0.416      leopard @ Pr=0.818      cliff @ Pr=0.093        prayer_rug @ Pr=0.730   pot @ Pr=0.271  pot @ Pr=0.685  king_crab @ Pr=0.256    coral_reef @ Pr=0.170   leopard @ Pr=0.650      slug @ Pr=0.467         cheetah @ Pr=0.314      slug @ Pr=0.322         common_newt @ Pr=0.172  cheetah @ Pr=0.524      leopard @ Pr=0.769      valley @ Pr=0.228       sidewinder @ Pr=0.056   prayer_rug @ Pr=0.377   prayer_rug @ Pr=0.079   brambling @ Pr=0.208    king_crab @ Pr=0.365    brambling @ Pr=0.884    coral_reef @ Pr=0.103   coral_reef @ Pr=0.216   spiny_lobster @ Pr=0.118        stinkhorn @ Pr=0.231    Indian_cobra @ Pr=0.117         leopard @ Pr=0.440      common_newt @ Pr=0.378  horned_viper @ Pr=0.416         banded_gecko @ Pr=0.303         ant @ Pr=0.190  prayer_rug @ Pr=0.380   honeycomb @ Pr=0.302    pot @ Pr=0.399  brambling @ Pr=0.575    earthstar @ Pr=0.260    sidewinder @ Pr=0.197   coral_reef @ Pr=0.655   hognose_snake @ Pr=0.162        king_crab @ Pr=0.296    stinkhorn @ Pr=0.504    common_newt @ Pr=0.893  French_loaf @ Pr=0.577  ant @ Pr=0.181  French_loaf @ Pr=0.482  badger @ Pr=0.154       spiny_lobster @ Pr=0.170        barn_spider @ Pr=0.169  langur @ Pr=0.081       black_grouse @ Pr=0.080         lakeside @ Pr=0.191     pot @ Pr=0.947  earthstar @ Pr=0.255    hen-of-the-woods @ Pr=0.831     meat_loaf @ Pr=0.348    cockroach @ Pr=0.368    stinkhorn @ Pr=0.605    electric_ray @ Pr=0.144         dough @ Pr=0.388        cliff @ Pr=0.466        vault @ Pr=0.412        velvet @ Pr=0.388       hartebeest @ Pr=0.117   lakeside @ Pr=0.138     lakeside @ Pr=0.324     coral_reef @ Pr=0.188   hen-of-the-woods @ Pr=0.585     stinkhorn @ Pr=0.334    hen-of-the-woods @ Pr=0.651     cliff @ Pr=0.833        meat_loaf @ Pr=0.527    cliff @ Pr=0.615        cliff @ Pr=0.447        French_loaf @ Pr=0.584  cliff @ Pr=0.202        common_newt @ Pr=0.432  common_newt @ Pr=0.304  prayer_rug @ Pr=0.620
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[45]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">true_label</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[45]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&#39;leopard&#39;
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[46]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">label2idx</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">get_label_to_idx</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+<span class="n">label2idx</span><span class="p">[</span><span class="n">true_label</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[46]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+288
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[47]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">full_image_np</span><span class="p">)</span>
+<span class="c1"># ax.set_xticks([])</span>
+<span class="n">proba_label</span> <span class="o">=</span> <span class="n">probas</span><span class="p">[:,</span> <span class="n">label2idx</span><span class="p">[</span><span class="n">true_label</span><span class="p">]]</span>
+<span class="n">idx_max</span> <span class="o">=</span> <span class="n">proba_label</span><span class="o">.</span><span class="n">argmax</span><span class="p">()</span>
+
+<span class="n">scatter</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">pos_W</span><span class="p">,</span> <span class="n">pos_H</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">proba_label</span><span class="o">*</span><span class="n">s_max</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">proba_label</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span> <span class="n">edgecolors</span><span class="o">=</span><span class="s1">'none'</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'Min proba_label ='</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">proba_label</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Max proba_label =</span><span class="si">{</span><span class="nb">max</span><span class="p">(</span><span class="n">proba_label</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">pos_W</span><span class="p">[</span><span class="n">idx_max</span><span class="p">],</span> <span class="n">pos_H</span><span class="p">[</span><span class="n">idx_max</span><span class="p">],</span> <span class="n">s</span><span class="o">=</span><span class="n">proba_label</span><span class="p">[</span><span class="n">idx_max</span><span class="p">]</span><span class="o">*</span><span class="n">s_max</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">'*'</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">'red'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">scatter</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>  <span class="c1"># Add colorbar</span>
+<span class="c1"># ax.scatter(500, 100, s=1000, c='r')</span>
+<span class="c1"># ax.set_yticks([])</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">set_facecolor</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">'white'</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [0.0..1.0000001].
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Min proba_label = tensor(0.000)
+Max proba_label =0.998
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/40_compute_likelihood_map_59_2.png" src="_images/40_compute_likelihood_map_59_2.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[48]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">proba_label</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">pos_W</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">idx_max</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[48]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+(torch.Size([315]), (315,), tensor(197))
+</pre></div></div>
+</div>
+<section id="as-a-function-fovea.compute_likelihood_map">
+<h3>as a function <code class="docutils literal notranslate"><span class="pre">fovea.compute_likelihood_map</span></code><a class="headerlink" href="#as-a-function-fovea.compute_likelihood_map" title="Link to this heading">¶</a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[49]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">N_fixations</span><span class="p">,</span> <span class="n">N_batch</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">32</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[50]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">N_fixations</span><span class="p">,</span> <span class="n">N_batch</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">((</span><span class="n">idx</span><span class="o">+</span><span class="n">N_batch</span><span class="p">,</span> <span class="n">N_fixations</span><span class="p">)))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+0 32
+32 64
+64 96
+96 100
+</pre></div></div>
+</div>
+</section>
+</section>
+<section id="comparing-mappings">
+<h2>comparing mappings<a class="headerlink" href="#comparing-mappings" title="Link to this heading">¶</a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[51]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># data_set_type = 'bbox'</span>
+<span class="c1"># model_name = 'resnet101'</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[52]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">three</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">W</span> <span class="o">=</span> <span class="n">full_image</span><span class="o">.</span><span class="n">shape</span>
+<span class="k">assert</span> <span class="n">three</span> <span class="o">==</span> <span class="mi">3</span>
+
+<span class="n">pos_H</span><span class="p">,</span> <span class="n">pos_W</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">get_positions</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="n">resolution</span><span class="p">)</span>
+<span class="n">probas</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">compute_likelihood_map</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">full_image</span><span class="p">,</span> <span class="n">pos_H</span><span class="p">,</span> <span class="n">pos_W</span><span class="p">,</span> <span class="n">size_ratio</span><span class="o">=</span><span class="n">size_ratio</span><span class="p">)</span>
+
+<span class="n">proba</span> <span class="o">=</span> <span class="n">proba</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[53]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">probas</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">pos_H</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[53]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+(torch.Size([315, 1000]), (315,))
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[54]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">proba_label</span> <span class="o">=</span> <span class="n">probas</span><span class="p">[:,</span> <span class="n">label2idx</span><span class="p">[</span><span class="n">true_label</span><span class="p">]]</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span>
+<span class="n">proba_label</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[54]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+tensor([0.001, 0.002, 0.002, 0.001, 0.001, 0.001, 0.000, 0.000, 0.000, 0.000, 0.000, 0.002, 0.016, 0.002, 0.032, 0.000, 0.000, 0.004, 0.000,
+        0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.001, 0.001, 0.001, 0.110, 0.002, 0.010, 0.001, 0.013, 0.003, 0.001, 0.002, 0.000, 0.001,
+        0.000, 0.001, 0.001, 0.033, 0.001, 0.010, 0.006, 0.004, 0.003, 0.002, 0.003, 0.001, 0.003, 0.001, 0.000, 0.000, 0.002, 0.000, 0.001,
+        0.010, 0.436, 0.051, 0.007, 0.003, 0.011, 0.003, 0.000, 0.000, 0.001, 0.001, 0.000, 0.001, 0.006, 0.001, 0.002, 0.003, 0.001, 0.028,
+        0.002, 0.005, 0.002, 0.005, 0.002, 0.038, 0.002, 0.000, 0.002, 0.007, 0.033, 0.006, 0.019, 0.001, 0.007, 0.006, 0.000, 0.005, 0.004,
+        0.007, 0.001, 0.004, 0.024, 0.001, 0.002, 0.000, 0.017, 0.005, 0.000, 0.129, 0.016, 0.001, 0.008, 0.001, 0.015, 0.006, 0.017, 0.006,
+        0.002, 0.001, 0.001, 0.002, 0.032, 0.004, 0.013, 0.012, 0.002, 0.001, 0.014, 0.001, 0.013, 0.007, 0.048, 0.005, 0.004, 0.003, 0.011,
+        0.002, 0.015, 0.002, 0.012, 0.004, 0.239, 0.170, 0.002, 0.005, 0.037, 0.031, 0.006, 0.003, 0.009, 0.013, 0.012, 0.005, 0.007, 0.037,
+        0.689, 0.948, 0.916, 0.996, 0.844, 0.586, 0.376, 0.956, 0.217, 0.096, 0.717, 0.009, 0.000, 0.035, 0.098, 0.999, 0.984, 0.998, 0.992,
+        0.996, 0.944, 0.764, 0.802, 0.706, 0.766, 0.057, 0.722, 0.000, 0.032, 0.998, 0.999, 0.997, 0.998, 0.949, 0.972, 0.829, 0.445, 0.232,
+        0.772, 0.659, 0.556, 0.072, 0.001, 0.011, 0.881, 0.996, 0.999, 0.997, 0.994, 0.984, 0.823, 0.938, 0.394, 0.658, 0.626, 0.919, 0.676,
+        0.000, 0.018, 0.989, 0.997, 0.999, 0.997, 0.992, 0.985, 0.899, 0.310, 0.771, 0.262, 0.916, 0.255, 0.012, 0.002, 0.110, 0.067, 0.912,
+        0.981, 0.937, 0.984, 0.994, 0.965, 0.941, 0.994, 0.939, 0.838, 0.357, 0.907, 0.006, 0.001, 0.070, 0.849, 0.998, 0.564, 0.925, 0.990,
+        0.900, 0.995, 0.394, 0.662, 0.420, 0.973, 0.018, 0.001, 0.005, 0.005, 0.005, 0.823, 0.855, 0.041, 0.368, 0.949, 0.322, 0.091, 0.023,
+        0.018, 0.001, 0.009, 0.002, 0.007, 0.003, 0.001, 0.006, 0.000, 0.002, 0.000, 0.001, 0.000, 0.001, 0.000, 0.000, 0.001, 0.000, 0.001,
+        0.004, 0.012, 0.003, 0.000, 0.004, 0.001, 0.000, 0.000, 0.000, 0.001, 0.000, 0.002, 0.000, 0.001, 0.000, 0.006, 0.002, 0.001, 0.004,
+        0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.007])
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[55]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">idx_max</span> <span class="o">=</span> <span class="n">proba_label</span><span class="o">.</span><span class="n">argmax</span><span class="p">()</span>
+<span class="n">idx_max</span><span class="p">,</span> <span class="n">pos_W</span><span class="p">[</span><span class="n">idx_max</span><span class="p">],</span> <span class="n">pos_H</span><span class="p">[</span><span class="n">idx_max</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[55]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+(tensor(198), np.float64(346.8181818181818), np.float64(93.75))
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[56]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">plot_map</span><span class="p">(</span><span class="n">size_ratio</span><span class="p">):</span>
+    <span class="n">pos_H</span><span class="p">,</span> <span class="n">pos_W</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">get_positions</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="n">resolution</span><span class="p">)</span>
+    <span class="n">probas</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">compute_likelihood_map</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">full_image</span><span class="p">,</span> <span class="n">pos_H</span><span class="p">,</span> <span class="n">pos_W</span><span class="p">,</span> <span class="n">size_ratio</span><span class="o">=</span><span class="n">size_ratio</span><span class="p">,</span> <span class="n">do_softmax</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">probas</span> <span class="o">=</span> <span class="n">probas</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span>
+    <span class="n">proba_label</span> <span class="o">=</span> <span class="n">probas</span><span class="p">[:,</span> <span class="n">label2idx</span><span class="p">[</span><span class="n">true_label</span><span class="p">]]</span>
+    <span class="n">idx_max</span> <span class="o">=</span> <span class="n">proba_label</span><span class="o">.</span><span class="n">argmax</span><span class="p">()</span>
+
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">full_image_np</span><span class="p">)</span>
+
+    <span class="n">scatter</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">pos_W</span><span class="p">,</span> <span class="n">pos_H</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">proba_label</span><span class="o">*</span><span class="n">s_max</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">proba_label</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span> <span class="n">edgecolors</span><span class="o">=</span><span class="s1">'none'</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Max proba_label =</span><span class="si">{</span><span class="nb">max</span><span class="p">(</span><span class="n">proba_label</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+
+    <span class="n">idx_max</span> <span class="o">=</span> <span class="n">proba_label</span><span class="o">.</span><span class="n">argmax</span><span class="p">()</span>
+
+    <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">pos_W</span><span class="p">[</span><span class="n">idx_max</span><span class="p">],</span> <span class="n">pos_H</span><span class="p">[</span><span class="n">idx_max</span><span class="p">],</span> <span class="n">s</span><span class="o">=</span><span class="n">proba_label</span><span class="p">[</span><span class="n">idx_max</span><span class="p">]</span><span class="o">*</span><span class="n">s_max</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">'*'</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">'red'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">scatter</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>  <span class="c1"># Add colorbar</span>
+
+    <span class="n">fig</span><span class="o">.</span><span class="n">set_facecolor</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">'white'</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plot_map</span><span class="p">(</span><span class="n">size_ratio</span><span class="o">=</span><span class="n">size_ratio</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [0.0..1.0000001].
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Max proba_label =0.999
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/40_compute_likelihood_map_70_2.png" src="_images/40_compute_likelihood_map_70_2.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[57]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">size_ratio</span> <span class="ow">in</span> <span class="p">[</span><span class="mf">.1</span><span class="p">,</span> <span class="mf">.2</span><span class="p">,</span> <span class="mf">.5</span><span class="p">,</span> <span class="mf">.618</span><span class="p">,</span> <span class="mf">.8</span><span class="p">]:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="mi">50</span> <span class="o">*</span> <span class="s2">"="</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"size_ratio = </span><span class="si">{</span><span class="n">size_ratio</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plot_map</span><span class="p">(</span><span class="n">size_ratio</span><span class="o">=</span><span class="n">size_ratio</span><span class="p">)</span>
+    <span class="n">fovea</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+==================================================
+size_ratio = 0.1
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [0.0..1.0000001].
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Max proba_label =0.965
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/40_compute_likelihood_map_71_3.png" src="_images/40_compute_likelihood_map_71_3.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+==================================================
+size_ratio = 0.2
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [0.0..1.0000001].
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Max proba_label =0.999
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/40_compute_likelihood_map_71_7.png" src="_images/40_compute_likelihood_map_71_7.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+==================================================
+size_ratio = 0.5
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [0.0..1.0000001].
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Max proba_label =1.000
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/40_compute_likelihood_map_71_11.png" src="_images/40_compute_likelihood_map_71_11.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+==================================================
+size_ratio = 0.618
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [0.0..1.0000001].
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Max proba_label =1.000
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/40_compute_likelihood_map_71_15.png" src="_images/40_compute_likelihood_map_71_15.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+==================================================
+size_ratio = 0.8
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [0.0..1.0000001].
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Max proba_label =1.000
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/40_compute_likelihood_map_71_19.png" src="_images/40_compute_likelihood_map_71_19.png" />
+</div>
+</div>
+</section>
+<section id="combining-different-mappings">
+<h2>combining different mappings<a class="headerlink" href="#combining-different-mappings" title="Link to this heading">¶</a></h2>
+<p>the response should be rotation and zoom invariant, so we can combine different mappings with different angles and size ratios</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[58]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pos_H</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">proba_label</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[58]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+((315,), torch.Size([315]))
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[59]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">plot_map</span><span class="p">(</span><span class="n">size_ratios</span><span class="p">):</span>
+    <span class="n">pos_H</span><span class="p">,</span> <span class="n">pos_W</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">get_positions</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="n">resolution</span><span class="p">)</span>
+    <span class="n">proba_label</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">for</span> <span class="n">size_ratio</span> <span class="ow">in</span> <span class="n">size_ratios</span><span class="p">:</span>
+        <span class="n">probas</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">compute_likelihood_map</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">full_image</span><span class="p">,</span> <span class="n">pos_H</span><span class="p">,</span> <span class="n">pos_W</span><span class="p">,</span> <span class="n">size_ratio</span><span class="o">=</span><span class="n">size_ratio</span><span class="p">,</span> <span class="n">do_softmax</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">probas</span> <span class="o">=</span> <span class="n">probas</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span>
+        <span class="n">proba_label_</span> <span class="o">=</span> <span class="n">probas</span><span class="p">[:,</span> <span class="n">label2idx</span><span class="p">[</span><span class="n">true_label</span><span class="p">]]</span>
+        <span class="k">if</span> <span class="n">proba_label</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">proba_label</span> <span class="o">=</span> <span class="n">proba_label_</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">proba_label</span> <span class="o">+=</span> <span class="n">proba_label_</span>
+    <span class="n">proba_label</span> <span class="o">=</span> <span class="n">proba_label</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">size_ratios</span><span class="p">)</span>
+
+    <span class="n">idx_max</span> <span class="o">=</span> <span class="n">proba_label</span><span class="o">.</span><span class="n">argmax</span><span class="p">()</span>
+
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">full_image_np</span><span class="p">)</span>
+
+    <span class="n">scatter</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">pos_W</span><span class="p">,</span> <span class="n">pos_H</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">proba_label</span><span class="o">*</span><span class="n">s_max</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">proba_label</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span> <span class="n">edgecolors</span><span class="o">=</span><span class="s1">'none'</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Max proba_label =</span><span class="si">{</span><span class="nb">max</span><span class="p">(</span><span class="n">proba_label</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+
+    <span class="n">idx_max</span> <span class="o">=</span> <span class="n">proba_label</span><span class="o">.</span><span class="n">argmax</span><span class="p">()</span>
+
+    <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">pos_W</span><span class="p">[</span><span class="n">idx_max</span><span class="p">],</span> <span class="n">pos_H</span><span class="p">[</span><span class="n">idx_max</span><span class="p">],</span> <span class="n">s</span><span class="o">=</span><span class="n">proba_label</span><span class="p">[</span><span class="n">idx_max</span><span class="p">]</span><span class="o">*</span><span class="n">s_max</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">'*'</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">'red'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">scatter</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>  <span class="c1"># Add colorbar</span>
+
+    <span class="n">fig</span><span class="o">.</span><span class="n">set_facecolor</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">'white'</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span>
+
+
+<span class="c1"># size_ratios = [.1, .2, .5, .618, .8]</span>
+<span class="n">size_ratios</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">,</span> <span class="mi">9</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plot_map</span><span class="p">(</span><span class="n">size_ratios</span><span class="o">=</span><span class="n">size_ratios</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [0.0..1.0000001].
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Max proba_label =0.990
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/40_compute_likelihood_map_75_2.png" src="_images/40_compute_likelihood_map_75_2.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[60]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">plot_map</span><span class="p">(</span><span class="n">size_ratios</span><span class="p">,</span> <span class="n">angles</span><span class="p">):</span>
+    <span class="n">pos_H</span><span class="p">,</span> <span class="n">pos_W</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">get_positions</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="n">resolution</span><span class="p">)</span>
+    <span class="n">proba_label</span><span class="p">,</span> <span class="n">proba_label_max</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="mf">0.</span>
+    <span class="n">size_ratio_max</span> <span class="o">=</span> <span class="n">size_ratios</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">size_ratio</span> <span class="ow">in</span> <span class="n">size_ratios</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">angle</span> <span class="ow">in</span> <span class="n">angles</span><span class="p">:</span>
+            <span class="n">probas</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">compute_likelihood_map</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">full_image</span><span class="p">,</span> <span class="n">pos_H</span><span class="p">,</span> <span class="n">pos_W</span><span class="p">,</span> <span class="n">size_ratio</span><span class="o">=</span><span class="n">size_ratio</span><span class="p">,</span> <span class="n">angle</span><span class="o">=</span><span class="n">angle</span><span class="p">,</span> <span class="n">do_softmax</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">probas</span> <span class="o">=</span> <span class="n">probas</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span>
+            <span class="n">proba_label_</span> <span class="o">=</span> <span class="n">probas</span><span class="p">[:,</span> <span class="n">label2idx</span><span class="p">[</span><span class="n">true_label</span><span class="p">]]</span>
+
+            <span class="k">if</span> <span class="n">proba_label_</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">&gt;</span> <span class="n">proba_label_max</span><span class="p">:</span>
+                <span class="n">proba_label_max</span> <span class="o">=</span> <span class="n">proba_label_</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+                <span class="n">size_ratio_max</span> <span class="o">=</span> <span class="n">size_ratio</span>
+
+            <span class="k">if</span> <span class="n">proba_label</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">proba_label</span> <span class="o">=</span> <span class="n">proba_label_</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">proba_label</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">proba_label</span><span class="p">,</span> <span class="n">proba_label_</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s1">'size_ratio_max'</span><span class="p">,</span> <span class="n">size_ratio_max</span><span class="p">)</span>
+
+    <span class="n">idx_max</span> <span class="o">=</span> <span class="n">proba_label</span><span class="o">.</span><span class="n">argmax</span><span class="p">()</span>
+
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">full_image_np</span><span class="p">)</span>
+
+    <span class="n">scatter</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">pos_W</span><span class="p">,</span> <span class="n">pos_H</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">proba_label</span><span class="o">*</span><span class="n">s_max</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">proba_label</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span> <span class="n">edgecolors</span><span class="o">=</span><span class="s1">'none'</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Max proba_label =</span><span class="si">{</span><span class="nb">max</span><span class="p">(</span><span class="n">proba_label</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+
+    <span class="n">idx_max</span> <span class="o">=</span> <span class="n">proba_label</span><span class="o">.</span><span class="n">argmax</span><span class="p">()</span>
+
+    <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">pos_W</span><span class="p">[</span><span class="n">idx_max</span><span class="p">],</span> <span class="n">pos_H</span><span class="p">[</span><span class="n">idx_max</span><span class="p">],</span> <span class="n">s</span><span class="o">=</span><span class="n">proba_label</span><span class="p">[</span><span class="n">idx_max</span><span class="p">]</span><span class="o">*</span><span class="n">s_max</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">'*'</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">'red'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">scatter</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>  <span class="c1"># Add colorbar</span>
+
+    <span class="n">fig</span><span class="o">.</span><span class="n">set_facecolor</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">'white'</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span>
+
+<span class="n">angles</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">45</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="mi">135</span><span class="p">,</span> <span class="mi">180</span><span class="p">,</span> <span class="mi">225</span><span class="p">,</span> <span class="mi">270</span><span class="p">,</span> <span class="mi">315</span><span class="p">]</span>
+<span class="n">angles</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="mi">180</span><span class="p">,</span> <span class="mi">270</span><span class="p">]</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plot_map</span><span class="p">(</span><span class="n">size_ratios</span><span class="o">=</span><span class="n">size_ratios</span><span class="p">,</span> <span class="n">angles</span><span class="o">=</span><span class="n">angles</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [0.0..1.0000001].
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+size_ratio_max 0.9
+Max proba_label =1.000
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/40_compute_likelihood_map_77_2.png" src="_images/40_compute_likelihood_map_77_2.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[61]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">plot_map</span><span class="p">(</span><span class="n">size_ratios</span><span class="p">,</span> <span class="n">angles</span><span class="p">):</span>
+    <span class="n">pos_H</span><span class="p">,</span> <span class="n">pos_W</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">get_positions</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="n">resolution</span><span class="p">)</span>
+    <span class="n">proba_label</span><span class="p">,</span> <span class="n">proba_label_max</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="mf">0.</span>
+    <span class="n">size_ratio_max</span> <span class="o">=</span> <span class="n">size_ratios</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">size_ratio</span> <span class="ow">in</span> <span class="n">size_ratios</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">angle</span> <span class="ow">in</span> <span class="n">angles</span><span class="p">:</span>
+            <span class="n">probas</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">compute_likelihood_map</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">full_image</span><span class="p">,</span> <span class="n">pos_H</span><span class="p">,</span> <span class="n">pos_W</span><span class="p">,</span> <span class="n">size_ratio</span><span class="o">=</span><span class="n">size_ratio</span><span class="p">,</span> <span class="n">angle</span><span class="o">=</span><span class="n">angle</span><span class="p">,</span> <span class="n">do_softmax</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">probas</span> <span class="o">=</span> <span class="n">probas</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span>
+            <span class="n">proba_label_</span> <span class="o">=</span> <span class="n">probas</span><span class="p">[:,</span> <span class="n">label2idx</span><span class="p">[</span><span class="n">true_label</span><span class="p">]]</span>
+
+            <span class="k">if</span> <span class="n">proba_label_</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">&gt;</span> <span class="n">proba_label_max</span><span class="p">:</span>
+                <span class="n">proba_label_max</span> <span class="o">=</span> <span class="n">proba_label_</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+                <span class="n">size_ratio_max</span> <span class="o">=</span> <span class="n">size_ratio</span>
+
+            <span class="k">if</span> <span class="n">proba_label</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">proba_label</span> <span class="o">=</span> <span class="n">proba_label_</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">proba_label</span> <span class="o">+=</span> <span class="n">proba_label_</span>
+    <span class="n">proba_label</span> <span class="o">=</span> <span class="n">proba_label</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">size_ratios</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">angles</span><span class="p">)</span>
+
+    <span class="n">idx_max</span> <span class="o">=</span> <span class="n">proba_label</span><span class="o">.</span><span class="n">argmax</span><span class="p">()</span>
+
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">full_image_np</span><span class="p">)</span>
+
+    <span class="n">scatter</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">pos_W</span><span class="p">,</span> <span class="n">pos_H</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">proba_label</span><span class="o">*</span><span class="n">s_max</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">proba_label</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span> <span class="n">edgecolors</span><span class="o">=</span><span class="s1">'none'</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Max proba_label =</span><span class="si">{</span><span class="nb">max</span><span class="p">(</span><span class="n">proba_label</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+
+    <span class="n">idx_max</span> <span class="o">=</span> <span class="n">proba_label</span><span class="o">.</span><span class="n">argmax</span><span class="p">()</span>
+
+    <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">pos_W</span><span class="p">[</span><span class="n">idx_max</span><span class="p">],</span> <span class="n">pos_H</span><span class="p">[</span><span class="n">idx_max</span><span class="p">],</span> <span class="n">s</span><span class="o">=</span><span class="n">proba_label</span><span class="p">[</span><span class="n">idx_max</span><span class="p">]</span><span class="o">*</span><span class="n">s_max</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">'*'</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">'red'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">scatter</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>  <span class="c1"># Add colorbar</span>
+
+    <span class="n">fig</span><span class="o">.</span><span class="n">set_facecolor</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">'white'</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span>
+
+
+<span class="c1"># size_ratios = [.1, .2, .5, .618, .8]</span>
+<span class="c1"># size_ratios = np.linspace(0.1, 0.9, 9)</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plot_map</span><span class="p">(</span><span class="n">size_ratios</span><span class="o">=</span><span class="n">size_ratios</span><span class="p">,</span> <span class="n">angles</span><span class="o">=</span><span class="n">angles</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [0.0..1.0000001].
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Max proba_label =0.939
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/40_compute_likelihood_map_79_2.png" src="_images/40_compute_likelihood_map_79_2.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[62]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plot_map</span><span class="p">(</span><span class="n">size_ratios</span><span class="o">=</span><span class="n">size_ratios</span><span class="p">,</span> <span class="n">angles</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">60</span><span class="p">,</span> <span class="mi">120</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [0.0..1.0000001].
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Max proba_label =0.893
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/40_compute_likelihood_map_81_2.png" src="_images/40_compute_likelihood_map_81_2.png" />
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[63]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># fig, ax = plot_map(size_ratios=np.linspace(0.3, 0.9, 5), angles=angles)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[64]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># fig, ax = plot_map(size_ratios=np.linspace(0.1, 0.6, 5), angles=angles)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[65]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plot_map</span><span class="p">(</span><span class="n">size_ratios</span><span class="o">=</span><span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">],</span> <span class="n">angles</span><span class="o">=</span><span class="n">angles</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [0.0..1.0000001].
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Max proba_label =0.963
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/40_compute_likelihood_map_84_2.png" src="_images/40_compute_likelihood_map_84_2.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[66]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plot_map</span><span class="p">(</span><span class="n">size_ratios</span><span class="o">=</span><span class="n">size_ratios</span><span class="p">,</span> <span class="n">angles</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="mi">180</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [0.0..1.0000001].
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Max proba_label =0.950
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/40_compute_likelihood_map_85_2.png" src="_images/40_compute_likelihood_map_85_2.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[67]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plot_map</span><span class="p">(</span><span class="n">size_ratios</span><span class="o">=</span><span class="n">size_ratios</span><span class="p">,</span> <span class="n">angles</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="mi">180</span><span class="p">,</span> <span class="mi">270</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [0.0..1.0000001].
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Max proba_label =0.942
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/40_compute_likelihood_map_86_2.png" src="_images/40_compute_likelihood_map_86_2.png" />
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[68]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># fig, ax = plot_map(size_ratios=size_ratios, angles=[0, 60, -30])</span>
+</pre></div>
+</div>
+</div>
+<p>Voilà !</p>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2025, Laurent U Perrinet
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Likelihood map on a test image</a><ul>
+<li><a class="reference internal" href="#testing-fixate">testing fixate</a><ul>
+<li><a class="reference internal" href="#making-a-grid">making a grid</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#first-strategy:-valid-boxes">first strategy: valid boxes</a></li>
+<li><a class="reference internal" href="#second-strategy:-more-brutal">second strategy: more brutal</a></li>
+<li><a class="reference internal" href="#second-strategy:-a-regular-grid-with-a-hexagonal-twist">second strategy: a regular grid with a hexagonal twist</a></li>
+<li><a class="reference internal" href="#all-in-one-function-def-get_positions">all in one function <code class="docutils literal notranslate"><span class="pre">def</span> <span class="pre">get_positions</span></code></a><ul>
+<li><a class="reference internal" href="#making-fixations-on-the-positions-of-the-grid">making fixations on the positions of the grid</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#using-the-fovea.fixate-function">using the <code class="docutils literal notranslate"><span class="pre">fovea.fixate</span></code> function</a></li>
+<li><a class="reference internal" href="#preprocess-the-batch">preprocess the batch</a></li>
+<li><a class="reference internal" href="#process-the-batch">process the batch</a><ul>
+<li><a class="reference internal" href="#as-a-function-fovea.compute_likelihood_map">as a function <code class="docutils literal notranslate"><span class="pre">fovea.compute_likelihood_map</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#comparing-mappings">comparing mappings</a></li>
+<li><a class="reference internal" href="#combining-different-mappings">combining different mappings</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/scripts/furo.js?v=46bd48cc"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    </body>
+</html>

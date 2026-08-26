@@ -1,0 +1,46 @@
+# Foveated Retinotopy: Giving a biological look to deep learning convolutional networks.
+
+![PyPI version](https://img.shields.io/pypi/v/retinoto_py.svg)[![Documentation Status](https://readthedocs.org/projects/retinoto_py/badge/?version=latest)](https://retinoto_py.readthedocs.io/en/latest/?version=latest)
+
+* PyPI package: https://pypi.org/project/retinoto_py/
+* Free software: MIT License
+* Documentation: https://retinoto_py.readthedocs.io.
+
+## TODO list in chronological order
+
+* DONE : 2025-12-18 pretrain for faster warmstart FC pour 20 - pas conclusif
+* DONE : 2025-12-25 use Subset instead of n_val_stop.
+* DONE : 2025-12-27 clean for `in_memory` code. fait, bon débarras !
+* DONE : 2026-01-12 hexagonal tiling for log-polar grid / mettre test_hexagonal_grid dans une notebook / 2026-01-12 - validé, ça marche effectivement mieux
+* DONE : regénérer bbox avec `fovea.fixate` = nouveau dataset `focus` / 2026-01-14 test sur Jean-Zay, monte à 75% assez vite puis descencd (mais avec  'NegLogitLoss')
+* DONE : test different costs: 2026-01-14 'BCEWithLogitsLoss' is worst, 'CrossEntropyLoss' is best but 'NegLogitLoss' is pretty good. 
+* DONE : introduced stochastic_depth_prob /  2026-01-18 still big over-fitting  acc_train":0.9716529699, "acc_val":0.7339647971,
+
+* DONE : more aggressive augmentation 
+* TODO : CutMix
+* DONE : test different optimizers: 2026-01-14 : close tie between adam and adamw, adding SGD 
+* DONE : scheduling - helps but not crucial
+* TODO : work out in `NegLogitLoss` how it really represents a log odd-ratio / do the stats of how labels are likely to appear together / is that an attention map ? / page 35 de 2023-04-19_THC ICANN suggère qu'on utilise une maximisation de (2*d -1) * logit (Pr) - mais a-t'on des exemples où on sait qu'il n'y a pas un chien-tench-... ? / c'est lié au label smoothing qui adoucit la présence d'un autre objet dans l'image / c'est notre cas dans bbox et on pourrait faire un bokeh autour de l'objet par segmentation...
+* TODO : optuna for grid parameters
+
+* TODO : create focus dataset: test saccades in each bounding box, select the most likely saccade for the given label
+
+* TODO : remove all resnet testing / learning and focus on convNext ?
+* TODO : semi-supervised learning: using YOLO / fasterRCNN method to extract images - regarder https://docs.pytorch.org/vision/main/generated/torchvision.transforms.v2.RandomIoUCrop.html#torchvision.transforms.v2.RandomIoUCrop
+* TODO : use ecoset
+* TODO : relancer 1* 2* 3* avant de passer à focus
+* TODO : relancer les likelihood maps / ajouter des crops à différentes échelles
+* TODO : check if we see center / surround effects
+* TODO : test circular padding
+* TODO : make a test that the recognition should work on very large images in a better way than a resizing
+* TODO: theroretical derivation of the joint encoding / decoding ("how is it to look through an eye")
+* TODO: learn the differentiable retinotopic mapping
+* TODO: log-polar mapping is a good prior
+* TODO: Event-based retinotopy / optic flow detection
+* TODO: where network : teacher student / get symmetries to find the best topology 
+* TODO : do visual search with a prompt
+* TODO : what about sigmoid, softmax or log-softmax ??
+
+## Credits
+
+This package was created with [Cookiecutter](https://github.com/audreyfeldroy/cookiecutter) and the [audreyfeldroy/cookiecutter-pypackage](https://github.com/audreyfeldroy/cookiecutter-pypackage) project template.

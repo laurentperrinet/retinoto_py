@@ -1,0 +1,1476 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="./">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html">
+
+    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
+        <title>transfer learning of each network on the masked dataset - retinoto_py | Foveated Retinotopy Documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="_static/nbsphinx-code-cells.css?v=2aa19091" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">retinoto_py | Foveated Retinotopy Documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  
+  <span class="sidebar-brand-text">retinoto_py | Foveated Retinotopy Documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="_sources/21_transfer-learning-convnext.ipynb.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <p>In this notebook, we perform transfer learning on a ConvNeXt model (specifically convnext_base) using the ImageNet dataset with different masking strategies (with or without) and datasets (full image vs. bounding box). We evaluate the model’s performance, compare results across different datasets, and visualize the learning evolution (training and validation accuracy) over time to assess the impact of masking on learning efficiency and robustness.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">retinoto_py</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">fovea</span>
+<span class="n">model_name</span> <span class="o">=</span> <span class="s1">'convnext_base'</span>
+<span class="n">args</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">Params</span><span class="p">(</span><span class="n">do_fovea</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">do_mask</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">model_name</span><span class="o">=</span><span class="n">model_name</span><span class="p">,</span> <span class="n">num_epochs</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">args</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Params(batch_size=32, num_workers=4, prefetch_factor=0, image_size=224, grid_size_ecc=161, grid_size_ang=309, do_mask=True, do_fovea=False, use_hexagonal_grid=True, rs_min=-3.5, rs_max=0.7, angle_start=-5.235987755982989, angle_margin=0.010166966516471823, mode=&#39;bilinear&#39;, padding_mode=&#39;zeros&#39;, model_name=&#39;convnext_base&#39;, num_epochs=10, subset_factor=1, optimizer_name=&#39;adamw&#39;, loss_name=&#39;CrossEntropyLoss&#39;, base_lr=1e-06, final_lr=1e-09, num_warmup_epochs=20, delta1=0.3, delta2=0.002, weight_decay=0.0001, label_smoothing=0.0005, do_full_training=True, do_augment=True, augment_proba=0.85, stochastic_depth_prob=0.6, seed=1998, shuffle=True, verbose=False)
+</pre></div></div>
+</div>
+<section id="transfer-learning-of-each-network-on-the-masked-dataset">
+<h1>transfer learning of each network on the masked dataset<a class="headerlink" href="#transfer-learning-of-each-network-on-the-masked-dataset" title="Link to this heading">¶</a></h1>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">ls</span> -ltr cached_data/21*
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+-rw-r--r--@ 1 laurent  staff  1063545885  1 juin  07:59 cached_data/21_model_name=convnext_base_dataset=full.pth
+-rw-r--r--@ 1 laurent  staff        7697  1 juin  07:59 cached_data/21_model_name=convnext_base_dataset=full.json
+-rw-r-----@ 1 laurent  staff  1063545885  5 juin  02:56 cached_data/21_model_name=convnext_base_dataset=bbox.pth
+-rw-r-----@ 1 laurent  staff        7656  5 juin  02:56 cached_data/21_model_name=convnext_base_dataset=bbox.json
+-rw-r--r--@ 1 laurent  staff           0  9 juin  10:34 cached_data/21_model_name=convnext_tiny_dataset=bbox.lock
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># %rm "cached_data/21_model_name=convnext_base_dataset=bbox.lock"   # FORCING RECOMPUTE</span>
+<span class="c1"># %rm "cached_data/21_model_name*.lock"   # FORCING RECOMPUTE</span>
+<span class="c1"># %rm "cached_data/21_model_name=convnext_base_dataset=bbox.lock"   # FORCING RECOMPUTE</span>
+<span class="c1"># %rm cached_data/20*</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+rm: cached_data/21_model_name*.lock: No such file or directory
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">model_name</span> <span class="ow">in</span> <span class="n">fovea</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">all_cn_model_names</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">dataset</span> <span class="ow">in</span> <span class="n">fovea</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">all_datasets</span><span class="p">:</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">model_name</span> <span class="o">=</span> <span class="n">model_name</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'21_model_name=</span><span class="si">{</span><span class="n">model_name</span><span class="si">}</span><span class="s1">_dataset=</span><span class="si">{</span><span class="n">dataset</span><span class="si">}</span><span class="s1">'</span>
+        <span class="n">model_filename</span><span class="p">,</span> <span class="n">json_filename</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">do_learning</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Training model convnext_tiny, file= cached_data/21_model_name=convnext_tiny_dataset=full.pth - image_size=224
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "695ae384178a4ec9af825ff9bbd4da4a", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "59b44225ff9b4c0f9a09520e22643122", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "d976f8ebeb4b4dd7a504c9aefa0323ef", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "128709bd2c1e4b8a9486f4607c39310f", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "fe99852e64554f13899265832b9c535b", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "736942852d9d4e22af7984ddf9ef7292", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "214757e79a354bbd91ac6d41cf2ec7d1", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "0b5534e28c0d4854b17a60eb9e05c4ed", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "1b29741a64d0400eb223e6920dc344ec", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "d5c2dbe13cc44332be91b843cbc2dea9", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "f3788af4c6c34079ae65747af54e601c", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "ad88e997cc144bc6aedf48aac0c6a337", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "ea2e5884477f44639f70a0b93c9a119c", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "80bf3e4b5b8749bfabff2e12e9bcc695", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "c984f436aa7242aa93cef2cc17d1a9ee", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "03eba47039fb48feae0ed778d996e205", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "fc0ff7f76717441ebd2107fdbab14aec", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "f47bef0af86445e3a786aa85a9bdac58", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "46802fbed0da4058b5708db9a782ffe9", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "dcac8cbdc0384d2eadc51917a3622d66", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "408f3367bc674bdc9eddc979deb27189", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Training of ConvNeXt(
+  (features): Sequential(
+    (0): Conv2dNormActivation(
+      (0): Conv2d(3, 96, kernel_size=(4, 4), stride=(4, 4))
+      (1): LayerNorm2d((96,), eps=1e-06, elementwise_affine=True)
+    )
+    (1): Sequential(
+      (0): CNBlock(
+        (block): Sequential(
+          (0): Conv2d(96, 96, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=96)
+          (1): Permute()
+          (2): LayerNorm((96,), eps=1e-06, elementwise_affine=True)
+          (3): Linear(in_features=96, out_features=384, bias=True)
+          (4): GELU(approximate=&#39;none&#39;)
+          (5): Linear(in_features=384, out_features=96, bias=True)
+          (6): Permute()
+        )
+        (stochastic_depth): StochasticDepth(p=0.0, mode=row)
+      )
+      (1): CNBlock(
+        (block): Sequential(
+          (0): Conv2d(96, 96, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=96)
+          (1): Permute()
+          (2): LayerNorm((96,), eps=1e-06, elementwise_affine=True)
+          (3): Linear(in_features=96, out_features=384, bias=True)
+          (4): GELU(approximate=&#39;none&#39;)
+          (5): Linear(in_features=384, out_features=96, bias=True)
+          (6): Permute()
+        )
+        (stochastic_depth): StochasticDepth(p=0.03529411764705882, mode=row)
+      )
+      (2): CNBlock(
+        (block): Sequential(
+          (0): Conv2d(96, 96, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=96)
+          (1): Permute()
+          (2): LayerNorm((96,), eps=1e-06, elementwise_affine=True)
+          (3): Linear(in_features=96, out_features=384, bias=True)
+          (4): GELU(approximate=&#39;none&#39;)
+          (5): Linear(in_features=384, out_features=96, bias=True)
+          (6): Permute()
+        )
+        (stochastic_depth): StochasticDepth(p=0.07058823529411765, mode=row)
+      )
+    )
+    (2): Sequential(
+      (0): LayerNorm2d((96,), eps=1e-06, elementwise_affine=True)
+      (1): Conv2d(96, 192, kernel_size=(2, 2), stride=(2, 2))
+    )
+    (3): Sequential(
+      (0): CNBlock(
+        (block): Sequential(
+          (0): Conv2d(192, 192, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=192)
+          (1): Permute()
+          (2): LayerNorm((192,), eps=1e-06, elementwise_affine=True)
+          (3): Linear(in_features=192, out_features=768, bias=True)
+          (4): GELU(approximate=&#39;none&#39;)
+          (5): Linear(in_features=768, out_features=192, bias=True)
+          (6): Permute()
+        )
+        (stochastic_depth): StochasticDepth(p=0.10588235294117646, mode=row)
+      )
+      (1): CNBlock(
+        (block): Sequential(
+          (0): Conv2d(192, 192, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=192)
+          (1): Permute()
+          (2): LayerNorm((192,), eps=1e-06, elementwise_affine=True)
+          (3): Linear(in_features=192, out_features=768, bias=True)
+          (4): GELU(approximate=&#39;none&#39;)
+          (5): Linear(in_features=768, out_features=192, bias=True)
+          (6): Permute()
+        )
+        (stochastic_depth): StochasticDepth(p=0.1411764705882353, mode=row)
+      )
+      (2): CNBlock(
+        (block): Sequential(
+          (0): Conv2d(192, 192, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=192)
+          (1): Permute()
+          (2): LayerNorm((192,), eps=1e-06, elementwise_affine=True)
+          (3): Linear(in_features=192, out_features=768, bias=True)
+          (4): GELU(approximate=&#39;none&#39;)
+          (5): Linear(in_features=768, out_features=192, bias=True)
+          (6): Permute()
+        )
+        (stochastic_depth): StochasticDepth(p=0.17647058823529413, mode=row)
+      )
+    )
+    (4): Sequential(
+      (0): LayerNorm2d((192,), eps=1e-06, elementwise_affine=True)
+      (1): Conv2d(192, 384, kernel_size=(2, 2), stride=(2, 2))
+    )
+    (5): Sequential(
+      (0): CNBlock(
+        (block): Sequential(
+          (0): Conv2d(384, 384, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=384)
+          (1): Permute()
+          (2): LayerNorm((384,), eps=1e-06, elementwise_affine=True)
+          (3): Linear(in_features=384, out_features=1536, bias=True)
+          (4): GELU(approximate=&#39;none&#39;)
+          (5): Linear(in_features=1536, out_features=384, bias=True)
+          (6): Permute()
+        )
+        (stochastic_depth): StochasticDepth(p=0.2117647058823529, mode=row)
+      )
+      (1): CNBlock(
+        (block): Sequential(
+          (0): Conv2d(384, 384, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=384)
+          (1): Permute()
+          (2): LayerNorm((384,), eps=1e-06, elementwise_affine=True)
+          (3): Linear(in_features=384, out_features=1536, bias=True)
+          (4): GELU(approximate=&#39;none&#39;)
+          (5): Linear(in_features=1536, out_features=384, bias=True)
+          (6): Permute()
+        )
+        (stochastic_depth): StochasticDepth(p=0.24705882352941178, mode=row)
+      )
+      (2): CNBlock(
+        (block): Sequential(
+          (0): Conv2d(384, 384, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=384)
+          (1): Permute()
+          (2): LayerNorm((384,), eps=1e-06, elementwise_affine=True)
+          (3): Linear(in_features=384, out_features=1536, bias=True)
+          (4): GELU(approximate=&#39;none&#39;)
+          (5): Linear(in_features=1536, out_features=384, bias=True)
+          (6): Permute()
+        )
+        (stochastic_depth): StochasticDepth(p=0.2823529411764706, mode=row)
+      )
+      (3): CNBlock(
+        (block): Sequential(
+          (0): Conv2d(384, 384, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=384)
+          (1): Permute()
+          (2): LayerNorm((384,), eps=1e-06, elementwise_affine=True)
+          (3): Linear(in_features=384, out_features=1536, bias=True)
+          (4): GELU(approximate=&#39;none&#39;)
+          (5): Linear(in_features=1536, out_features=384, bias=True)
+          (6): Permute()
+        )
+        (stochastic_depth): StochasticDepth(p=0.3176470588235294, mode=row)
+      )
+      (4): CNBlock(
+        (block): Sequential(
+          (0): Conv2d(384, 384, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=384)
+          (1): Permute()
+          (2): LayerNorm((384,), eps=1e-06, elementwise_affine=True)
+          (3): Linear(in_features=384, out_features=1536, bias=True)
+          (4): GELU(approximate=&#39;none&#39;)
+          (5): Linear(in_features=1536, out_features=384, bias=True)
+          (6): Permute()
+        )
+        (stochastic_depth): StochasticDepth(p=0.35294117647058826, mode=row)
+      )
+      (5): CNBlock(
+        (block): Sequential(
+          (0): Conv2d(384, 384, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=384)
+          (1): Permute()
+          (2): LayerNorm((384,), eps=1e-06, elementwise_affine=True)
+          (3): Linear(in_features=384, out_features=1536, bias=True)
+          (4): GELU(approximate=&#39;none&#39;)
+          (5): Linear(in_features=1536, out_features=384, bias=True)
+          (6): Permute()
+        )
+        (stochastic_depth): StochasticDepth(p=0.388235294117647, mode=row)
+      )
+      (6): CNBlock(
+        (block): Sequential(
+          (0): Conv2d(384, 384, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=384)
+          (1): Permute()
+          (2): LayerNorm((384,), eps=1e-06, elementwise_affine=True)
+          (3): Linear(in_features=384, out_features=1536, bias=True)
+          (4): GELU(approximate=&#39;none&#39;)
+          (5): Linear(in_features=1536, out_features=384, bias=True)
+          (6): Permute()
+        )
+        (stochastic_depth): StochasticDepth(p=0.4235294117647058, mode=row)
+      )
+      (7): CNBlock(
+        (block): Sequential(
+          (0): Conv2d(384, 384, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=384)
+          (1): Permute()
+          (2): LayerNorm((384,), eps=1e-06, elementwise_affine=True)
+          (3): Linear(in_features=384, out_features=1536, bias=True)
+          (4): GELU(approximate=&#39;none&#39;)
+          (5): Linear(in_features=1536, out_features=384, bias=True)
+          (6): Permute()
+        )
+        (stochastic_depth): StochasticDepth(p=0.4588235294117647, mode=row)
+      )
+      (8): CNBlock(
+        (block): Sequential(
+          (0): Conv2d(384, 384, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=384)
+          (1): Permute()
+          (2): LayerNorm((384,), eps=1e-06, elementwise_affine=True)
+          (3): Linear(in_features=384, out_features=1536, bias=True)
+          (4): GELU(approximate=&#39;none&#39;)
+          (5): Linear(in_features=1536, out_features=384, bias=True)
+          (6): Permute()
+        )
+        (stochastic_depth): StochasticDepth(p=0.49411764705882355, mode=row)
+      )
+    )
+    (6): Sequential(
+      (0): LayerNorm2d((384,), eps=1e-06, elementwise_affine=True)
+      (1): Conv2d(384, 768, kernel_size=(2, 2), stride=(2, 2))
+    )
+    (7): Sequential(
+      (0): CNBlock(
+        (block): Sequential(
+          (0): Conv2d(768, 768, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=768)
+          (1): Permute()
+          (2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+          (3): Linear(in_features=768, out_features=3072, bias=True)
+          (4): GELU(approximate=&#39;none&#39;)
+          (5): Linear(in_features=3072, out_features=768, bias=True)
+          (6): Permute()
+        )
+        (stochastic_depth): StochasticDepth(p=0.5294117647058824, mode=row)
+      )
+      (1): CNBlock(
+        (block): Sequential(
+          (0): Conv2d(768, 768, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=768)
+          (1): Permute()
+          (2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+          (3): Linear(in_features=768, out_features=3072, bias=True)
+          (4): GELU(approximate=&#39;none&#39;)
+          (5): Linear(in_features=3072, out_features=768, bias=True)
+          (6): Permute()
+        )
+        (stochastic_depth): StochasticDepth(p=0.5647058823529412, mode=row)
+      )
+      (2): CNBlock(
+        (block): Sequential(
+          (0): Conv2d(768, 768, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=768)
+          (1): Permute()
+          (2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+          (3): Linear(in_features=768, out_features=3072, bias=True)
+          (4): GELU(approximate=&#39;none&#39;)
+          (5): Linear(in_features=3072, out_features=768, bias=True)
+          (6): Permute()
+        )
+        (stochastic_depth): StochasticDepth(p=0.6, mode=row)
+      )
+    )
+  )
+  (avgpool): AdaptiveAvgPool2d(output_size=1)
+  (classifier): Sequential(
+    (0): LayerNorm2d((768,), eps=1e-06, elementwise_affine=True)
+    (1): Flatten(start_dim=1, end_dim=-1)
+    (2): Linear(in_features=768, out_features=1000, bias=True)
+  )
+) completed in 1179m 14s
+Training model convnext_small, file= cached_data/21_model_name=convnext_small_dataset=full.pth - image_size=224
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "bd66cff011144dc0864a7fab4d96fdfe", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "e673324ff4ec4a5caf03796866783421", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "2fbc4274416d42ca9ff25e0777cc1323", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "1a8cdc5575814677ac9115a1fb1f3cc7", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "97f9fbaca3a94e72a54cce398978ed9c", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "d50e53808028449db79e6ec1b9eb8205", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "5aa67374b46546caa3252ad299c4be52", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "c7e0453271aa465295c0f1ca9b4f15ef", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "66251f83cdcf43c8a2f092eaf2f14ec8", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "51343da3c3c247459d46cf2b55aceda3", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "2ccf7afda9e74811a0705f0999651c21", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "a3cfb888319446d0abc5513445f87326", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "8b25583f36d045b29758059648ac3fbf", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "f9eb4b0b240f4b1e98f494228f3caaa7", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "c96e9f0d96e64eb7838c2e5089516407", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "96224622446a4b7da30079132b19761f", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "258322f5d6e94efd8f0d84db9c26cd85", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "63b3b64f9e4345759897e8454a35be5f", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "78be56fb856a4974986efb11ca3465af", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "2032d23b2faa4a39860ef42fb379665e", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "ccb9f944306e4de6b1507fdf54f5f75e", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Training of ConvNeXt(
+  (features): Sequential(
+    (0): Conv2dNormActivation(
+      (0): Conv2d(3, 96, kernel_size=(4, 4), stride=(4, 4))
+      (1): LayerNorm2d((96,), eps=1e-06, elementwise_affine=True)
+    )
+    (1): Sequential(
+      (0): CNBlock(
+        (block): Sequential(
+          (0): Conv2d(96, 96, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=96)
+          (1): Permute()
+          (2): LayerNorm((96,), eps=1e-06, elementwise_affine=True)
+          (3): Linear(in_features=96, out_features=384, bias=True)
+          (4): GELU(approximate=&#39;none&#39;)
+          (5): Linear(in_features=384, out_features=96, bias=True)
+          (6): Permute()
+        )
+        (stochastic_depth): StochasticDepth(p=0.0, mode=row)
+      )
+      (1): CNBlock(
+        (block): Sequential(
+          (0): Conv2d(96, 96, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=96)
+          (1): Permute()
+          (2): LayerNorm((96,), eps=1e-06, elementwise_affine=True)
+          (3): Linear(in_features=96, out_features=384, bias=True)
+          (4): GELU(approximate=&#39;none&#39;)
+          (5): Linear(in_features=384, out_features=96, bias=True)
+          (6): Permute()
+        )
+        (stochastic_depth): StochasticDepth(p=0.017142857142857144, mode=row)
+      )
+      (2): CNBlock(
+        (block): Sequential(
+          (0): Conv2d(96, 96, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=96)
+          (1): Permute()
+          (2): LayerNorm((96,), eps=1e-06, elementwise_affine=True)
+          (3): Linear(in_features=96, out_features=384, bias=True)
+          (4): GELU(approximate=&#39;none&#39;)
+          (5): Linear(in_features=384, out_features=96, bias=True)
+          (6): Permute()
+        )
+        (stochastic_depth): StochasticDepth(p=0.03428571428571429, mode=row)
+      )
+    )
+    (2): Sequential(
+      (0): LayerNorm2d((96,), eps=1e-06, elementwise_affine=True)
+      (1): Conv2d(96, 192, kernel_size=(2, 2), stride=(2, 2))
+    )
+    (3): Sequential(
+      (0): CNBlock(
+        (block): Sequential(
+          (0): Conv2d(192, 192, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=192)
+          (1): Permute()
+          (2): LayerNorm((192,), eps=1e-06, elementwise_affine=True)
+          (3): Linear(in_features=192, out_features=768, bias=True)
+          (4): GELU(approximate=&#39;none&#39;)
+          (5): Linear(in_features=768, out_features=192, bias=True)
+          (6): Permute()
+        )
+        (stochastic_depth): StochasticDepth(p=0.05142857142857142, mode=row)
+      )
+      (1): CNBlock(
+        (block): Sequential(
+          (0): Conv2d(192, 192, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=192)
+          (1): Permute()
+          (2): LayerNorm((192,), eps=1e-06, elementwise_affine=True)
+          (3): Linear(in_features=192, out_features=768, bias=True)
+          (4): GELU(approximate=&#39;none&#39;)
+          (5): Linear(in_features=768, out_features=192, bias=True)
+          (6): Permute()
+        )
+        (stochastic_depth): StochasticDepth(p=0.06857142857142857, mode=row)
+      )
+      (2): CNBlock(
+        (block): Sequential(
+          (0): Conv2d(192, 192, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=192)
+          (1): Permute()
+          (2): LayerNorm((192,), eps=1e-06, elementwise_affine=True)
+          (3): Linear(in_features=192, out_features=768, bias=True)
+          (4): GELU(approximate=&#39;none&#39;)
+          (5): Linear(in_features=768, out_features=192, bias=True)
+          (6): Permute()
+        )
+        (stochastic_depth): StochasticDepth(p=0.08571428571428572, mode=row)
+      )
+    )
+    (4): Sequential(
+      (0): LayerNorm2d((192,), eps=1e-06, elementwise_affine=True)
+      (1): Conv2d(192, 384, kernel_size=(2, 2), stride=(2, 2))
+    )
+    (5): Sequential(
+      (0): CNBlock(
+        (block): Sequential(
+          (0): Conv2d(384, 384, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=384)
+          (1): Permute()
+          (2): LayerNorm((384,), eps=1e-06, elementwise_affine=True)
+          (3): Linear(in_features=384, out_features=1536, bias=True)
+          (4): GELU(approximate=&#39;none&#39;)
+          (5): Linear(in_features=1536, out_features=384, bias=True)
+          (6): Permute()
+        )
+        (stochastic_depth): StochasticDepth(p=0.10285714285714284, mode=row)
+      )
+      (1): CNBlock(
+        (block): Sequential(
+          (0): Conv2d(384, 384, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=384)
+          (1): Permute()
+          (2): LayerNorm((384,), eps=1e-06, elementwise_affine=True)
+          (3): Linear(in_features=384, out_features=1536, bias=True)
+          (4): GELU(approximate=&#39;none&#39;)
+          (5): Linear(in_features=1536, out_features=384, bias=True)
+          (6): Permute()
+        )
+        (stochastic_depth): StochasticDepth(p=0.12000000000000001, mode=row)
+      )
+      (2): CNBlock(
+        (block): Sequential(
+          (0): Conv2d(384, 384, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=384)
+          (1): Permute()
+          (2): LayerNorm((384,), eps=1e-06, elementwise_affine=True)
+          (3): Linear(in_features=384, out_features=1536, bias=True)
+          (4): GELU(approximate=&#39;none&#39;)
+          (5): Linear(in_features=1536, out_features=384, bias=True)
+          (6): Permute()
+        )
+        (stochastic_depth): StochasticDepth(p=0.13714285714285715, mode=row)
+      )
+      (3): CNBlock(
+        (block): Sequential(
+          (0): Conv2d(384, 384, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=384)
+          (1): Permute()
+          (2): LayerNorm((384,), eps=1e-06, elementwise_affine=True)
+          (3): Linear(in_features=384, out_features=1536, bias=True)
+          (4): GELU(approximate=&#39;none&#39;)
+          (5): Linear(in_features=1536, out_features=384, bias=True)
+          (6): Permute()
+        )
+        (stochastic_depth): StochasticDepth(p=0.15428571428571428, mode=row)
+      )
+      (4): CNBlock(
+        (block): Sequential(
+          (0): Conv2d(384, 384, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=384)
+          (1): Permute()
+          (2): LayerNorm((384,), eps=1e-06, elementwise_affine=True)
+          (3): Linear(in_features=384, out_features=1536, bias=True)
+          (4): GELU(approximate=&#39;none&#39;)
+          (5): Linear(in_features=1536, out_features=384, bias=True)
+          (6): Permute()
+        )
+        (stochastic_depth): StochasticDepth(p=0.17142857142857143, mode=row)
+      )
+      (5): CNBlock(
+        (block): Sequential(
+          (0): Conv2d(384, 384, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=384)
+          (1): Permute()
+          (2): LayerNorm((384,), eps=1e-06, elementwise_affine=True)
+          (3): Linear(in_features=384, out_features=1536, bias=True)
+          (4): GELU(approximate=&#39;none&#39;)
+          (5): Linear(in_features=1536, out_features=384, bias=True)
+          (6): Permute()
+        )
+        (stochastic_depth): StochasticDepth(p=0.18857142857142856, mode=row)
+      )
+      (6): CNBlock(
+        (block): Sequential(
+          (0): Conv2d(384, 384, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=384)
+          (1): Permute()
+          (2): LayerNorm((384,), eps=1e-06, elementwise_affine=True)
+          (3): Linear(in_features=384, out_features=1536, bias=True)
+          (4): GELU(approximate=&#39;none&#39;)
+          (5): Linear(in_features=1536, out_features=384, bias=True)
+          (6): Permute()
+        )
+        (stochastic_depth): StochasticDepth(p=0.20571428571428568, mode=row)
+      )
+      (7): CNBlock(
+        (block): Sequential(
+          (0): Conv2d(384, 384, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=384)
+          (1): Permute()
+          (2): LayerNorm((384,), eps=1e-06, elementwise_affine=True)
+          (3): Linear(in_features=384, out_features=1536, bias=True)
+          (4): GELU(approximate=&#39;none&#39;)
+          (5): Linear(in_features=1536, out_features=384, bias=True)
+          (6): Permute()
+        )
+        (stochastic_depth): StochasticDepth(p=0.22285714285714286, mode=row)
+      )
+      (8): CNBlock(
+        (block): Sequential(
+          (0): Conv2d(384, 384, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=384)
+          (1): Permute()
+          (2): LayerNorm((384,), eps=1e-06, elementwise_affine=True)
+          (3): Linear(in_features=384, out_features=1536, bias=True)
+          (4): GELU(approximate=&#39;none&#39;)
+          (5): Linear(in_features=1536, out_features=384, bias=True)
+          (6): Permute()
+        )
+        (stochastic_depth): StochasticDepth(p=0.24000000000000002, mode=row)
+      )
+      (9): CNBlock(
+        (block): Sequential(
+          (0): Conv2d(384, 384, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=384)
+          (1): Permute()
+          (2): LayerNorm((384,), eps=1e-06, elementwise_affine=True)
+          (3): Linear(in_features=384, out_features=1536, bias=True)
+          (4): GELU(approximate=&#39;none&#39;)
+          (5): Linear(in_features=1536, out_features=384, bias=True)
+          (6): Permute()
+        )
+        (stochastic_depth): StochasticDepth(p=0.2571428571428571, mode=row)
+      )
+      (10): CNBlock(
+        (block): Sequential(
+          (0): Conv2d(384, 384, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=384)
+          (1): Permute()
+          (2): LayerNorm((384,), eps=1e-06, elementwise_affine=True)
+          (3): Linear(in_features=384, out_features=1536, bias=True)
+          (4): GELU(approximate=&#39;none&#39;)
+          (5): Linear(in_features=1536, out_features=384, bias=True)
+          (6): Permute()
+        )
+        (stochastic_depth): StochasticDepth(p=0.2742857142857143, mode=row)
+      )
+      (11): CNBlock(
+        (block): Sequential(
+          (0): Conv2d(384, 384, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=384)
+          (1): Permute()
+          (2): LayerNorm((384,), eps=1e-06, elementwise_affine=True)
+          (3): Linear(in_features=384, out_features=1536, bias=True)
+          (4): GELU(approximate=&#39;none&#39;)
+          (5): Linear(in_features=1536, out_features=384, bias=True)
+          (6): Permute()
+        )
+        (stochastic_depth): StochasticDepth(p=0.2914285714285714, mode=row)
+      )
+      (12): CNBlock(
+        (block): Sequential(
+          (0): Conv2d(384, 384, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=384)
+          (1): Permute()
+          (2): LayerNorm((384,), eps=1e-06, elementwise_affine=True)
+          (3): Linear(in_features=384, out_features=1536, bias=True)
+          (4): GELU(approximate=&#39;none&#39;)
+          (5): Linear(in_features=1536, out_features=384, bias=True)
+          (6): Permute()
+        )
+        (stochastic_depth): StochasticDepth(p=0.30857142857142855, mode=row)
+      )
+      (13): CNBlock(
+        (block): Sequential(
+          (0): Conv2d(384, 384, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=384)
+          (1): Permute()
+          (2): LayerNorm((384,), eps=1e-06, elementwise_affine=True)
+          (3): Linear(in_features=384, out_features=1536, bias=True)
+          (4): GELU(approximate=&#39;none&#39;)
+          (5): Linear(in_features=1536, out_features=384, bias=True)
+          (6): Permute()
+        )
+        (stochastic_depth): StochasticDepth(p=0.32571428571428573, mode=row)
+      )
+      (14): CNBlock(
+        (block): Sequential(
+          (0): Conv2d(384, 384, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=384)
+          (1): Permute()
+          (2): LayerNorm((384,), eps=1e-06, elementwise_affine=True)
+          (3): Linear(in_features=384, out_features=1536, bias=True)
+          (4): GELU(approximate=&#39;none&#39;)
+          (5): Linear(in_features=1536, out_features=384, bias=True)
+          (6): Permute()
+        )
+        (stochastic_depth): StochasticDepth(p=0.34285714285714286, mode=row)
+      )
+      (15): CNBlock(
+        (block): Sequential(
+          (0): Conv2d(384, 384, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=384)
+          (1): Permute()
+          (2): LayerNorm((384,), eps=1e-06, elementwise_affine=True)
+          (3): Linear(in_features=384, out_features=1536, bias=True)
+          (4): GELU(approximate=&#39;none&#39;)
+          (5): Linear(in_features=1536, out_features=384, bias=True)
+          (6): Permute()
+        )
+        (stochastic_depth): StochasticDepth(p=0.36, mode=row)
+      )
+      (16): CNBlock(
+        (block): Sequential(
+          (0): Conv2d(384, 384, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=384)
+          (1): Permute()
+          (2): LayerNorm((384,), eps=1e-06, elementwise_affine=True)
+          (3): Linear(in_features=384, out_features=1536, bias=True)
+          (4): GELU(approximate=&#39;none&#39;)
+          (5): Linear(in_features=1536, out_features=384, bias=True)
+          (6): Permute()
+        )
+        (stochastic_depth): StochasticDepth(p=0.3771428571428571, mode=row)
+      )
+      (17): CNBlock(
+        (block): Sequential(
+          (0): Conv2d(384, 384, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=384)
+          (1): Permute()
+          (2): LayerNorm((384,), eps=1e-06, elementwise_affine=True)
+          (3): Linear(in_features=384, out_features=1536, bias=True)
+          (4): GELU(approximate=&#39;none&#39;)
+          (5): Linear(in_features=1536, out_features=384, bias=True)
+          (6): Permute()
+        )
+        (stochastic_depth): StochasticDepth(p=0.39428571428571424, mode=row)
+      )
+      (18): CNBlock(
+        (block): Sequential(
+          (0): Conv2d(384, 384, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=384)
+          (1): Permute()
+          (2): LayerNorm((384,), eps=1e-06, elementwise_affine=True)
+          (3): Linear(in_features=384, out_features=1536, bias=True)
+          (4): GELU(approximate=&#39;none&#39;)
+          (5): Linear(in_features=1536, out_features=384, bias=True)
+          (6): Permute()
+        )
+        (stochastic_depth): StochasticDepth(p=0.41142857142857137, mode=row)
+      )
+      (19): CNBlock(
+        (block): Sequential(
+          (0): Conv2d(384, 384, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=384)
+          (1): Permute()
+          (2): LayerNorm((384,), eps=1e-06, elementwise_affine=True)
+          (3): Linear(in_features=384, out_features=1536, bias=True)
+          (4): GELU(approximate=&#39;none&#39;)
+          (5): Linear(in_features=1536, out_features=384, bias=True)
+          (6): Permute()
+        )
+        (stochastic_depth): StochasticDepth(p=0.42857142857142855, mode=row)
+      )
+      (20): CNBlock(
+        (block): Sequential(
+          (0): Conv2d(384, 384, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=384)
+          (1): Permute()
+          (2): LayerNorm((384,), eps=1e-06, elementwise_affine=True)
+          (3): Linear(in_features=384, out_features=1536, bias=True)
+          (4): GELU(approximate=&#39;none&#39;)
+          (5): Linear(in_features=1536, out_features=384, bias=True)
+          (6): Permute()
+        )
+        (stochastic_depth): StochasticDepth(p=0.44571428571428573, mode=row)
+      )
+      (21): CNBlock(
+        (block): Sequential(
+          (0): Conv2d(384, 384, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=384)
+          (1): Permute()
+          (2): LayerNorm((384,), eps=1e-06, elementwise_affine=True)
+          (3): Linear(in_features=384, out_features=1536, bias=True)
+          (4): GELU(approximate=&#39;none&#39;)
+          (5): Linear(in_features=1536, out_features=384, bias=True)
+          (6): Permute()
+        )
+        (stochastic_depth): StochasticDepth(p=0.46285714285714286, mode=row)
+      )
+      (22): CNBlock(
+        (block): Sequential(
+          (0): Conv2d(384, 384, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=384)
+          (1): Permute()
+          (2): LayerNorm((384,), eps=1e-06, elementwise_affine=True)
+          (3): Linear(in_features=384, out_features=1536, bias=True)
+          (4): GELU(approximate=&#39;none&#39;)
+          (5): Linear(in_features=1536, out_features=384, bias=True)
+          (6): Permute()
+        )
+        (stochastic_depth): StochasticDepth(p=0.48000000000000004, mode=row)
+      )
+      (23): CNBlock(
+        (block): Sequential(
+          (0): Conv2d(384, 384, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=384)
+          (1): Permute()
+          (2): LayerNorm((384,), eps=1e-06, elementwise_affine=True)
+          (3): Linear(in_features=384, out_features=1536, bias=True)
+          (4): GELU(approximate=&#39;none&#39;)
+          (5): Linear(in_features=1536, out_features=384, bias=True)
+          (6): Permute()
+        )
+        (stochastic_depth): StochasticDepth(p=0.4971428571428571, mode=row)
+      )
+      (24): CNBlock(
+        (block): Sequential(
+          (0): Conv2d(384, 384, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=384)
+          (1): Permute()
+          (2): LayerNorm((384,), eps=1e-06, elementwise_affine=True)
+          (3): Linear(in_features=384, out_features=1536, bias=True)
+          (4): GELU(approximate=&#39;none&#39;)
+          (5): Linear(in_features=1536, out_features=384, bias=True)
+          (6): Permute()
+        )
+        (stochastic_depth): StochasticDepth(p=0.5142857142857142, mode=row)
+      )
+      (25): CNBlock(
+        (block): Sequential(
+          (0): Conv2d(384, 384, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=384)
+          (1): Permute()
+          (2): LayerNorm((384,), eps=1e-06, elementwise_affine=True)
+          (3): Linear(in_features=384, out_features=1536, bias=True)
+          (4): GELU(approximate=&#39;none&#39;)
+          (5): Linear(in_features=1536, out_features=384, bias=True)
+          (6): Permute()
+        )
+        (stochastic_depth): StochasticDepth(p=0.5314285714285714, mode=row)
+      )
+      (26): CNBlock(
+        (block): Sequential(
+          (0): Conv2d(384, 384, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=384)
+          (1): Permute()
+          (2): LayerNorm((384,), eps=1e-06, elementwise_affine=True)
+          (3): Linear(in_features=384, out_features=1536, bias=True)
+          (4): GELU(approximate=&#39;none&#39;)
+          (5): Linear(in_features=1536, out_features=384, bias=True)
+          (6): Permute()
+        )
+        (stochastic_depth): StochasticDepth(p=0.5485714285714286, mode=row)
+      )
+    )
+    (6): Sequential(
+      (0): LayerNorm2d((384,), eps=1e-06, elementwise_affine=True)
+      (1): Conv2d(384, 768, kernel_size=(2, 2), stride=(2, 2))
+    )
+    (7): Sequential(
+      (0): CNBlock(
+        (block): Sequential(
+          (0): Conv2d(768, 768, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=768)
+          (1): Permute()
+          (2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+          (3): Linear(in_features=768, out_features=3072, bias=True)
+          (4): GELU(approximate=&#39;none&#39;)
+          (5): Linear(in_features=3072, out_features=768, bias=True)
+          (6): Permute()
+        )
+        (stochastic_depth): StochasticDepth(p=0.5657142857142857, mode=row)
+      )
+      (1): CNBlock(
+        (block): Sequential(
+          (0): Conv2d(768, 768, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=768)
+          (1): Permute()
+          (2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+          (3): Linear(in_features=768, out_features=3072, bias=True)
+          (4): GELU(approximate=&#39;none&#39;)
+          (5): Linear(in_features=3072, out_features=768, bias=True)
+          (6): Permute()
+        )
+        (stochastic_depth): StochasticDepth(p=0.5828571428571429, mode=row)
+      )
+      (2): CNBlock(
+        (block): Sequential(
+          (0): Conv2d(768, 768, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), groups=768)
+          (1): Permute()
+          (2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+          (3): Linear(in_features=768, out_features=3072, bias=True)
+          (4): GELU(approximate=&#39;none&#39;)
+          (5): Linear(in_features=3072, out_features=768, bias=True)
+          (6): Permute()
+        )
+        (stochastic_depth): StochasticDepth(p=0.6, mode=row)
+      )
+    )
+  )
+  (avgpool): AdaptiveAvgPool2d(output_size=1)
+  (classifier): Sequential(
+    (0): LayerNorm2d((768,), eps=1e-06, elementwise_affine=True)
+    (1): Flatten(start_dim=1, end_dim=-1)
+    (2): Linear(in_features=768, out_features=1000, bias=True)
+  )
+) completed in 1842m 50s
+Training model convnext_small, file= cached_data/21_model_name=convnext_small_dataset=bbox.pth - image_size=224
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "795713ac23a04b739eee51bb29c03dd0", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "b70a39d736474191ad4ab49bb5c3bd99", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "b7701988b7964c4cbbafc3134973c671", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "c83b76a31dcb4ce7a55eec9a48bb1bd5", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "896571fb1ff3456ab4b7b14b6de47574", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "e863c87da3b2440d8e3ee69e6dc72930", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "6da0eea111cc4aabbb8c7790a96f786a", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "945c1e712a01412ab9c3941adcdbfdaf", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<section id="Model-comparison">
+<h2>Model comparison<a class="headerlink" href="#Model-comparison" title="Link to this heading">¶</a></h2>
+<p>In this section, we compare the final validation accuracy of the ConvNeXt model across the different datasets (full image vs. bounding box) by reading the cached JSON results and comparing them with other baseline models.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model_name</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">model_name</span>
+<span class="k">for</span> <span class="n">dataset</span> <span class="ow">in</span> <span class="n">fovea</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">all_datasets</span><span class="p">:</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">read_json</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">data_cache</span> <span class="o">/</span> <span class="sa">f</span><span class="s1">'21_model_name=</span><span class="si">{</span><span class="n">model_name</span><span class="si">}</span><span class="s1">_dataset=</span><span class="si">{</span><span class="n">dataset</span><span class="si">}</span><span class="s1">.json'</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">results</span><span class="o">.</span><span class="n">tail</span><span class="p">(</span><span class="mi">1</span><span class="p">)[</span><span class="s1">'acc_val'</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">results</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">results_13</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">read_json</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">data_cache</span> <span class="o">/</span> <span class="s1">'13_model_comparison.json'</span><span class="p">)</span>
+<span class="n">results_13</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Plot-learning-evolution">
+<h2>Plot learning evolution<a class="headerlink" href="#Plot-learning-evolution" title="Link to this heading">¶</a></h2>
+<p>This section visualizes the learning process by plotting the training and validation accuracy as a function of the total number of images processed. A rolling mean is applied to smooth the accuracy curves for better visualization.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">dataset</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'bbox'</span><span class="p">]:</span> <span class="c1"># fovea.params.all_datasets:</span>
+    <span class="n">color</span> <span class="o">=</span> <span class="s1">'r'</span>
+    <span class="n">lw</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="n">name</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'21_model_name=</span><span class="si">{</span><span class="n">model_name</span><span class="si">}</span><span class="s1">_dataset=</span><span class="si">{</span><span class="n">dataset</span><span class="si">}</span><span class="s1">'</span>
+    <span class="n">model_filename</span><span class="p">,</span> <span class="n">json_filename</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">do_learning</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+    <span class="n">df_train</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">read_json</span><span class="p">(</span><span class="n">json_filename</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s1">'records'</span><span class="p">)</span>
+
+    <span class="n">df_train_roll</span> <span class="o">=</span> <span class="n">df_train</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">min_periods</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">df_train_roll</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">'total_image'</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">'acc_train'</span><span class="p">,</span>
+                        <span class="n">c</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">'dashed'</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="n">lw</span><span class="p">,</span>
+                        <span class="n">grid</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'TRAIN: '</span> <span class="o">+</span> <span class="n">args</span><span class="o">.</span><span class="n">model_name</span><span class="p">)</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">df_train_roll</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">'total_image'</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">'acc_val'</span><span class="p">,</span>
+                        <span class="n">c</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="n">lw</span><span class="p">,</span>
+                        <span class="n">grid</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'VAL: '</span> <span class="o">+</span> <span class="n">args</span><span class="o">.</span><span class="n">model_name</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df_train</span>
+</pre></div>
+</div>
+</div>
+<script type="application/vnd.jupyter.widget-state+json">
+{"state": {"011686273175436db3ed9171890b2289": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HTMLStyleModel", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HTMLStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "StyleView", "background": null, "description_width": "", "font_size": null, "text_color": null}}, "02c6cb17d5b0438286dd8905d1321ee5": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HTMLStyleModel", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HTMLStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "StyleView", "background": null, "description_width": "", "font_size": null, "text_color": null}}, "07a36e54d7824c4e9a8347b5ba03ea61": {"model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "model_name": "LayoutModel", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": "hidden", "width": null}}, "099f7ba4b81940458e1428a78b9b031f": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HTMLModel", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HTMLModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": "HTMLView", "description": "", "description_allow_html": false, "layout": "IPY_MODEL_971e5a41b25a46449e21a835ff203360", "placeholder": "\u200b", "style": "IPY_MODEL_618350c4d0254b31a23386116e480a5f", "tabbable": null, "tooltip": null, "value": "\u20071005/1005\u2007[04:50&lt;00:00,\u2007\u20073.13it/s]"}}, "0b748fbee63e411a940e859bda6b6770": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HBoxModel", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HBoxModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": "HBoxView", "box_style": "", "children": ["IPY_MODEL_4b90f783572b405e98c9e405fc3b5b5d", "IPY_MODEL_635e9371956645b686b72349b6eb0529", "IPY_MODEL_d67c3ee641d54784b69dceda99c83d69"], "layout": "IPY_MODEL_07a36e54d7824c4e9a8347b5ba03ea61", "tabbable": null, "tooltip": null}}, "12962cbdd6ff4b80b606c07e25cb00e7": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HTMLModel", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HTMLModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": "HTMLView", "description": "", "description_allow_html": false, "layout": "IPY_MODEL_3b3bfef02c5d468288879711f0c47f43", "placeholder": "\u200b", "style": "IPY_MODEL_83fdf7b8247140a68d54a2049c08cdc1", "tabbable": null, "tooltip": null, "value": "Epoch=4/4:\u2007100%"}}, "1468dec74547408a8ac04f4061fd1ec4": {"model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "model_name": "LayoutModel", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "16104a0474684261b076ca19cc361881": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "FloatProgressModel", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "FloatProgressModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": "ProgressView", "bar_style": "", "description": "", "description_allow_html": false, "layout": "IPY_MODEL_c706a57d695c4b06b72509e17e4195ae", "max": 1005, "min": 0, "orientation": "horizontal", "style": "IPY_MODEL_b3908f8bc7df434989cefaf77ca01fbc", "tabbable": null, "tooltip": null, "value": 1005}}, "17baf21ce455474f851bff1c361b1cdd": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HTMLModel", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HTMLModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": "HTMLView", "description": "", "description_allow_html": false, "layout": "IPY_MODEL_7074e7f06c9a4c0785bf0fe5afc2528d", "placeholder": "\u200b", "style": "IPY_MODEL_bacf33eb0b0e4b5eb5c14894895b662e", "tabbable": null, "tooltip": null, "value": "\u20074/4\u2007[7:50:08&lt;00:00,\u20077050.64s/it,\u2007Acc:\u2007train=0.937\u2007-\u2007val=0.814\u2007-\u2007(Max:train=0.937\u2007-\u2007val=0.814)]"}}, "195f8b4682844459a8bf64109eab0e72": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HTMLModel", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HTMLModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": "HTMLView", "description": "", "description_allow_html": false, "layout": "IPY_MODEL_a161f4e481ed489f9e7d7b09a9319b9f", "placeholder": "\u200b", "style": "IPY_MODEL_1ca9955b5dc14a208556ee26fc936373", "tabbable": null, "tooltip": null, "value": "Epoch=3/4:\u2007100%"}}, "1ca9955b5dc14a208556ee26fc936373": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HTMLStyleModel", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HTMLStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "StyleView", "background": null, "description_width": "", "font_size": null, "text_color": null}}, "1f340834724e4b7c9d7fc62c517f3145": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HTMLModel", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HTMLModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": "HTMLView", "description": "", "description_allow_html": false, "layout": "IPY_MODEL_d5b0a2c121ff4d8885134e9869e6bf1c", "placeholder": "\u200b", "style": "IPY_MODEL_c90b8b6736ca41818dd50a35ef882275", "tabbable": null, "tooltip": null, "value": "Evaluating\u2007convnext_base:\u2007100%"}}, "2213dc8069e140dea0f462afa634be1c": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HTMLModel", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HTMLModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": "HTMLView", "description": "", "description_allow_html": false, "layout": "IPY_MODEL_d5858e3b3cd54911bbbe5ec128400001", "placeholder": "\u200b", "style": "IPY_MODEL_d771c05fcacd41888b4856a4432b5277", "tabbable": null, "tooltip": null, "value": "\u20077691/7691\u2007[1:52:38&lt;00:00,\u2007\u20071.14it/s]"}}, "24cc0aa2ceb7425e8cda62f93d403ba5": {"model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "model_name": "LayoutModel", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "2bfeea5e4adc4547849ac4d8aa4a5e54": {"model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "model_name": "LayoutModel", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "2c69d5492f704d388acb37a4532c0e65": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "ProgressStyleModel", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "ProgressStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "StyleView", "bar_color": null, "description_width": ""}}, "2e9bfc1003894c46b269112b8e3b38e3": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "ProgressStyleModel", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "ProgressStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "StyleView", "bar_color": null, "description_width": ""}}, "32f45e0be566455da8744bd46b5fca87": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HTMLModel", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HTMLModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": "HTMLView", "description": "", "description_allow_html": false, "layout": "IPY_MODEL_96307194f1ef405dbee727856d019718", "placeholder": "\u200b", "style": "IPY_MODEL_70799d02e41b4e0faa63e277b13692fa", "tabbable": null, "tooltip": null, "value": "\u20077691/7691\u2007[1:52:41&lt;00:00,\u2007\u20071.14it/s]"}}, "3542357b65ab43a79e679117e3de8989": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HTMLStyleModel", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HTMLStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "StyleView", "background": null, "description_width": "", "font_size": null, "text_color": null}}, "35445bd12263409fa20933a5d726d6c1": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "FloatProgressModel", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "FloatProgressModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": "ProgressView", "bar_style": "", "description": "", "description_allow_html": false, "layout": "IPY_MODEL_8b212477a51d41dc8962e2863e25cabb", "max": 1005, "min": 0, "orientation": "horizontal", "style": "IPY_MODEL_db1517e61d204c37b1c0740c9246ecb7", "tabbable": null, "tooltip": null, "value": 1005}}, "385b782c4d404f7ba440945aecb68cc7": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HTMLStyleModel", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HTMLStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "StyleView", "background": null, "description_width": "", "font_size": null, "text_color": null}}, "3a28883270584acdbf03c0fc66a0e004": {"model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "model_name": "LayoutModel", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "3b3bfef02c5d468288879711f0c47f43": {"model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "model_name": "LayoutModel", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "3b99ca2caf0348d5b549e432d0f12e8d": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HBoxModel", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HBoxModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": "HBoxView", "box_style": "", "children": ["IPY_MODEL_7a4741e745b6478e884b11383e3634a3", "IPY_MODEL_608f3dbde0cc465cad474fef15a7d530", "IPY_MODEL_906e507b9c6341b18e2c314d3c92c321"], "layout": "IPY_MODEL_64fdc4346cf54c8f87890ec3a698a2db", "tabbable": null, "tooltip": null}}, "3fe198789f0d40979d8a47962784bfc5": {"model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "model_name": "LayoutModel", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "42998f9ca7ac4272a9119ea6774b51c4": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HBoxModel", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HBoxModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": "HBoxView", "box_style": "", "children": ["IPY_MODEL_1f340834724e4b7c9d7fc62c517f3145", "IPY_MODEL_9047f8271c0e467aaf9ff85e1e2d5030", "IPY_MODEL_099f7ba4b81940458e1428a78b9b031f"], "layout": "IPY_MODEL_abb0a1bc49f94d3290193894601abaf6", "tabbable": null, "tooltip": null}}, "443de393c17b4f2380c8fb0404103a88": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HTMLStyleModel", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HTMLStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "StyleView", "background": null, "description_width": "", "font_size": null, "text_color": null}}, "4b90f783572b405e98c9e405fc3b5b5d": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HTMLModel", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HTMLModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": "HTMLView", "description": "", "description_allow_html": false, "layout": "IPY_MODEL_eada90489fee4fffae773f4e7cd1d59e", "placeholder": "\u200b", "style": "IPY_MODEL_011686273175436db3ed9171890b2289", "tabbable": null, "tooltip": null, "value": "Epoch=1/4:\u2007100%"}}, "5142f86809c64e309420ee6262c15b92": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "FloatProgressModel", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "FloatProgressModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": "ProgressView", "bar_style": "", "description": "", "description_allow_html": false, "layout": "IPY_MODEL_d8e70d7e7e51457ba289a5089c2070ac", "max": 7691, "min": 0, "orientation": "horizontal", "style": "IPY_MODEL_ae3c2968b26346bdbd2075044b8c5d48", "tabbable": null, "tooltip": null, "value": 7691}}, "527cc0d7dbdf42ab98cd3386c4c54fc1": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HTMLModel", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HTMLModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": "HTMLView", "description": "", "description_allow_html": false, "layout": "IPY_MODEL_b4a4fa37276e4b65bd530a69dfadd288", "placeholder": "\u200b", "style": "IPY_MODEL_02c6cb17d5b0438286dd8905d1321ee5", "tabbable": null, "tooltip": null, "value": "Epochs:\u2007100%"}}, "587ade15a7844c0185b8698dad72fe11": {"model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "model_name": "LayoutModel", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "5a741ec68c1046f59394f7597996d0cb": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HTMLModel", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HTMLModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": "HTMLView", "description": "", "description_allow_html": false, "layout": "IPY_MODEL_3a28883270584acdbf03c0fc66a0e004", "placeholder": "\u200b", "style": "IPY_MODEL_9d58a00032384ca4a3cf4300a3669f6d", "tabbable": null, "tooltip": null, "value": "\u20071005/1005\u2007[04:47&lt;00:00,\u2007\u20073.70it/s]"}}, "5aa5172586cf49e08e38f1f3c8e4209a": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HTMLModel", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HTMLModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": "HTMLView", "description": "", "description_allow_html": false, "layout": "IPY_MODEL_63d2378d18944231a456fdce7abd3779", "placeholder": "\u200b", "style": "IPY_MODEL_c4f5cf6ea1d5495fb37481a9093657c9", "tabbable": null, "tooltip": null, "value": "Epoch=2/4:\u2007100%"}}, "608f3dbde0cc465cad474fef15a7d530": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "FloatProgressModel", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "FloatProgressModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": "ProgressView", "bar_style": "", "description": "", "description_allow_html": false, "layout": "IPY_MODEL_d87f5fad01db47189cad62b884a8aafd", "max": 1005, "min": 0, "orientation": "horizontal", "style": "IPY_MODEL_ea55e0507f3b4012b8a18a6622288ec9", "tabbable": null, "tooltip": null, "value": 1005}}, "61643f2a6ae54bc5a55984ef6c6f5ae7": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HBoxModel", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HBoxModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": "HBoxView", "box_style": "", "children": ["IPY_MODEL_9e94e70346154a659efde601048dd740", "IPY_MODEL_35445bd12263409fa20933a5d726d6c1", "IPY_MODEL_6cb37bf1b9b94cd0ba08fb66e652d084"], "layout": "IPY_MODEL_7a4baa5dc07143b6b30b61fe7df70405", "tabbable": null, "tooltip": null}}, "618350c4d0254b31a23386116e480a5f": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HTMLStyleModel", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HTMLStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "StyleView", "background": null, "description_width": "", "font_size": null, "text_color": null}}, "635e9371956645b686b72349b6eb0529": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "FloatProgressModel", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "FloatProgressModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": "ProgressView", "bar_style": "", "description": "", "description_allow_html": false, "layout": "IPY_MODEL_24cc0aa2ceb7425e8cda62f93d403ba5", "max": 7691, "min": 0, "orientation": "horizontal", "style": "IPY_MODEL_9e5e630e269a484b8c008e536fb9e151", "tabbable": null, "tooltip": null, "value": 7691}}, "63d2378d18944231a456fdce7abd3779": {"model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "model_name": "LayoutModel", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "64fdc4346cf54c8f87890ec3a698a2db": {"model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "model_name": "LayoutModel", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": "hidden", "width": null}}, "6639be60803b483db9cbbeb597909ba5": {"model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "model_name": "LayoutModel", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "6cb37bf1b9b94cd0ba08fb66e652d084": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HTMLModel", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HTMLModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": "HTMLView", "description": "", "description_allow_html": false, "layout": "IPY_MODEL_6639be60803b483db9cbbeb597909ba5", "placeholder": "\u200b", "style": "IPY_MODEL_dc8866506ddf471887e4e1f64acc39c7", "tabbable": null, "tooltip": null, "value": "\u20071005/1005\u2007[04:48&lt;00:00,\u2007\u20073.20it/s]"}}, "7074e7f06c9a4c0785bf0fe5afc2528d": {"model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "model_name": "LayoutModel", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "70799d02e41b4e0faa63e277b13692fa": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HTMLStyleModel", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HTMLStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "StyleView", "background": null, "description_width": "", "font_size": null, "text_color": null}}, "71d15d04a2514fe9bfb444068b405273": {"model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "model_name": "LayoutModel", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "7a4741e745b6478e884b11383e3634a3": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HTMLModel", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HTMLModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": "HTMLView", "description": "", "description_allow_html": false, "layout": "IPY_MODEL_2bfeea5e4adc4547849ac4d8aa4a5e54", "placeholder": "\u200b", "style": "IPY_MODEL_443de393c17b4f2380c8fb0404103a88", "tabbable": null, "tooltip": null, "value": "Evaluating\u2007convnext_base:\u2007100%"}}, "7a4baa5dc07143b6b30b61fe7df70405": {"model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "model_name": "LayoutModel", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": "hidden", "width": null}}, "7c3a6d503eb54ca1936273027bf2bd25": {"model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "model_name": "LayoutModel", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "7f27a12fd21b4f2a8e0de07f419951fb": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HBoxModel", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HBoxModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": "HBoxView", "box_style": "", "children": ["IPY_MODEL_195f8b4682844459a8bf64109eab0e72", "IPY_MODEL_ce0ec923b9304dcf9f33e097eb8708a0", "IPY_MODEL_32f45e0be566455da8744bd46b5fca87"], "layout": "IPY_MODEL_b6a2687a654a4deb8aff5cd094e6856b", "tabbable": null, "tooltip": null}}, "7f87284e00b14d0d8364e5a3f819f561": {"model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "model_name": "LayoutModel", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": "hidden", "width": null}}, "83fdf7b8247140a68d54a2049c08cdc1": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HTMLStyleModel", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HTMLStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "StyleView", "background": null, "description_width": "", "font_size": null, "text_color": null}}, "8b212477a51d41dc8962e2863e25cabb": {"model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "model_name": "LayoutModel", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "9047f8271c0e467aaf9ff85e1e2d5030": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "FloatProgressModel", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "FloatProgressModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": "ProgressView", "bar_style": "", "description": "", "description_allow_html": false, "layout": "IPY_MODEL_71d15d04a2514fe9bfb444068b405273", "max": 1005, "min": 0, "orientation": "horizontal", "style": "IPY_MODEL_2c69d5492f704d388acb37a4532c0e65", "tabbable": null, "tooltip": null, "value": 1005}}, "906e507b9c6341b18e2c314d3c92c321": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HTMLModel", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HTMLModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": "HTMLView", "description": "", "description_allow_html": false, "layout": "IPY_MODEL_af0954d3f8894eaa820f62a08138c2b6", "placeholder": "\u200b", "style": "IPY_MODEL_90d9d81785594d9e83dbece28427eb9f", "tabbable": null, "tooltip": null, "value": "\u20071005/1005\u2007[04:58&lt;00:00,\u2007\u20073.43it/s]"}}, "90d9d81785594d9e83dbece28427eb9f": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HTMLStyleModel", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HTMLStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "StyleView", "background": null, "description_width": "", "font_size": null, "text_color": null}}, "96307194f1ef405dbee727856d019718": {"model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "model_name": "LayoutModel", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "96996f2d3533459c9ceba9584744bf2b": {"model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "model_name": "LayoutModel", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "971e5a41b25a46449e21a835ff203360": {"model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "model_name": "LayoutModel", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "9d58a00032384ca4a3cf4300a3669f6d": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HTMLStyleModel", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HTMLStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "StyleView", "background": null, "description_width": "", "font_size": null, "text_color": null}}, "9e5e630e269a484b8c008e536fb9e151": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "ProgressStyleModel", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "ProgressStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "StyleView", "bar_color": null, "description_width": ""}}, "9e94e70346154a659efde601048dd740": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HTMLModel", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HTMLModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": "HTMLView", "description": "", "description_allow_html": false, "layout": "IPY_MODEL_e618dbb301e842aaba242087258ef4e2", "placeholder": "\u200b", "style": "IPY_MODEL_385b782c4d404f7ba440945aecb68cc7", "tabbable": null, "tooltip": null, "value": "Evaluating\u2007convnext_base:\u2007100%"}}, "a161f4e481ed489f9e7d7b09a9319b9f": {"model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "model_name": "LayoutModel", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "ab8d02ad758845109a27515c72743fc2": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "ProgressStyleModel", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "ProgressStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "StyleView", "bar_color": null, "description_width": ""}}, "abb0a1bc49f94d3290193894601abaf6": {"model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "model_name": "LayoutModel", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": "hidden", "width": null}}, "ae3c2968b26346bdbd2075044b8c5d48": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "ProgressStyleModel", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "ProgressStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "StyleView", "bar_color": null, "description_width": ""}}, "af0954d3f8894eaa820f62a08138c2b6": {"model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "model_name": "LayoutModel", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "b1de4e39fbb04a40b29c912ddbbc7d74": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HTMLStyleModel", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HTMLStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "StyleView", "background": null, "description_width": "", "font_size": null, "text_color": null}}, "b3908f8bc7df434989cefaf77ca01fbc": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "ProgressStyleModel", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "ProgressStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "StyleView", "bar_color": null, "description_width": ""}}, "b4a4fa37276e4b65bd530a69dfadd288": {"model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "model_name": "LayoutModel", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "b6a2687a654a4deb8aff5cd094e6856b": {"model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "model_name": "LayoutModel", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": "hidden", "width": null}}, "b9c1efe76dd14b1788a2eb361cb325d2": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HTMLModel", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HTMLModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": "HTMLView", "description": "", "description_allow_html": false, "layout": "IPY_MODEL_96996f2d3533459c9ceba9584744bf2b", "placeholder": "\u200b", "style": "IPY_MODEL_cbc4321ec11a4525ab6197979ae24d45", "tabbable": null, "tooltip": null, "value": "Evaluating\u2007convnext_base:\u2007100%"}}, "bacf33eb0b0e4b5eb5c14894895b662e": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HTMLStyleModel", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HTMLStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "StyleView", "background": null, "description_width": "", "font_size": null, "text_color": null}}, "bdfe4bd6166241caa6f87cf7c07a33e8": {"model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "model_name": "LayoutModel", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "c4f5cf6ea1d5495fb37481a9093657c9": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HTMLStyleModel", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HTMLStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "StyleView", "background": null, "description_width": "", "font_size": null, "text_color": null}}, "c706a57d695c4b06b72509e17e4195ae": {"model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "model_name": "LayoutModel", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "c90b8b6736ca41818dd50a35ef882275": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HTMLStyleModel", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HTMLStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "StyleView", "background": null, "description_width": "", "font_size": null, "text_color": null}}, "cbc4321ec11a4525ab6197979ae24d45": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HTMLStyleModel", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HTMLStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "StyleView", "background": null, "description_width": "", "font_size": null, "text_color": null}}, "ce0ec923b9304dcf9f33e097eb8708a0": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "FloatProgressModel", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "FloatProgressModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": "ProgressView", "bar_style": "", "description": "", "description_allow_html": false, "layout": "IPY_MODEL_bdfe4bd6166241caa6f87cf7c07a33e8", "max": 7691, "min": 0, "orientation": "horizontal", "style": "IPY_MODEL_f27bbc4a6824471fb233723a0ed55496", "tabbable": null, "tooltip": null, "value": 7691}}, "d287e2fc59fa47288132351e71a77eed": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "FloatProgressModel", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "FloatProgressModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": "ProgressView", "bar_style": "success", "description": "", "description_allow_html": false, "layout": "IPY_MODEL_f87a703beb184576b02c44c31d24cd45", "max": 4, "min": 0, "orientation": "horizontal", "style": "IPY_MODEL_2e9bfc1003894c46b269112b8e3b38e3", "tabbable": null, "tooltip": null, "value": 4}}, "d48d0fc50cfc4462b12047dea7830c23": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HBoxModel", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HBoxModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": "HBoxView", "box_style": "", "children": ["IPY_MODEL_527cc0d7dbdf42ab98cd3386c4c54fc1", "IPY_MODEL_d287e2fc59fa47288132351e71a77eed", "IPY_MODEL_17baf21ce455474f851bff1c361b1cdd"], "layout": "IPY_MODEL_3fe198789f0d40979d8a47962784bfc5", "tabbable": null, "tooltip": null}}, "d54a63eb22e84aff965fac9608312931": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HBoxModel", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HBoxModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": "HBoxView", "box_style": "", "children": ["IPY_MODEL_5aa5172586cf49e08e38f1f3c8e4209a", "IPY_MODEL_db0f3a0cc1e94c5ebe42618caa4ec52b", "IPY_MODEL_2213dc8069e140dea0f462afa634be1c"], "layout": "IPY_MODEL_efc680f88e3949e2abd31c78c961d855", "tabbable": null, "tooltip": null}}, "d5858e3b3cd54911bbbe5ec128400001": {"model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "model_name": "LayoutModel", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "d5b0a2c121ff4d8885134e9869e6bf1c": {"model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "model_name": "LayoutModel", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "d61a6dd27cc0455fb3018f7fb871c691": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HBoxModel", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HBoxModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": "HBoxView", "box_style": "", "children": ["IPY_MODEL_b9c1efe76dd14b1788a2eb361cb325d2", "IPY_MODEL_16104a0474684261b076ca19cc361881", "IPY_MODEL_5a741ec68c1046f59394f7597996d0cb"], "layout": "IPY_MODEL_ff59d7a53def4d9da4d392267f83f218", "tabbable": null, "tooltip": null}}, "d67c3ee641d54784b69dceda99c83d69": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HTMLModel", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HTMLModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": "HTMLView", "description": "", "description_allow_html": false, "layout": "IPY_MODEL_1468dec74547408a8ac04f4061fd1ec4", "placeholder": "\u200b", "style": "IPY_MODEL_b1de4e39fbb04a40b29c912ddbbc7d74", "tabbable": null, "tooltip": null, "value": "\u20077691/7691\u2007[1:52:39&lt;00:00,\u2007\u20071.14it/s]"}}, "d771c05fcacd41888b4856a4432b5277": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HTMLStyleModel", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HTMLStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "StyleView", "background": null, "description_width": "", "font_size": null, "text_color": null}}, "d87f5fad01db47189cad62b884a8aafd": {"model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "model_name": "LayoutModel", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "d8e70d7e7e51457ba289a5089c2070ac": {"model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "model_name": "LayoutModel", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "db0f3a0cc1e94c5ebe42618caa4ec52b": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "FloatProgressModel", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "FloatProgressModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": "ProgressView", "bar_style": "", "description": "", "description_allow_html": false, "layout": "IPY_MODEL_587ade15a7844c0185b8698dad72fe11", "max": 7691, "min": 0, "orientation": "horizontal", "style": "IPY_MODEL_ab8d02ad758845109a27515c72743fc2", "tabbable": null, "tooltip": null, "value": 7691}}, "db1517e61d204c37b1c0740c9246ecb7": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "ProgressStyleModel", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "ProgressStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "StyleView", "bar_color": null, "description_width": ""}}, "dc8866506ddf471887e4e1f64acc39c7": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HTMLStyleModel", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HTMLStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "StyleView", "background": null, "description_width": "", "font_size": null, "text_color": null}}, "e325978282e5491e9629304efdc75634": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HTMLModel", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HTMLModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": "HTMLView", "description": "", "description_allow_html": false, "layout": "IPY_MODEL_7c3a6d503eb54ca1936273027bf2bd25", "placeholder": "\u200b", "style": "IPY_MODEL_3542357b65ab43a79e679117e3de8989", "tabbable": null, "tooltip": null, "value": "\u20077691/7691\u2007[1:52:38&lt;00:00,\u2007\u20071.14it/s]"}}, "e618dbb301e842aaba242087258ef4e2": {"model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "model_name": "LayoutModel", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "ea55e0507f3b4012b8a18a6622288ec9": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "ProgressStyleModel", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "ProgressStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "StyleView", "bar_color": null, "description_width": ""}}, "eada90489fee4fffae773f4e7cd1d59e": {"model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "model_name": "LayoutModel", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "efc680f88e3949e2abd31c78c961d855": {"model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "model_name": "LayoutModel", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": "hidden", "width": null}}, "f27bbc4a6824471fb233723a0ed55496": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "ProgressStyleModel", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "ProgressStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "StyleView", "bar_color": null, "description_width": ""}}, "f6bc076f6d104ca4a51358b63896cc88": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HBoxModel", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HBoxModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": "HBoxView", "box_style": "", "children": ["IPY_MODEL_12962cbdd6ff4b80b606c07e25cb00e7", "IPY_MODEL_5142f86809c64e309420ee6262c15b92", "IPY_MODEL_e325978282e5491e9629304efdc75634"], "layout": "IPY_MODEL_7f87284e00b14d0d8364e5a3f819f561", "tabbable": null, "tooltip": null}}, "f87a703beb184576b02c44c31d24cd45": {"model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "model_name": "LayoutModel", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "ff59d7a53def4d9da4d392267f83f218": {"model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "model_name": "LayoutModel", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": "hidden", "width": null}}}, "version_major": 2, "version_minor": 0}
+</script></section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2025, Laurent U Perrinet
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">transfer learning of each network on the masked dataset</a><ul>
+<li><a class="reference internal" href="#Model-comparison">Model comparison</a></li>
+<li><a class="reference internal" href="#Plot-learning-evolution">Plot learning evolution</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/scripts/furo.js?v=46bd48cc"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    </body>
+</html>

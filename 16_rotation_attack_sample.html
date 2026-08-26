@@ -1,0 +1,764 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="./">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html">
+
+    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
+        <title>displaying sample images - retinoto_py | Foveated Retinotopy Documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="_static/nbsphinx-code-cells.css?v=2aa19091" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">retinoto_py | Foveated Retinotopy Documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  
+  <span class="sidebar-brand-text">retinoto_py | Foveated Retinotopy Documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="_sources/16_rotation_attack_sample.ipynb.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <p>This notebook provides a visual exploration of the rotation attack process. We display sample images from the validation set and visualize how they are transformed by rotations and masking before being fed into the network.</p>
+<section id="displaying-sample-images">
+<h1>displaying sample images<a class="headerlink" href="#displaying-sample-images" title="Link to this heading">¶</a></h1>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">retinoto_py</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">fovea</span>
+
+<span class="n">N_show</span> <span class="o">=</span> <span class="mi">6</span>
+<span class="n">args</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">Params</span><span class="p">(</span><span class="n">batch_size</span><span class="o">=</span><span class="n">N_show</span><span class="p">,</span> <span class="n">do_mask</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">do_fovea</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">do_augment</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">args</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Welcome on macOS-26.4.1-arm64-arm-64bit-Mach-O - Timestamp (UTC)  2026-05-07_08-56-44  user laurent &gt;  pytorch==2.11.0
+&gt; device (Apple Silicon/MacOS) - macos_version = 26.4.1
+Random seed 1998 has been set.
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Params(batch_size=6, num_workers=0, prefetch_factor=0, image_size=224, grid_size_ecc=161, grid_size_ang=309, do_mask=False, do_fovea=False, use_hexagonal_grid=True, rs_min=-3.5, rs_max=0.7, angle_start=-5.235987755982989, angle_margin=0.010166966516471823, mode=&#39;bilinear&#39;, padding_mode=&#39;zeros&#39;, model_name=&#39;convnext_base&#39;, num_epochs=340, subset_factor=1, optimizer_name=&#39;adamw&#39;, loss_name=&#39;CrossEntropyLoss&#39;, base_lr=1e-06, final_lr=1e-09, num_warmup_epochs=20, delta1=0.3, delta2=0.002, weight_decay=0.0001, label_smoothing=0.0005, do_full_training=True, do_augment=False, augment_proba=0.85, stochastic_depth_prob=0.6, seed=1998, shuffle=True, verbose=True)
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># VAL_DATA_DIR = args.DATAROOT / 'Imagenet_full' / 'val'</span>
+<span class="c1"># # VAL_DATA_DIR = args.DATAROOT / 'Imagenet_bbox' / 'val'</span>
+<span class="c1"># val_dataset = fovea.get_dataset(args, VAL_DATA_DIR)</span>
+<span class="c1"># val_loader = fovea.get_loader(args, val_dataset)</span>
+<span class="n">val_loader</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">get_val_loader</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">dataset</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># print(VAL_DATA_DIR)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+/Users/laurent/data/Imagenet/Imagenet_full/val
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">images</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">val_loader</span><span class="p">))</span>
+<span class="n">images</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">images</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s1">'cpu'</span><span class="p">),</span> <span class="n">labels</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s1">'cpu'</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">'Example of Cartesian input images'</span><span class="p">,</span> <span class="n">fig_height</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">fovea</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/16_rotation_attack_sample_6_0.png" src="_images/16_rotation_attack_sample_6_0.png" />
+</div>
+</div>
+</section>
+<section id="displaying-sample-images-with-a-mask">
+<h1>displaying sample images with a mask<a class="headerlink" href="#displaying-sample-images-with-a-mask" title="Link to this heading">¶</a></h1>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">args</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">Params</span><span class="p">(</span><span class="n">batch_size</span><span class="o">=</span><span class="n">N_show</span><span class="p">,</span> <span class="n">do_mask</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">do_augment</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">do_fovea</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">val_dataset</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">VAL_DATA_DIR</span><span class="p">)</span>
+<span class="n">val_loader</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">get_loader</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">val_dataset</span><span class="p">)</span>
+<span class="n">images</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">val_loader</span><span class="p">))</span>
+<span class="n">images</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">images</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s1">'cpu'</span><span class="p">),</span> <span class="n">labels</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s1">'cpu'</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">'Example of Cartesian input images'</span><span class="p">,</span> <span class="n">fig_height</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">fovea</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/16_rotation_attack_sample_8_0.png" src="_images/16_rotation_attack_sample_8_0.png" />
+</div>
+</div>
+</section>
+<section id="displaying-sample-images-with-a-mask-and-a-rotation">
+<h1>displaying sample images with a mask and a rotation<a class="headerlink" href="#displaying-sample-images-with-a-mask-and-a-rotation" title="Link to this heading">¶</a></h1>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">args</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">Params</span><span class="p">(</span><span class="n">batch_size</span><span class="o">=</span><span class="n">N_show</span><span class="p">,</span> <span class="n">do_mask</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">do_augment</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">do_fovea</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">val_dataset</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">VAL_DATA_DIR</span><span class="p">,</span> <span class="n">angle_min</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">angle_max</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+<span class="n">val_loader</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">get_loader</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">val_dataset</span><span class="p">)</span>
+<span class="n">images</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">val_loader</span><span class="p">))</span>
+<span class="n">images</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">images</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s1">'cpu'</span><span class="p">),</span> <span class="n">labels</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s1">'cpu'</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">'Example of Cartesian input images'</span><span class="p">,</span> <span class="n">fig_height</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">fovea</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/16_rotation_attack_sample_10_0.png" src="_images/16_rotation_attack_sample_10_0.png" />
+</div>
+</div>
+</section>
+<section id="testing-one-image-at-different-rotations">
+<h1>testing one image at different rotations<a class="headerlink" href="#testing-one-image-at-different-rotations" title="Link to this heading">¶</a></h1>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">seed</span> <span class="o">=</span> <span class="mi">1998</span>
+<span class="n">args</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">Params</span><span class="p">(</span><span class="n">batch_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">do_mask</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">do_fovea</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">do_augment</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">val_dataset</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">VAL_DATA_DIR</span><span class="p">)</span>
+<span class="n">val_loader</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">get_loader</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">val_dataset</span><span class="p">)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">81</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+    <span class="n">images</span><span class="p">,</span> <span class="n">true_idxs</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">val_loader</span><span class="p">))</span>
+    <span class="n">images</span> <span class="o">=</span> <span class="n">images</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">true_idxs</span> <span class="o">=</span> <span class="n">true_idxs</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+<span class="n">images</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">true_idxs</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+(torch.Size([1, 3, 224, 224]), tensor([811], device=&#39;mps:0&#39;))
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">all_angles</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">360</span><span class="p">,</span> <span class="mi">22</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">all_image_tensors</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">mask</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">make_mask</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">image_size</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">angle</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">all_angles</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">_</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+        <span class="n">all_image_tensors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">images</span> <span class="o">*</span> <span class="n">mask</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">all_image_tensors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">images</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">fovea</span><span class="o">.</span><span class="n">torch</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">images</span><span class="p">))</span>
+<span class="n">all_images</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">all_image_tensors</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">all_images</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+torch.Size([22, 3, 224, 224])
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">all_images</span><span class="o">.</span><span class="n">cpu</span><span class="p">(),</span> <span class="n">fig_height</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">fovea</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">'16_rotation_attack_sample_rotations_zero'</span><span class="p">,</span> <span class="n">figures_folder</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">figures_folder</span><span class="p">,</span> <span class="n">exts</span><span class="o">=</span><span class="p">[</span><span class="s1">'png'</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/16_rotation_attack_sample_15_0.png" src="_images/16_rotation_attack_sample_15_0.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">all_image_tensors</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">all_label_tensors</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">torchvision.transforms</span><span class="w"> </span><span class="kn">import</span> <span class="n">InterpolationMode</span>
+
+<span class="k">for</span> <span class="n">angle</span> <span class="ow">in</span> <span class="n">all_angles</span><span class="p">:</span>
+    <span class="n">image_rot</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">TF</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="n">InterpolationMode</span><span class="o">.</span><span class="n">BILINEAR</span><span class="p">)</span> <span class="o">*</span> <span class="n">mask</span>
+
+    <span class="c1"># Append the batch of rotated images and their corresponding labels</span>
+    <span class="n">all_image_tensors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">image_rot</span><span class="p">)</span>
+    <span class="n">all_label_tensors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">true_idxs</span><span class="p">)</span> <span class="c1"># Append the full label tensor</span>
+
+<span class="c1"># --- AFTER THE LOOP: Concatenate everything at once ---</span>
+<span class="c1"># This is the efficient way!</span>
+<span class="n">all_images</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">all_image_tensors</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">all_labels</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">all_label_tensors</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="n">all_images</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">all_labels</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+(torch.Size([22, 3, 224, 224]), torch.Size([22]))
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">all_images</span><span class="o">.</span><span class="n">cpu</span><span class="p">(),</span> <span class="n">fig_height</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">fovea</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">'16_rotation_attack_sample_rotations'</span><span class="p">,</span> <span class="n">figures_folder</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">figures_folder</span><span class="p">,</span> <span class="n">exts</span><span class="o">=</span><span class="p">[</span><span class="s1">'png'</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/16_rotation_attack_sample_17_0.png" src="_images/16_rotation_attack_sample_17_0.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">criterion</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">CrossEntropyLoss</span><span class="p">(</span><span class="n">reduction</span><span class="o">=</span><span class="s1">'none'</span><span class="p">)</span>
+<span class="k">with</span> <span class="n">fovea</span><span class="o">.</span><span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+    <span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">all_images</span><span class="p">)</span>
+    <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">all_labels</span><span class="p">)</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+    <span class="n">logits</span> <span class="o">=</span> <span class="n">outputs</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+
+    <span class="n">_</span><span class="p">,</span> <span class="n">predicted_labels</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">correct_predictions_in_batch</span> <span class="o">=</span> <span class="p">(</span><span class="n">predicted_labels</span> <span class="o">==</span> <span class="n">all_labels</span><span class="p">)</span>
+<span class="n">predicted_labels</span><span class="p">,</span> <span class="n">all_labels</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+(tensor([811, 811, 811, 811, 811, 811, 859, 859, 811, 811, 811, 811, 811, 811, 811, 811, 811, 811, 811, 811, 811, 811], device=&#39;mps:0&#39;),
+ tensor([811, 811, 811, 811, 811, 811, 811, 811, 811, 811, 811, 811, 811, 811, 811, 811, 811, 811, 811, 811, 811, 811], device=&#39;mps:0&#39;))
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">correct_predictions_in_batch</span><span class="p">,</span> <span class="n">loss</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+(tensor([ True,  True,  True,  True,  True,  True, False, False,  True,  True,  True,  True,  True,  True,  True,  True,  True,  True,  True,
+          True,  True,  True], device=&#39;mps:0&#39;),
+ array([0.36419195, 0.61401767, 0.58199644, 0.566515  , 0.8411059 ,
+        1.2465312 , 2.0649595 , 2.4468641 , 0.65303785, 0.7409282 ,
+        0.66105956, 0.8728539 , 0.5484808 , 0.67440784, 1.2773129 ,
+        0.8200281 , 1.0153265 , 0.6952434 , 0.46669754, 0.47398546,
+        0.51274526, 0.36419195], dtype=float32))
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">worst_angle</span> <span class="o">=</span> <span class="n">loss</span><span class="o">.</span><span class="n">argmax</span><span class="p">()</span>
+<span class="n">worst_angle</span><span class="p">,</span> <span class="n">predicted_labels</span><span class="p">[</span><span class="n">worst_angle</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+(np.int64(7), tensor(859, device=&#39;mps:0&#39;))
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">idx_to_label</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">get_idx_to_label</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+<span class="n">idx_to_label</span><span class="p">[</span><span class="n">predicted_labels</span><span class="p">[</span><span class="n">worst_angle</span><span class="p">]],</span> <span class="n">idx_to_label</span><span class="p">[</span><span class="n">all_labels</span><span class="p">[</span><span class="n">worst_angle</span><span class="p">]]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+(&#39;toaster&#39;, &#39;space_heater&#39;)
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">all_images</span><span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="n">worst_angle</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+torch.Size([2, 3, 224, 224])
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig_height</span> <span class="o">=</span> <span class="mi">8</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">make_title</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">):</span>
+    <span class="c1"># We position text relative to the FIGURE (0-1), not the axes.</span>
+    <span class="c1"># This avoids transform complexities.</span>
+    <span class="n">transform</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">transFigure</span>
+
+    <span class="n">text_segments</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s2">"Label"</span><span class="p">,</span> <span class="s1">'black'</span><span class="p">),</span>
+        <span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">A</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="s1">'orange'</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">"is predicted as"</span><span class="p">,</span> <span class="s1">'black'</span><span class="p">),</span>
+        <span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">B</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="s1">'green'</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">"and as "</span><span class="p">,</span> <span class="s1">'black'</span><span class="p">),</span>
+        <span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">C</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="s1">'red'</span><span class="p">),</span>
+        <span class="p">(</span><span class="sa">f</span><span class="s2">"(tilt of </span><span class="si">{</span><span class="n">all_angles</span><span class="p">[</span><span class="n">worst_angle</span><span class="p">]</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">°)"</span><span class="p">,</span> <span class="s1">'black'</span><span class="p">,),</span>
+    <span class="p">]</span>
+
+    <span class="c1"># Position the title block relative to the figure's width</span>
+    <span class="n">x_pos</span> <span class="o">=</span> <span class="mf">0.21</span> <span class="c1"># Start 5% from the left edge of the figure</span>
+    <span class="n">y_pos</span> <span class="o">=</span> <span class="mf">0.99</span>  <span class="c1"># Start 97% from the bottom of the figure</span>
+    <span class="n">font_size</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">get_fontsize</span><span class="p">()</span> <span class="c1">#or plt.rcParams['font.size'] # Get title font size</span>
+
+    <span class="k">for</span> <span class="n">segment</span><span class="p">,</span> <span class="n">color</span> <span class="ow">in</span> <span class="n">text_segments</span><span class="p">:</span>
+        <span class="n">text_obj</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">x_pos</span><span class="p">,</span> <span class="n">y_pos</span><span class="p">,</span> <span class="n">segment</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">transform</span><span class="p">,</span>
+                            <span class="n">fontsize</span><span class="o">=</span><span class="n">font_size</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s1">'top'</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s1">'left'</span><span class="p">)</span>
+
+        <span class="c1"># Draw the canvas to ensure the bbox is accurate</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
+        <span class="n">bbox</span> <span class="o">=</span> <span class="n">text_obj</span><span class="o">.</span><span class="n">get_window_extent</span><span class="p">()</span>
+
+        <span class="c1"># The spacing is now just the width of the text in figure coordinates</span>
+        <span class="n">x_pos</span> <span class="o">=</span> <span class="p">(</span><span class="n">bbox</span><span class="o">.</span><span class="n">x1</span> <span class="o">-</span> <span class="n">fig</span><span class="o">.</span><span class="n">bbox</span><span class="o">.</span><span class="n">x0</span><span class="p">)</span> <span class="o">/</span> <span class="n">fig</span><span class="o">.</span><span class="n">bbox</span><span class="o">.</span><span class="n">width</span> <span class="o">+</span> <span class="mf">0.005</span> <span class="c1"># Add a small space</span>
+
+    <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span>
+
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">all_images</span><span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="n">worst_angle</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span><span class="o">.</span><span class="n">cpu</span><span class="p">(),</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fig_height</span><span class="o">=</span><span class="n">fig_height</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">make_title</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">idx_to_label</span><span class="p">[</span><span class="n">all_labels</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="n">idx_to_label</span><span class="p">[</span><span class="n">predicted_labels</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="n">idx_to_label</span><span class="p">[</span><span class="n">predicted_labels</span><span class="p">[</span><span class="n">worst_angle</span><span class="p">]])</span>
+<span class="n">fovea</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">'16_attack'</span><span class="p">,</span> <span class="n">figures_folder</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">figures_folder</span><span class="p">,</span> <span class="n">exts</span><span class="o">=</span><span class="p">[</span><span class="s1">'png'</span><span class="p">])</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/16_rotation_attack_sample_23_0.png" src="_images/16_rotation_attack_sample_23_0.png" />
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">one_rotation_attack</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">true_idx</span><span class="p">,</span> <span class="n">all_angles</span><span class="o">=</span><span class="n">all_angles</span><span class="p">,</span> <span class="n">fig_height</span> <span class="o">=</span> <span class="mi">6</span><span class="p">):</span>
+
+    <span class="n">all_image_tensors</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">all_label_tensors</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">angle</span> <span class="ow">in</span> <span class="n">all_angles</span><span class="p">:</span>
+        <span class="n">image_rot</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">TF</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="n">InterpolationMode</span><span class="o">.</span><span class="n">BILINEAR</span><span class="p">)</span> <span class="o">*</span> <span class="n">mask</span>
+        <span class="n">all_image_tensors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">image_rot</span><span class="p">)</span>
+        <span class="n">all_label_tensors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">true_idx</span><span class="p">)</span> <span class="c1"># Append the full label tensor</span>
+    <span class="n">all_images</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">all_image_tensors</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">all_labels</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">all_label_tensors</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">fovea</span><span class="o">.</span><span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+        <span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">all_images</span><span class="p">)</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">all_labels</span><span class="p">)</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">predicted_labels</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">worst_angle</span> <span class="o">=</span> <span class="n">loss</span><span class="o">.</span><span class="n">argmax</span><span class="p">()</span>
+
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">all_images</span><span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="n">worst_angle</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span><span class="o">.</span><span class="n">cpu</span><span class="p">(),</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fig_height</span><span class="o">=</span><span class="n">fig_height</span><span class="p">)</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">make_title</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span>
+                         <span class="n">idx_to_label</span><span class="p">[</span><span class="n">all_labels</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="n">idx_to_label</span><span class="p">[</span><span class="n">predicted_labels</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
+                         <span class="n">idx_to_label</span><span class="p">[</span><span class="n">predicted_labels</span><span class="p">[</span><span class="n">worst_angle</span><span class="p">]])</span>
+    <span class="c1"># fig.tight_layout()</span>
+
+    <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">n_images</span> <span class="o">=</span> <span class="mi">101</span>
+<span class="n">args</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">Params</span><span class="p">(</span><span class="n">batch_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">do_mask</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">do_fovea</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">do_augment</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">val_dataset</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">VAL_DATA_DIR</span><span class="p">,)</span>
+<span class="n">val_loader</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">get_loader</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">val_dataset</span><span class="p">)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">fovea</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+
+<span class="n">figures_folder</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">figures_folder</span> <span class="o">/</span> <span class="s1">'16_attack'</span>
+<span class="n">figures_folder</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i_image</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_images</span><span class="p">):</span>
+    <span class="n">image</span><span class="p">,</span> <span class="n">true_idx</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">val_loader</span><span class="p">))</span>
+    <span class="n">image</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">true_idx</span> <span class="o">=</span> <span class="n">true_idx</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">one_rotation_attack</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">true_idx</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span>  <span class="sa">f</span><span class="s1">'16_attack-</span><span class="si">{</span><span class="n">i_image</span><span class="si">}</span><span class="s1">'</span>
+    <span class="n">fovea</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">figures_folder</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">figures_folder</span> <span class="o">/</span> <span class="s1">'16_attack'</span><span class="p">,</span> <span class="n">exts</span><span class="o">=</span><span class="p">[</span><span class="s1">'png'</span><span class="p">])</span>
+    <span class="n">fovea</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span> <span class="c1"># will close the plot</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Saved </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">'</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">'</span><span class="se">\t</span><span class="s1">'</span><span class="p">)</span>
+    <span class="c1"># if i_image &gt;= n_images: break</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Welcome on macOS-26.4.1-arm64-arm-64bit-Mach-O - Timestamp (UTC)  2026-05-07_08-56-47  user laurent &gt;  pytorch==2.11.0
+&gt; device (Apple Silicon/MacOS) - macos_version = 26.4.1
+Random seed 1998 has been set.
+Saved 16_attack-0       Saved 16_attack-1       Saved 16_attack-2       Saved 16_attack-3       Saved 16_attack-4       Saved 16_attack-5       Saved 16_attack-6       Saved 16_attack-7       Saved 16_attack-8       Saved 16_attack-9       Saved 16_attack-10      Saved 16_attack-11      Saved 16_attack-12      Saved 16_attack-13      Saved 16_attack-14      Saved 16_attack-15      Saved 16_attack-16      Saved 16_attack-17      Saved 16_attack-18      Saved 16_attack-19      Saved 16_attack-20      Saved 16_attack-21      Saved 16_attack-22      Saved 16_attack-23      Saved 16_attack-24      Saved 16_attack-25      Saved 16_attack-26      Saved 16_attack-27      Saved 16_attack-28      Saved 16_attack-29      Saved 16_attack-30      Saved 16_attack-31      Saved 16_attack-32      Saved 16_attack-33      Saved 16_attack-34      Saved 16_attack-35      Saved 16_attack-36      Saved 16_attack-37      Saved 16_attack-38      Saved 16_attack-39      Saved 16_attack-40      Saved 16_attack-41      Saved 16_attack-42      Saved 16_attack-43      Saved 16_attack-44      Saved 16_attack-45      Saved 16_attack-46      Saved 16_attack-47      Saved 16_attack-48      Saved 16_attack-49      Saved 16_attack-50      Saved 16_attack-51      Saved 16_attack-52      Saved 16_attack-53      Saved 16_attack-54      Saved 16_attack-55      Saved 16_attack-56      Saved 16_attack-57      Saved 16_attack-58      Saved 16_attack-59      Saved 16_attack-60      Saved 16_attack-61      Saved 16_attack-62      Saved 16_attack-63      Saved 16_attack-64      Saved 16_attack-65      Saved 16_attack-66      Saved 16_attack-67      Saved 16_attack-68      Saved 16_attack-69      Saved 16_attack-70      Saved 16_attack-71      Saved 16_attack-72      Saved 16_attack-73      Saved 16_attack-74      Saved 16_attack-75      Saved 16_attack-76      Saved 16_attack-77      Saved 16_attack-78      Saved 16_attack-79      Saved 16_attack-80      Saved 16_attack-81      Saved 16_attack-82      Saved 16_attack-83      Saved 16_attack-84      Saved 16_attack-85      Saved 16_attack-86      Saved 16_attack-87      Saved 16_attack-88      Saved 16_attack-89      Saved 16_attack-90      Saved 16_attack-91      Saved 16_attack-92      Saved 16_attack-93      Saved 16_attack-94      Saved 16_attack-95      Saved 16_attack-96      Saved 16_attack-97      Saved 16_attack-98      Saved 16_attack-99      Saved 16_attack-100
+</pre></div></div>
+</div>
+<p>Voilà !</p>
+<script type="application/vnd.jupyter.widget-state+json">
+{"state": {"076668252c544513982ff4b266209816": {"model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "model_name": "LayoutModel", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": "hidden", "width": null}}, "0de8c460898142b2b346cb26604e41cc": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HTMLModel", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HTMLModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": "HTMLView", "description": "", "description_allow_html": false, "layout": "IPY_MODEL_bd102886f3924e03a49958d0ef313320", "placeholder": "\u200b", "style": "IPY_MODEL_cee892f67a06423c98873df086ab9f7f", "tabbable": null, "tooltip": null, "value": "\u20070/6\u2007[00:00&lt;?,\u2007?it/s]"}}, "19e1b0aedb7c485ebf295c9a76a748db": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HBoxModel", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HBoxModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": "HBoxView", "box_style": "", "children": ["IPY_MODEL_30db52de138e42859a46cfa2898c6bec", "IPY_MODEL_c2b572945f56491183903ce4b7253032", "IPY_MODEL_1c13aa68285a4c0ba1f5a8ec4a85e1f8"], "layout": "IPY_MODEL_423b199c08c0416c98246b2b33f51a2f", "tabbable": null, "tooltip": null}}, "1acd2427d56b46358c30fc475ef682b9": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "ProgressStyleModel", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "ProgressStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "StyleView", "bar_color": null, "description_width": ""}}, "1c13aa68285a4c0ba1f5a8ec4a85e1f8": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HTMLModel", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HTMLModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": "HTMLView", "description": "", "description_allow_html": false, "layout": "IPY_MODEL_2b17663a05c64b609331ea8d4701d08a", "placeholder": "\u200b", "style": "IPY_MODEL_3754b379b31b4ba78f80c219d8d07d85", "tabbable": null, "tooltip": null, "value": "\u20070/6\u2007[00:00&lt;?,\u2007?it/s]"}}, "2b17663a05c64b609331ea8d4701d08a": {"model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "model_name": "LayoutModel", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "2b40d3fd4f4e45ea9ac81721334303fa": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HTMLStyleModel", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HTMLStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "StyleView", "background": null, "description_width": "", "font_size": null, "text_color": null}}, "2d0f8c6fbf704f7e94ff0eea28f6e76c": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HTMLModel", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HTMLModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": "HTMLView", "description": "", "description_allow_html": false, "layout": "IPY_MODEL_760fb009b328459f915b62a06d8576aa", "placeholder": "\u200b", "style": "IPY_MODEL_bcdee3fa7be74a52a354a0db085c4083", "tabbable": null, "tooltip": null, "value": "Putting\u2007images\u2007in\u2007memory:\u2007\u2007\u20070%"}}, "30db52de138e42859a46cfa2898c6bec": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HTMLModel", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HTMLModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": "HTMLView", "description": "", "description_allow_html": false, "layout": "IPY_MODEL_cf4a2bd5cbd4461380284fdd48c3e5fd", "placeholder": "\u200b", "style": "IPY_MODEL_2b40d3fd4f4e45ea9ac81721334303fa", "tabbable": null, "tooltip": null, "value": "Putting\u2007images\u2007in\u2007memory:\u2007\u2007\u20070%"}}, "3116c9416aad47f9babd16642482cf70": {"model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "model_name": "LayoutModel", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "3754b379b31b4ba78f80c219d8d07d85": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HTMLStyleModel", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HTMLStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "StyleView", "background": null, "description_width": "", "font_size": null, "text_color": null}}, "423b199c08c0416c98246b2b33f51a2f": {"model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "model_name": "LayoutModel", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": "hidden", "width": null}}, "68965587a9174d5e820eb62dd8e71361": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "ProgressStyleModel", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "ProgressStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "StyleView", "bar_color": null, "description_width": ""}}, "6fc62c0aadb64413a2a95f273001af17": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "FloatProgressModel", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "FloatProgressModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": "ProgressView", "bar_style": "", "description": "", "description_allow_html": false, "layout": "IPY_MODEL_c94f55d7dae64d4aad02bf0b2d02e046", "max": 6, "min": 0, "orientation": "horizontal", "style": "IPY_MODEL_d132c48f753a4cf6bd33877da23c85c4", "tabbable": null, "tooltip": null, "value": 6}}, "760fb009b328459f915b62a06d8576aa": {"model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "model_name": "LayoutModel", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "8c3f87361e9e49a284a99216b549bfc1": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HTMLModel", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HTMLModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": "HTMLView", "description": "", "description_allow_html": false, "layout": "IPY_MODEL_f5baca9b1de44df996f4336f891a939d", "placeholder": "\u200b", "style": "IPY_MODEL_e3ca858520234113b9cbf0ef9d5edc3c", "tabbable": null, "tooltip": null, "value": "Putting\u2007images\u2007in\u2007memory:\u2007\u2007\u20070%"}}, "a1bb391f529149d9ae2298a070ec0b13": {"model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "model_name": "LayoutModel", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": "hidden", "width": null}}, "bcdee3fa7be74a52a354a0db085c4083": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HTMLStyleModel", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HTMLStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "StyleView", "background": null, "description_width": "", "font_size": null, "text_color": null}}, "bd102886f3924e03a49958d0ef313320": {"model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "model_name": "LayoutModel", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "c2b572945f56491183903ce4b7253032": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "FloatProgressModel", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "FloatProgressModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": "ProgressView", "bar_style": "", "description": "", "description_allow_html": false, "layout": "IPY_MODEL_3116c9416aad47f9babd16642482cf70", "max": 6, "min": 0, "orientation": "horizontal", "style": "IPY_MODEL_1acd2427d56b46358c30fc475ef682b9", "tabbable": null, "tooltip": null, "value": 6}}, "c8ff6561d7574563b9ac5b762e1c9085": {"model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "model_name": "LayoutModel", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "c94f55d7dae64d4aad02bf0b2d02e046": {"model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "model_name": "LayoutModel", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "cee892f67a06423c98873df086ab9f7f": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HTMLStyleModel", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HTMLStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "StyleView", "background": null, "description_width": "", "font_size": null, "text_color": null}}, "cf4a2bd5cbd4461380284fdd48c3e5fd": {"model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "model_name": "LayoutModel", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "d132c48f753a4cf6bd33877da23c85c4": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "ProgressStyleModel", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "ProgressStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "StyleView", "bar_color": null, "description_width": ""}}, "d66d8248496241a0bcb36cbaa3cae0fc": {"model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "model_name": "LayoutModel", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "d69458525ece422583268c07e49954c2": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HBoxModel", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HBoxModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": "HBoxView", "box_style": "", "children": ["IPY_MODEL_8c3f87361e9e49a284a99216b549bfc1", "IPY_MODEL_6fc62c0aadb64413a2a95f273001af17", "IPY_MODEL_0de8c460898142b2b346cb26604e41cc"], "layout": "IPY_MODEL_076668252c544513982ff4b266209816", "tabbable": null, "tooltip": null}}, "dd5fee35639e4bb4b609101f3c525abd": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HBoxModel", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HBoxModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": "HBoxView", "box_style": "", "children": ["IPY_MODEL_2d0f8c6fbf704f7e94ff0eea28f6e76c", "IPY_MODEL_f2986ac181f24672a26c9ce4f27a7dfe", "IPY_MODEL_e2bc3ada88b948acbca49ed1fd1de094"], "layout": "IPY_MODEL_a1bb391f529149d9ae2298a070ec0b13", "tabbable": null, "tooltip": null}}, "e2bc3ada88b948acbca49ed1fd1de094": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HTMLModel", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HTMLModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": "HTMLView", "description": "", "description_allow_html": false, "layout": "IPY_MODEL_d66d8248496241a0bcb36cbaa3cae0fc", "placeholder": "\u200b", "style": "IPY_MODEL_f94a69d2ba6849b38e03c261c0fa6a5f", "tabbable": null, "tooltip": null, "value": "\u20070/6\u2007[00:00&lt;?,\u2007?it/s]"}}, "e3ca858520234113b9cbf0ef9d5edc3c": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HTMLStyleModel", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HTMLStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "StyleView", "background": null, "description_width": "", "font_size": null, "text_color": null}}, "f2986ac181f24672a26c9ce4f27a7dfe": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "FloatProgressModel", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "FloatProgressModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": "ProgressView", "bar_style": "", "description": "", "description_allow_html": false, "layout": "IPY_MODEL_c8ff6561d7574563b9ac5b762e1c9085", "max": 6, "min": 0, "orientation": "horizontal", "style": "IPY_MODEL_68965587a9174d5e820eb62dd8e71361", "tabbable": null, "tooltip": null, "value": 6}}, "f5baca9b1de44df996f4336f891a939d": {"model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "model_name": "LayoutModel", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "f94a69d2ba6849b38e03c261c0fa6a5f": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HTMLStyleModel", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HTMLStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "StyleView", "background": null, "description_width": "", "font_size": null, "text_color": null}}}, "version_major": 2, "version_minor": 0}
+</script></section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2025, Laurent U Perrinet
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer no-toc">
+      
+      
+      
+    </aside>
+  </div>
+</div><script src="_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/scripts/furo.js?v=46bd48cc"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    </body>
+</html>

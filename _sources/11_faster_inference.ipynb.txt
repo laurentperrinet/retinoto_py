@@ -1,0 +1,356 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "id": "9c0de904",
+   "metadata": {},
+   "source": [
+    "In this script, we analyze the impact of batch size on inference speed. The objective is to quantify the performance gain obtained by processing multiple images simultaneously rather than sequentially.\n",
+    "\n",
+    "We will specifically observe:\n",
+    "* The overall acceleration of the inference pipeline thanks to batching.\n",
+    "* The trade-off between model complexity (number of parameters) and the resulting accuracy."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "id": "efdb6e14-6ce3-481d-9afc-61b1cfee1168",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-12-05T08:57:23.532963Z",
+     "iopub.status.busy": "2025-12-05T08:57:23.532791Z",
+     "iopub.status.idle": "2025-12-05T08:57:25.332243Z",
+     "shell.execute_reply": "2025-12-05T08:57:25.331785Z"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "Params(batch_size=128, num_workers=0, prefetch_factor=0, image_size=224, grid_size_ecc=161, grid_size_ang=309, do_mask=False, do_fovea=False, use_hexagonal_grid=True, rs_min=-3.5, rs_max=0.7, angle_start=-5.235987755982989, angle_margin=0.010166966516471823, mode='bilinear', padding_mode='zeros', model_name='convnext_base', num_epochs=340, subset_factor=1, optimizer_name='adamw', loss_name='CrossEntropyLoss', base_lr=1e-06, final_lr=1e-09, num_warmup_epochs=20, delta1=0.3, delta2=0.002, weight_decay=0.0001, label_smoothing=0.0005, do_full_training=True, do_augment=True, augment_proba=0.85, stochastic_depth_prob=0.6, seed=1998, shuffle=True, verbose=False)"
+      ]
+     },
+     "execution_count": 1,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# Only import fovea as it provides all necessary utilities\n",
+    "import retinoto_py as fovea\n",
+    "subset_factor = 2\n",
+    "args = fovea.Params(do_fovea=True, subset_factor=subset_factor)\n",
+    "args"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "a95f4302",
+   "metadata": {},
+   "source": [
+    "# testing the ConvNet model on the validation dataset"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "id": "266f8a9c",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-12-05T08:57:25.333784Z",
+     "iopub.status.busy": "2025-12-05T08:57:25.333610Z",
+     "iopub.status.idle": "2025-12-05T08:57:25.335509Z",
+     "shell.execute_reply": "2025-12-05T08:57:25.335162Z"
+    }
+   },
+   "outputs": [],
+   "source": [
+    "VAL_DATA_DIR = args.DATAROOT / 'Imagenet_full' / 'val'"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "id": "06229308",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-12-05T08:57:25.336665Z",
+     "iopub.status.busy": "2025-12-05T08:57:25.336600Z",
+     "iopub.status.idle": "2025-12-05T08:57:26.042736Z",
+     "shell.execute_reply": "2025-12-05T08:57:26.042276Z"
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "🔢 Parameter Count:\n",
+      "  Total:     88,591,464\n",
+      "  Trainable: 88,591,464\n",
+      "--------------------------------------------------\n",
+      "🧱 Layer Count:\n",
+      "  Total Modules (nn.Module): 383\n",
+      "  Convolutional (nn.Conv2d): 40\n",
+      "  Linear (nn.Linear): 73\n",
+      "==================================================\n"
+     ]
+    }
+   ],
+   "source": [
+    "# Load model and benchmark its complexity (parameters and layers)\n",
+    "model = fovea.load_model(args)\n",
+    "model.eval()\n",
+    "# --- Parameter Counts ---\n",
+    "param_stats = fovea.count_parameters(model)\n",
+    "print(\"🔢 Parameter Count:\")\n",
+    "print(f\"  Total:     {param_stats['total_parameters']:,}\")\n",
+    "print(f\"  Trainable: {param_stats['trainable_parameters']:,}\")\n",
+    "print(\"-\" * 50)\n",
+    "\n",
+    "# --- Layer Counts ---\n",
+    "print(\"🧱 Layer Count:\")\n",
+    "total_layers = fovea.count_layers(model)\n",
+    "print(f\"  Total Modules (nn.Module): {total_layers}\")\n",
+    "\n",
+    "from torch import nn\n",
+    "conv_layers = fovea.count_layers(model, layer_type=nn.Conv2d)\n",
+    "linear_layers = fovea.count_layers(model, layer_type=nn.Linear)\n",
+    "print(f\"  Convolutional (nn.Conv2d): {conv_layers}\")\n",
+    "print(f\"  Linear (nn.Linear): {linear_layers}\")\n",
+    "print(\"=\" * 50)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "id": "27d0cef0",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-12-05T08:57:26.043856Z",
+     "iopub.status.busy": "2025-12-05T08:57:26.043762Z",
+     "iopub.status.idle": "2025-12-05T08:57:26.049345Z",
+     "shell.execute_reply": "2025-12-05T08:57:26.048932Z"
+    }
+   },
+   "outputs": [
+    {
+     "data": {
+      "application/vnd.jupyter.widget-view+json": {
+       "model_id": "f447d081fe4944959e49302bf6a78963",
+       "version_major": 2,
+       "version_minor": 0
+      },
+      "text/plain": [
+       "Evaluating convnext_base on dataset: full:   0%|          | 0/390 [00:00<?, ?it/s]"
+      ]
+     },
+     "metadata": {},
+     "output_type": "display_data"
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Evaluation complete.\n"
+     ]
+    }
+   ],
+   "source": [
+    "# 4. Calculate baseline accuracy on the full dataset to ensure model consistency\n",
+    "json_filename = args.data_cache / '11_model_accuracy.json'\n",
+    "\n",
+    "if json_filename.exists():\n",
+    "    results = fovea.pd.read_json(json_filename)\n",
+    "else:\n",
+    "    all_results_list = []\n",
+    "    for dataset in ['full']:# <HACK until bbox is finished> fovea.params.all_datasets:\n",
+    "        VAL_DATA_DIR = args.DATAROOT / f'Imagenet_{dataset}' / 'val'\n",
+    "        val_dataset = fovea.get_dataset(args, VAL_DATA_DIR)\n",
+    "        val_loader = fovea.get_loader(args, val_dataset)\n",
+    "        accuracy = fovea.get_validation_accuracy(args, model, val_loader, f\"Evaluating {args.model_name} on dataset: {dataset}\")\n",
+    "        all_results_list.append({'model_name':args.model_name, 'dataset':dataset, 'accuracy': accuracy})\n",
+    "\n",
+    "    results = fovea.pd.DataFrame(all_results_list)\n",
+    "    results['accuracy_str'] = results['accuracy'].apply(lambda x: f\"Accuracy: {x * 100:.1f}%\")\n",
+    "    results.to_json(json_filename, orient='records', indent=2)\n",
+    "\n",
+    "print(f\"Evaluation complete.\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "id": "fb0ad2ae",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-12-05T08:57:26.050391Z",
+     "iopub.status.busy": "2025-12-05T08:57:26.050309Z",
+     "iopub.status.idle": "2025-12-05T08:57:26.054261Z",
+     "shell.execute_reply": "2025-12-05T08:57:26.053902Z"
+    }
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>model_name</th>\n",
+       "      <th>dataset</th>\n",
+       "      <th>accuracy</th>\n",
+       "      <th>accuracy_str</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>convnext_base</td>\n",
+       "      <td>full</td>\n",
+       "      <td>0.745713</td>\n",
+       "      <td>Accuracy: 74.6%</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "      model_name dataset  accuracy     accuracy_str\n",
+       "0  convnext_base    full  0.745713  Accuracy: 74.6%"
+      ]
+     },
+     "execution_count": 5,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "results"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "id": "241445c9",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-12-05T08:57:26.055200Z",
+     "iopub.status.busy": "2025-12-05T08:57:26.055120Z",
+     "iopub.status.idle": "2025-12-05T08:57:26.057224Z",
+     "shell.execute_reply": "2025-12-05T08:57:26.056871Z"
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Accuracy for full: 74.571%\n"
+     ]
+    }
+   ],
+   "source": [
+    "for _, row in results.iterrows():\n",
+    "    accuracy_percent = row['accuracy'] * 100\n",
+    "    print(f\"Accuracy for {row['dataset']}: {accuracy_percent:.3f}%\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "id": "6f4f86c4",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-12-05T08:57:26.058122Z",
+     "iopub.status.busy": "2025-12-05T08:57:26.058056Z",
+     "iopub.status.idle": "2025-12-05T08:57:26.303832Z",
+     "shell.execute_reply": "2025-12-05T08:57:26.303223Z"
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[\n",
+      "  {\n",
+      "    \"model_name\":\"convnext_base\",\n",
+      "    \"dataset\":\"full\",\n",
+      "    \"accuracy\":0.745713141,\n",
+      "    \"accuracy_str\":\"Accuracy: 74.6%\"\n",
+      "  }\n",
+      "]"
+     ]
+    }
+   ],
+   "source": [
+    "%cat {json_filename}"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 8,
+   "id": "01cb5c38",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-12-05T08:57:26.306049Z",
+     "iopub.status.busy": "2025-12-05T08:57:26.305907Z",
+     "iopub.status.idle": "2025-12-05T08:57:26.310160Z",
+     "shell.execute_reply": "2025-12-05T08:57:26.309614Z"
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "dataset    accuracy_str\n",
+      "   full Accuracy: 74.6%\n"
+     ]
+    }
+   ],
+   "source": [
+    "print(results[['dataset', 'accuracy_str']].to_string(index=False))"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": ".venv",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.14.5"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
