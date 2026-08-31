@@ -3,13 +3,17 @@
 Welcome to retinoto_py's documentation!
 ========================================
 
-Retinotopy is an open-source Python package for applying spatial transformations based on visual field representations in the human brain. It allows researchers and engineers to analyze and interpret data using different transformation topologies, including log-polar mappings that simulate biological retina structures. The project provides tools for both theoretical modeling and practical application development in computational neuroscience and computer vision research.
+Retinoto`_py`` is an open-source Python package for applying spatial transformations based on visual field representations in the brain of different species including the human brain. It allows researchers and engineers to analyze and interpret data using different transformation topologies, including log-polar mappings that simulate biological retina structures. The project provides tools for both theoretical modeling and practical application development in computational neuroscience and computer vision research.
 
 .. toctree::
    :maxdepth: 2
    :caption: Getting Started
  
  
+   :doc:`00_installation`
+   :doc:`01_quickstart`
+   :doc:`02_basic-usage`
+   :doc:`03_advanced-usage`
  
  .. _tutorials-section:
 
@@ -35,7 +39,7 @@ The initial configuration covers installation steps and project setup. The noteb
 Training & Transfers
 ++++++++++++++++++++|
 
-The second section demonstrates how trained models can be transferred between architectures using retinoto_py's built-in transfer learning capabilities. These notebooks show progressive complexity from simple experiments to advanced multi-task learning - perfect for adapting our work on biological-inspired vision systems (such as those studied in [Perrinet 2013](https://doi.org/10.3389/fnins.2015.00430)) to your research questions:
+The second section demonstrates how trained models can be transferred between architectures using retinoto_py's built-in transfer learning capabilities. These notebooks show progressive complexity from simple experiments to advanced multi-task learning - perfect for adapting our work on biological-inspired vision systems (such as those studied in [Perrinet 2013](https://doi.org/1XXX-YYY)) to your research questions:
 
 * :doc:`20_transfer-learning-resnet101.ipynb`
 * :doc:`21_transfer-learning-convnext.ipynb`
